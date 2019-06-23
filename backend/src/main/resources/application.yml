@@ -1,0 +1,19 @@
+spring:
+  h2:
+    console:
+      path: /api/db
+      enabled: true
+  datasource:
+    url: jdbc:h2:file:./jms-ui;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  data:
+    rest:
+      base-path: /api
+      default-page-size: 10
+  quartz:
+    job-store-type: JDBC

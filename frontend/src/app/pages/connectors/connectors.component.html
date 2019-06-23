@@ -1,0 +1,63 @@
+
+<div class="jms-ui-actions">
+  <mat-form-field>
+    <mat-label>JMS Type</mat-label>
+    <mat-select required [(value)] = "selectedConnector">
+      <mat-option *ngFor="let con of supportedConnectors" [value]="con">
+        {{con.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button mat-raised-button (click)="addConnector(selectedConnector)" [disabled]="selectedConnector == null">
+    <mat-icon>add</mat-icon> Add JMS Connection
+  </button>
+</div>
+
+
+<mat-card class="mb-20" *ngIf="newConnector">
+  <div class="jms-ui-row">
+    <mat-form-field class="jms-ui-flex-item">
+      <input matInput placeholder="Connection name" [(ngModel)]="newConnectorData.name">
+    </mat-form-field>
+    <mat-form-field class="jms-ui-flex-item">
+        <input matInput placeholder="Timeout" type="number" [(ngModel)]="newConnectorData.timeout">
+    </mat-form-field>
+  </div>
+  <mat-divider></mat-divider>
+  <div class="jms-us-space"></div>
+  <span flex></span>
+  <app-config-field *ngFor="let cm of selectedConnector.configMeta" [meta-field]="cm" 
+    [(value)] = "newConnectorData.configValues[cm.property]">
+  </app-config-field>
+  <mat-card-actions>
+      <button mat-raised-button (click)="doSave()" color="primary"><mat-icon>save</mat-icon> Save</button>
+      <button mat-raised-button (click)="cancelAdd()"><mat-icon>clear</mat-icon> Cancel</button>
+  </mat-card-actions>
+</mat-card>
+
+<div class="mat-elevation-z8">
+  <div class="jms-ui-actions" *ngIf="dataSource.$loading | async" >
+      <mat-spinner [diameter]="30" style="float: left"></mat-spinner><label>Loading ...</label>
+  </div>
+  <table mat-table [dataSource]="dataSource">
+    <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+  
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+    </ng-container>
+  
+    <!-- Weight Column -->
+    <ng-container matColumnDef="timeout">
+      <th mat-header-cell *matHeaderCellDef> Timeout </th>
+      <td mat-cell *matCellDef="let element"> {{element.timeout}} </td>
+    </ng-container>
+  
+    <tr mat-header-row *matHeaderRowDef="['name', 'timeout']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['name', 'timeout'];"></tr>
+  </table>
+
+  <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+</div>
