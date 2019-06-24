@@ -1,0 +1,16 @@
+<div class="jms-ui-row">
+  <mat-form-field class="jms-ui-flex-item">
+    <input matInput placeholder="Connection name" [(ngModel)]="connectorData.name">
+  </mat-form-field>
+  <mat-form-field class="jms-ui-flex-item">
+      <input matInput placeholder="Timeout" type="number" [(ngModel)]="connectorData.timeout">
+  </mat-form-field>
+</div>
+
+<mat-divider></mat-divider>
+<div class="jms-us-space"></div>
+<span flex></span>
+
+<app-config-field *ngFor="let cm of connectorMetaData.configMeta" [meta-field]="cm" 
+                  [(value)] = "connectorData.configValues[cm.property]">
+</app-config-field>

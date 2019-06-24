@@ -1,6 +1,6 @@
 import { LayoutModule } from '@angular/cdk/layout';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { MaterialModule}  from './material-module';
+import { MaterialModule} from './material-module';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +15,7 @@ import { UsersComponent } from './pages/users/users.component';
 import { ConnectorsComponent } from './pages/connectors/connectors.component';
 import { ConfigFieldComponent } from './components/connectors/config-field/config-field.component';
 import { JsonPipe } from './common/pipe/json.pipe';
+import { ConnectorViewComponent } from './components/connectors/connector-view/connector-view.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { JsonPipe } from './common/pipe/json.pipe';
     UsersComponent,
     ConnectorsComponent,
     ConfigFieldComponent,
-    JsonPipe
+    JsonPipe,
+    ConnectorViewComponent
   ],
   imports: [
     BrowserModule,

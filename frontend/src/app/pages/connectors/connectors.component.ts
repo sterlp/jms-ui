@@ -24,23 +24,21 @@ export class ConnectorsComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.dataSource = new ConnertorDataSource(this.$connector);
-    this.dataSource.loadConnectorData();
     this.$connector.getSupported().subscribe(result => {
       this.supportedConnectors = result;
       this.selectedConnector = ArrayUtils.first(this.supportedConnectors);
     });
+    this.dataSource.loadConnectorData();
   }
   ngAfterViewInit(): void {
     this.dataSource.$page.subscribe(p => {
       this.paginator.length = p.totalElements;
     });
-    this.paginator.page
-            .subscribe((p) => {
-                this.dataSource.loadConnectorData(p.pageIndex, p.pageSize);
-              }
-            );
+    this.paginator.page.subscribe(() => this.doLoad());
   }
-
+  doLoad() {
+    this.dataSource.loadConnectorData(this.paginator.pageIndex, this.paginator.pageSize);
+  }
   addConnector(type: SupportedConnector) {
     this.newConnector = type;
     this.newConnectorData = new ConnectorData();
@@ -54,6 +52,7 @@ export class ConnectorsComponent implements OnInit, AfterViewInit {
     this.$connector.save(this.newConnectorData).subscribe(result => {
       this.newConnectorData = result;
       this.newConnector = null;
+      this.doLoad();
     });
   }
 }
