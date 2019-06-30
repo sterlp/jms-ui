@@ -1,12 +1,15 @@
 package org.sterl.jmsui.bl.connectors.ibm;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.jms.JMSContext;
 import javax.jms.JMSException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.connectors.ibm.converter.IbmConverter.ToJmsResourceType;
@@ -24,7 +27,8 @@ import com.ibm.mq.headers.pcf.PCFMessageAgent;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-public class IbmMqConnector {
+public class IbmMqConnector implements Closeable {
+    private static final Logger LOG = LoggerFactory.getLogger(IbmMqConnector.class);
     
     private final String queueManagerName;
     @Getter
@@ -36,10 +40,12 @@ public class IbmMqConnector {
     private MQQueueManager ibmMqManager;
     private PCFMessageAgent agent;
     
+    /**
+     * Connects and disconnects again.
+     */
     public void testConnection() throws JMSException {
         jmsTemplate.getConnectionFactory().createConnection().close();
     }
-
 
     public IbmMqConnector(String queueManagerName, JmsTemplate jmsTemplate, Hashtable<String, Object> config) {
         this.queueManagerName = queueManagerName;
@@ -90,5 +96,29 @@ public class IbmMqConnector {
             return new IllegalArgumentException("User has no permissions to list queues.", e);
         }
         return new RuntimeException(message, e);
+    }
+
+    @Override
+    public void close() {
+        synchronized (LOCK) {
+            if (agent != null) {
+                try {
+                    agent.disconnect();
+                } catch (MQDataException e) {
+                    LOG.info("Error during closing PCFMessageAgent. {}", e.getMessage());
+                } finally {
+                    agent = null;
+                }
+            }
+            if (ibmMqManager != null) {
+                try {
+                    ibmMqManager.close();
+                } catch (MQException e) {
+                    LOG.info("Error during closing MQQueueManager. {}", e.getMessage());
+                } finally {
+                    ibmMqManager = null;
+                }
+            }
+        }
     }
 }

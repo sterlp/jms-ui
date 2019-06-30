@@ -8,14 +8,24 @@
     z-index: 999;
     -ms-overflow-y: auto;
     overflow-y: auto;
+
+    .mat-expansion-panel-header {
+        padding: 0 16px;
+    }
+    .mat-expansion-panel,
     .mat-nav-list {
         width: 100%;
-        a {
-            .mat-icon {
-                margin-right: 15px;
-            }
-            display: block;
+
+        .ng-fa-icon,
+        .mat-icon {
+            margin-right: 15px;
         }
+        button {
+            width: 100%;
+            text-align: left;
+        }
+        display: block;
+
     }
 }
 .nested-menu {

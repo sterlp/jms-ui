@@ -11,10 +11,14 @@ import org.sterl.jmsui.bl.connection.model.JmsConnection;
 public class JmsConnectionBM {
     @Autowired JmsConnectionDao connectionDao;
 
-    public JmsConnection get(Long id) {
-        return connectionDao.getOne(id);
+    public JmsConnection getWithConfig(Long id) {
+        JmsConnection result = connectionDao.getOne(id);
+        if (result != null) result.getConfigValues().size(); // fetch them
+        return result;
     }
     public JmsConnection save(JmsConnection connection) {
-        return connectionDao.save(connection);
+        JmsConnection result = connectionDao.save(connection);
+        connectionDao.flush();
+        return result;
     }
 }

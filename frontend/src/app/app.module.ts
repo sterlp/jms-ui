@@ -16,7 +16,11 @@ import { ConnectorsComponent } from './pages/connectors/connectors.component';
 import { ConfigFieldComponent } from './components/connectors/config-field/config-field.component';
 import { JsonPipe } from './common/pipe/json.pipe';
 import { ConnectorViewComponent } from './components/connectors/connector-view/connector-view.component';
-
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { SessionPageComponent } from './pages/session/session-page/session-page.component';
+import { LoadingComponent } from './common/loading/loading.component';
 
 @NgModule({
   declarations: [
@@ -28,10 +32,13 @@ import { ConnectorViewComponent } from './components/connectors/connector-view/c
     ConnectorsComponent,
     ConfigFieldComponent,
     JsonPipe,
-    ConnectorViewComponent
+    ConnectorViewComponent,
+    SessionPageComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,
+    FontAwesomeModule,
     FormsModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -43,4 +50,8 @@ import { ConnectorViewComponent } from './components/connectors/connector-view/c
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule { 
+  constructor() {
+    library.add(fas);
+  }
+}

@@ -7,6 +7,24 @@ import org.sterl.jmsui.bl.connection.api.model.JmsConnectionDetails;
 import org.sterl.jmsui.bl.connection.model.JmsConnection;
 
 class ConnectionConverter {
+    enum ToJmsConnectionDetails  implements Converter<JmsConnection, JmsConnectionDetails> {
+        INSTANCE;
+
+        @Override
+        public JmsConnectionDetails convert(JmsConnection source) {
+            if (source == null) return null;
+            final JmsConnectionDetails result = new JmsConnectionDetails();
+            result.setClientName(source.getClientName());
+            result.setId(source.getId());
+            result.setName(source.getName());
+            result.setTimeout(source.getTimeout());
+            result.setType(source.getType());
+            result.setVersion(source.getVersion());
+            source.getConfigValues().forEach(cv -> result.addConfig(cv.getName(), cv.getValue()));
+            return result;
+        }
+        
+    }
     enum ToJmsConnection implements Converter<JmsConnectionDetails, JmsConnection> {
         INSTANCE;
 

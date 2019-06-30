@@ -21,7 +21,7 @@ export class ConfigMetaData {
 }
 
 export class ConnectorData {
-    id?: string;
+    id?: number;
     type: string;
     version?: number;
     name: string;

@@ -7,6 +7,7 @@ import { ArrayUtils } from 'src/app/common/utils';
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject } from 'rxjs';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
+import { LoadingService } from 'src/app/common/loading/loading.service';
 
 
 @Injectable({
@@ -21,8 +22,13 @@ export class ConnectorService {
   }
 
   save(data: ConnectorData): Observable<ConnectorData> {
-    return this.http.post<ConnectorData>('api/jms/connections', data)
+    return this.http.post<ConnectorData>('api/jms/connections', data);
   }
+
+  getConnectorWithConfig(id: number): Observable<ConnectorData> {
+    return this.http.get<ConnectorData>('api/jms/connections/' + id);
+  }
+
   /**
    * Returns a Hateos Resource containing 
    * <li> _embedded.jmsConnections
@@ -37,14 +43,13 @@ export class ConnectorService {
 }
 
 export class ConnertorDataSource implements DataSource<ConnectorData> {
-  constructor(private $connector: ConnectorService) {}
+  constructor(private $connector: ConnectorService, private $loading: LoadingService) {}
 
   private connectorDataSubject = new BehaviorSubject<ConnectorData[]>([]);
   private pageSubject = new BehaviorSubject<Page>(new Page());
-  private loadingSubject = new BehaviorSubject<boolean>(false);
 
-  public $loading = this.loadingSubject.asObservable();
-  public $page = this.pageSubject.asObservable();
+  public loading$ = this.$loading.loading$;
+  public page$ = this.pageSubject.asObservable();
 
   connect(collectionViewer: CollectionViewer): Observable<ConnectorData[] | readonly ConnectorData[]> {
     return this.connectorDataSubject.asObservable();
@@ -53,14 +58,13 @@ export class ConnertorDataSource implements DataSource<ConnectorData> {
   disconnect(collectionViewer: CollectionViewer): void {
     this.connectorDataSubject.complete();
     this.pageSubject.complete();
-    this.loadingSubject.complete();
   }
 
   loadConnectorData(page: number = 0, size: number = 10): void {
     console.info('loadConnectorData ...');
-    this.loadingSubject.next(true);
+    this.$loading.isLoading();
     this.$connector.listConnections(page, size)
-      .pipe(finalize(() => this.loadingSubject.next(false)))
+      .pipe(finalize(() => this.$loading.finishedLoading()))
       .subscribe(data => {
         this.pageSubject.next(data.page);
         this.connectorDataSubject.next(data._embedded ? data._embedded.jmsConnections : []);

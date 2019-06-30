@@ -13,6 +13,9 @@
 - `npm install --save @angular/material @angular/cdk @angular/animations @angular/http`
 - `npm i -s @angular/flex-layout @angular/cdk`
 - `npm install --save hammerjs`  --> requires `import 'hammerjs'` in the `main.ts`;
+- https://www.npmjs.com/package/@fortawesome/angular-fontawesome
+- npm install --save @fortawesome/fontawesome-svg-core
+- npm install --save @fortawesome/free-solid-svg-icons @fortawesome/angular-fontawesome
 
 # usefull
 

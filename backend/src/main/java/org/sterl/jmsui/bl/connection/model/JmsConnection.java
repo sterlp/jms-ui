@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -24,10 +23,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(of = "id")
+@ToString(of = {"id", "name", "clientName", "type", "version"})
 @Entity
 @Table(name =  "JMS_CONNECTON", indexes = @Index(name = "IDX_JMS_CONNECTION_TYPE", columnList = "type"))
 public class JmsConnection {

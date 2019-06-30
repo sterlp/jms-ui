@@ -20,4 +20,9 @@ public class JmsConnectionDetails {
     private String clientName = "JMS UI";
     private Long timeout;
     private Map<String, String> configValues = new LinkedHashMap<>();
+    
+    public JmsConnectionDetails addConfig(String key, String value) {
+        configValues.put(key, value);
+        return this;
+    }
 }
