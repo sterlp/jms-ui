@@ -1,7 +1,7 @@
 <!-- <app-nav></app-nav> -->
 <app-topnav></app-topnav>
 <app-sidebar></app-sidebar>
-<app-loading></app-loading>
+<mat-progress-bar *ngIf="loading$ | async" style="z-index: 9999" mode="indeterminate" [color]="'accent'"></mat-progress-bar>
 <div class="main-container">
     <router-outlet></router-outlet>
 </div>

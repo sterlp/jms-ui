@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { MatPaginator, MatSort, MatTableDataSource } from '@angular/material';
+import { Observable, of } from 'rxjs';
+import { MatPaginator, MatSort, MatTableDataSource, MatDialog } from '@angular/material';
 import { SupportedConnector, ConnectorData } from 'src/app/api/connector';
 import { ArrayUtils } from 'src/app/common/utils';
 import { ConnectorService, ConnertorDataSource } from 'src/app/components/connectors/connector.service';
@@ -8,6 +8,7 @@ import { catchError, map, tap, finalize } from 'rxjs/operators';
 import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
 import { Router } from '@angular/router';
 import { LoadingService } from 'src/app/common/loading/loading.service';
+import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 
 @Component({
   selector: 'app-connectors',
@@ -24,7 +25,7 @@ export class ConnectorsComponent implements OnInit, AfterViewInit {
   dataSource: ConnertorDataSource;
 
   constructor(private $connector: ConnectorService, private $loading: LoadingService,
-              private $session: JmsSessionService, private $router: Router) { }
+              private $session: JmsSessionService, private $router: Router, private dialog: MatDialog) { }
 
   ngOnInit() {
     this.dataSource = new ConnertorDataSource(this.$connector, this.$loading);
@@ -49,8 +50,23 @@ export class ConnectorsComponent implements OnInit, AfterViewInit {
       this.newConnectorData = c;
     });
   }
+  doCopy(data: ConnectorData) {
+    this.$connector.getConnectorWithConfig(data.id).subscribe(c => {
+      this.newConnector = this.supportedConnectors.find(e => e.id === data.type);
+      c.id = null;
+      c.name = 'Copy of ' + c.name;
+      this.newConnectorData = c;
+    });
+  }
   doConnect(conData: ConnectorData) {
-    this.$session.openSession(conData).subscribe(() => this.$router.navigate(['/sessions', conData.id]));
+    this.$session.openSession(conData).subscribe(
+      openSessions => {
+        // only if we session was created
+        if (openSessions.find( s => s.id === conData.id)) {
+          this.$router.navigate(['/sessions', conData.id]);
+        }
+      },
+    );
   }
   addConnector(type: SupportedConnector) {
     this.newConnector = type;
@@ -68,4 +84,14 @@ export class ConnectorsComponent implements OnInit, AfterViewInit {
       this.doLoad();
     });
   }
+
+  private showError(operation = '', error: any) {
+    console.error(`${operation} failed: ${error.message}`, error); // log to console instead
+    this.dialog.open(ErrorDialogComponent, {
+      width: '250px',
+      data: {error, operation}
+    });
+  }
+
+  
 }

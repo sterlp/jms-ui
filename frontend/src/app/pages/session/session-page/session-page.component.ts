@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { switchMap, filter, withLatestFrom, map } from 'rxjs/operators';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
@@ -13,9 +13,10 @@ import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
   templateUrl: './session-page.component.html',
   styleUrls: ['./session-page.component.scss']
 })
-export class SessionPageComponent implements OnInit {
+export class SessionPageComponent implements OnInit, AfterViewInit {
+
   conData: ConnectorData;
-  dataSource: MatTableDataSource<JmsResource> = new MatTableDataSource([]);
+  dataSource = new MatTableDataSource<JmsResource>([]);
 
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: false}) sort: MatSort;
@@ -27,17 +28,16 @@ export class SessionPageComponent implements OnInit {
     private connectorService: ConnectorService) { }
 
   ngOnInit() {
-    this.sessionService.sessions$.subscribe(sessions => {
-      const id = parseInt(this.route.snapshot.paramMap.get('id'));
-      this.conData = sessions.find(d => d.id == id);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+  ngAfterViewInit(): void {
+    this.route.params.subscribe(params => {
+      const id = parseInt(params.id);
+      this.conData = this.sessionService.sessions$.value.find(d => d.id == id);
       if (this.conData) {
         if (this.dataSource.data.length === 0) {
           this.loadQueues();
-        } else {
-          this.connectorService.getConnectorWithConfig(id).subscribe(v => {
-            this.sessionService.openSession(v);
-            this.loadQueues();
-          });
         }
       } else {
         this.router.navigate(['/connectors']);
@@ -57,9 +57,9 @@ export class SessionPageComponent implements OnInit {
   loadQueues() {
     this.sessionService.getQueues(this.conData.id).subscribe(queues => {
       this.dataSource = new MatTableDataSource(queues);
-      this.paginator.length = queues.length;
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
+      if (this.paginator) this.paginator.length = queues.length;
     });
   }
 }

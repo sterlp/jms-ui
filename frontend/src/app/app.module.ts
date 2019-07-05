@@ -21,6 +21,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { SessionPageComponent } from './pages/session/session-page/session-page.component';
 import { LoadingComponent } from './common/loading/loading.component';
+import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
+import { JmsMessagePageComponent } from './pages/session/jms-message-page/jms-message-page.component';
 
 @NgModule({
   declarations: [
@@ -34,7 +36,9 @@ import { LoadingComponent } from './common/loading/loading.component';
     JsonPipe,
     ConnectorViewComponent,
     SessionPageComponent,
-    LoadingComponent
+    LoadingComponent,
+    ErrorDialogComponent,
+    JmsMessagePageComponent
   ],
   imports: [
     BrowserModule,
@@ -48,9 +52,12 @@ import { LoadingComponent } from './common/loading/loading.component';
     MaterialModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ErrorDialogComponent
+  ]
 })
-export class AppModule { 
+export class AppModule {
   constructor() {
     library.add(fas);
   }

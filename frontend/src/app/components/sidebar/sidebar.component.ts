@@ -10,6 +10,8 @@ import { ConnectorData } from 'src/app/api/connector';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit, OnDestroy {
+  public showMenu: string;
+
   subs = new Subscriptions();
   sessions: ConnectorData[] = [];
   constructor(private jmsSession: JmsSessionService) { }
@@ -20,5 +22,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.subs.ngOnDestroy();
+  }
+
+  addExpandClass(element: any) {
+    if (element === this.showMenu) {
+        this.showMenu = '0';
+    } else {
+        this.showMenu = element;
+    }
   }
 }

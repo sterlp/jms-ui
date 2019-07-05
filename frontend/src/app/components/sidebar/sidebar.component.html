@@ -6,14 +6,14 @@
       </a>
       -->
       <a mat-list-item [routerLinkActive]="'active'" [routerLink]="['/connectors']">
-        <fa-icon icon="plug"></fa-icon> Connectors
+        <fa-icon icon="plug"></fa-icon> <span class="middle">JMS Connectors</span>
       </a>
   </mat-nav-list>
 
   <mat-accordion>
     <mat-expansion-panel expanded="true">
       <mat-expansion-panel-header>
-        <mat-panel-title><fa-icon icon="plug"></fa-icon> Connectors</mat-panel-title>
+        <mat-panel-title><fa-icon icon="plug"></fa-icon> JMS Connectors</mat-panel-title>
       </mat-expansion-panel-header>
   
       <mat-nav-list>
@@ -30,9 +30,6 @@
         <mat-panel-title>
           Self aware panel
         </mat-panel-title>
-        <mat-panel-description>
-          Currently I am {{panelOpenState ? 'open' : 'closed'}}
-        </mat-panel-description>
       </mat-expansion-panel-header>
       <p>I'm visible because I am open</p>
     </mat-expansion-panel>

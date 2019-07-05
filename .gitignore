@@ -1,6 +1,8 @@
 HELP.md
 /target/
 !.mvn/wrapper/maven-wrapper.jar
+.mvn/
+target/
 
 ### STS ###
 .apt_generated
@@ -28,3 +30,4 @@ HELP.md
 ### VS Code ###
 .vscode/
 frontend/.editorconfig
+backend/jms-ui.mv.db

@@ -6,13 +6,7 @@ body {
     background: #fafafa;
     min-width: 260px;
 }
-// adjust fontawesome size to material size 
-.ng-fa-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
-    text-align: center;
-}
+
 .main-container {
     position: absolute;
     top: 64px;
@@ -66,7 +60,11 @@ body {
     flex: 1 1 auto;
 }
 
-.jms-ui-table-action button {
-    float: right;
-    margin-left: 8px;
+.jms-ui-table-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    button {
+        margin-left: 8px;    
+    }
 }

@@ -1,7 +1,6 @@
 package org.sterl.jmsui.bl.connectors.ibm;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -11,6 +10,7 @@ import javax.jms.JMSException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.sterl.jmsui.api.exception.JmsAuthorizationException;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.connectors.ibm.converter.IbmConverter.ToJmsResourceType;
 import org.sterl.jmsui.bl.connectors.ibm.model.QTypes;
@@ -23,6 +23,7 @@ import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.headers.MQDataException;
 import com.ibm.mq.headers.pcf.PCFMessage;
 import com.ibm.mq.headers.pcf.PCFMessageAgent;
+import com.ibm.msg.client.jms.DetailedJMSSecurityException;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,7 +45,16 @@ public class IbmMqConnector implements Closeable {
      * Connects and disconnects again.
      */
     public void testConnection() throws JMSException {
-        jmsTemplate.getConnectionFactory().createConnection().close();
+        try {
+            jmsTemplate.getConnectionFactory().createConnection().close();
+        } catch (JMSException e) {
+            if (e instanceof DetailedJMSSecurityException) {
+                throw new JmsAuthorizationException(e.getMessage(), e);
+            } else if (e.getCause() instanceof DetailedJMSSecurityException) {
+                throw new JmsAuthorizationException(e.getMessage(), e);
+            }
+            throw e;
+        }
     }
 
     public IbmMqConnector(String queueManagerName, JmsTemplate jmsTemplate, Hashtable<String, Object> config) {
@@ -68,7 +78,8 @@ public class IbmMqConnector implements Closeable {
                 
                 for (int i = 0; i < names.length; i++) {
                     QTypes type = QTypes.from(types[i]);
-                    result.add(new JmsResource(names[i], ToJmsResourceType.INSTANCE.convert(type), type.name()));
+                    result.add(new JmsResource(
+                            trim(names[i]), ToJmsResourceType.INSTANCE.convert(type), type.name()));
                 }
             }
             return result;
@@ -120,5 +131,10 @@ public class IbmMqConnector implements Closeable {
                 }
             }
         }
+    }
+    
+    private static String trim(String value) {
+        if (value == null) return value;
+        else return value.trim();
     }
 }

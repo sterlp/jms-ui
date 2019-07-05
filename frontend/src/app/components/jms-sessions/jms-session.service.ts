@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { SupportedConnector, ConnectorData, ConnectorDataResource } from 'src/app/api/connector';
 import { JmsResource } from 'src/app/api/jms-session';
 import { ArrayUtils } from 'src/app/common/utils';
@@ -8,6 +8,8 @@ import { LoadingService } from 'src/app/common/loading/loading.service';
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
+import { MatDialog } from '@angular/material';
+import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 
 
 @Injectable({
@@ -18,19 +20,24 @@ export class JmsSessionService {
   public sessions$ = new BehaviorSubject<ConnectorData[]>([]);
   public loading$: Observable<boolean>;
 
-  constructor(private http: HttpClient, private $loading: LoadingService) {
+  constructor(private http: HttpClient, private $loading: LoadingService, private dialog: MatDialog) {
     this.loading$ = $loading.loading$;
   }
 
   openSession(session: ConnectorData): Observable<ConnectorData[]> {
     this.$loading.isLoading();
     this.http.post<number>('api/jms/sessions/' + session.id, null)
-      .pipe(finalize(() => this.$loading.finishedLoading()))
+      .pipe(
+        finalize(() => this.$loading.finishedLoading()),
+        catchError(this.handleError<number>('Load JMS Session ' + session.name, null))
+      )
       .subscribe(r => {
-        const current = this.sessions$.getValue();
-        if (current.filter(s => s.id === session.id).length === 0) {
-          current.push(session);
-          this.sessions$.next(current);
+        if (r) {
+          const current = this.sessions$.getValue();
+          if (current.filter(s => s.id === session.id).length === 0) {
+            current.push(session);
+            this.sessions$.next(current);
+          }
         }
       });
     return this.sessions$;
@@ -40,5 +47,17 @@ export class JmsSessionService {
     this.$loading.isLoading();
     return this.http.get<JmsResource[]>('api/jms/sessions/' + connectorId + '/queues')
                .pipe(finalize(() => this.$loading.finishedLoading()));
+  }
+
+  private handleError<T>(operation = 'operation', result?: T) {
+    return (error: any): Observable<T> => {
+      console.error(`${operation} failed: ${error.message}`, error); // log to console instead
+      this.dialog.open(ErrorDialogComponent, {
+        width: '80%',
+        data: {error, operation}
+      });
+      // Let the app keep running by returning an empty result.
+      return of(result as T);
+    };
   }
 }
