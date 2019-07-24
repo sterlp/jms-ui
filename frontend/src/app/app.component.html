@@ -2,6 +2,6 @@
 <app-topnav></app-topnav>
 <app-sidebar></app-sidebar>
 <mat-progress-bar *ngIf="loading$ | async" style="z-index: 9999" mode="indeterminate" [color]="'accent'"></mat-progress-bar>
-<div class="main-container">
+<div class="main-container container-fluid">
     <router-outlet></router-outlet>
 </div>

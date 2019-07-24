@@ -29,8 +29,12 @@ public class JmsSessionBM {
         return sessionBA.openSessions();
     }
     public void sendMessage(long connectorId, String destination, Object message, JmsHeaderRequestValues header) {
-        final IbmMqConnector connector = getOrConnect(connectorId);
-        connector.getJmsTemplate().convertAndSend(destination, message, new MessagePostProcessor() {
+        final JmsTemplate template = getOrConnect(connectorId).getJmsTemplate();
+        
+        if (header.getJMSPriority() != null) template.setPriority(header.getJMSPriority());
+        else template.setPriority(4);
+        
+        template.convertAndSend(destination, message, new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws JMSException {
                 setMeassageHeader(header, message);

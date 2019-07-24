@@ -44,14 +44,14 @@ public class JmsSessionBF {
     }
     
     @PostMapping("/{connectorId}/message/{destination}")
-    public void sendMessage(@PathVariable long connectorId, @PathVariable String desintation, @RequestBody @Valid SendJmsMessageCommand message) {
-        jmsSessionBM.sendMessage(connectorId, desintation, message.getMessage(), message.getHeader());
+    public void sendMessage(@PathVariable long connectorId, @PathVariable String destination, @RequestBody @Valid SendJmsMessageCommand message) {
+        jmsSessionBM.sendMessage(connectorId, destination, message.getBody(), message.getHeader());
     }
     
     @GetMapping("/{connectorId}/message/{destination}")
-    public JmsResultMessage sendMessage(@PathVariable long connectorId, @PathVariable String desintation, 
+    public JmsResultMessage sendMessage(@PathVariable long connectorId, @PathVariable String destination, 
             @RequestParam(required = false) Long timeout) throws JMSException {
-        Message msg = jmsSessionBM.receive(connectorId, desintation, timeout);
+        Message msg = jmsSessionBM.receive(connectorId, destination, timeout);
         return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
     }
     

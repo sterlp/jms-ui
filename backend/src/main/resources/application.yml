@@ -1,4 +1,7 @@
 spring:
+  jackson:
+    mapper:
+      use-std-bean-naming: true
   h2:
     console:
       path: /api/db

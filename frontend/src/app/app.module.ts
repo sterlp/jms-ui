@@ -23,7 +23,17 @@ import { SessionPageComponent } from './pages/session/session-page/session-page.
 import { LoadingComponent } from './common/loading/loading.component';
 import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
 import { JmsMessagePageComponent } from './pages/session/jms-message-page/jms-message-page.component';
+import { AceModule, AceConfigInterface, ACE_CONFIG } from 'ngx-ace-wrapper';
+import { AceEditorComponent } from './components/ace-editor/ace-editor.component';
+import { JmsHeadersComponent } from './components/jms/jms-headers/jms-headers.component';
+import { JmsMessageComponent } from './components/jms/jms-message/jms-message.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
 
+const DEFAULT_ACE_CONFIG: AceConfigInterface = {
+  tabSize: 2,
+  fontSize: 16,
+  showPrintMargin: false
+};
 @NgModule({
   declarations: [
     AppComponent,
@@ -38,7 +48,10 @@ import { JmsMessagePageComponent } from './pages/session/jms-message-page/jms-me
     SessionPageComponent,
     LoadingComponent,
     ErrorDialogComponent,
-    JmsMessagePageComponent
+    JmsMessagePageComponent,
+    AceEditorComponent,
+    JmsHeadersComponent,
+    JmsMessageComponent
   ],
   imports: [
     BrowserModule,
@@ -50,8 +63,15 @@ import { JmsMessagePageComponent } from './pages/session/jms-message-page/jms-me
     OverlayModule,
     HttpClientModule,
     MaterialModule,
+    AceModule,
+    FlexLayoutModule.withConfig({
+      addFlexToParent: false
+    }),
   ],
-  providers: [],
+  providers: [{
+    provide: ACE_CONFIG,
+    useValue: DEFAULT_ACE_CONFIG
+  }],
   bootstrap: [AppComponent],
   entryComponents: [
     ErrorDialogComponent

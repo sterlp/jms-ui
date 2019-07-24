@@ -28,6 +28,8 @@
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "hammerjs": "^2.0.8",
     "material-icons": "^0.3.1",
+    "ngx-ace-wrapper": "^8.0.0",
+    "pretty-data": "^0.40.0",
     "rxjs": "^6.4.0",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"

@@ -24,6 +24,7 @@
 - https://css-tricks.com/snippets/css/a-guide-to-flexbox/
 - https://medium.com/sketch-app-sources/css-grid-einf%C3%BChrung-in-5-minuten-verstehen-und-in-sketch-umsetzen-9e9e8a16b07e
 - https://blog.angular-university.io/angular-material-data-table/
+- https://github.com/zefoy/ngx-ace-wrapper
 
 # Based on
 

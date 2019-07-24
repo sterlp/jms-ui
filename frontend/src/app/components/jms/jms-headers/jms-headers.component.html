@@ -1,0 +1,17 @@
+<div class="jms-ui-row" *ngFor="let h of headers; index as i">
+  <mat-form-field>
+    <input matInput placeholder="Header Key" name="jms-header-key" [matAutocomplete]="auto" [(ngModel)] = "h.key" (ngModelChange)="dataChange()">
+    <mat-autocomplete #auto="matAutocomplete">
+      <mat-option *ngFor="let option of jmsOptions" [value]="option">
+        {{option}}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput placeholder="Header Value" name="jms-header-value" [(ngModel)] = "h.value" (ngModelChange)="dataChange()">
+  </mat-form-field>
+  <div class="col-3 jms-ui-table-actions">
+    <button mat-raised-button (click)="addHeader()"><mat-icon>add</mat-icon></button>
+    <button mat-raised-button (click)="removeHeader(h)" color="warn"><mat-icon>remove</mat-icon></button>
+  </div>
+</div>

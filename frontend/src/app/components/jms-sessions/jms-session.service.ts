@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { SupportedConnector, ConnectorData, ConnectorDataResource } from 'src/app/api/connector';
-import { JmsResource } from 'src/app/api/jms-session';
+import { JmsResource, SendJmsMessageCommand, JmsResultMessage } from 'src/app/api/jms-session';
 import { ArrayUtils } from 'src/app/common/utils';
 import { LoadingService } from 'src/app/common/loading/loading.service';
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
@@ -41,6 +41,23 @@ export class JmsSessionService {
         }
       });
     return this.sessions$;
+  }
+
+  sendJmsMessage(connectorId: number, target: string, body: SendJmsMessageCommand): Observable<void> {
+    this.$loading.isLoading();
+    return this.http.post<void>(`api/jms/sessions/${connectorId}/message/${target}`, body)
+                    .pipe(
+                      finalize(() => this.$loading.finishedLoading()),
+                      catchError(this.handleError<void>('Send JMS Message to ' + target, null))
+                    );
+  }
+
+  receiveJmsMessage(connectorId: number, target: string): Observable<JmsResultMessage> {
+    this.$loading.isLoading();
+    return this.http.get<JmsResultMessage>(`api/jms/sessions/${connectorId}/message/${target}`).pipe(
+        finalize(() => this.$loading.finishedLoading()),
+        catchError(this.handleError<JmsResultMessage>('Send JMS Message to ' + target, null))
+      );
   }
 
   getQueues(connectorId: number): Observable<JmsResource[]> {

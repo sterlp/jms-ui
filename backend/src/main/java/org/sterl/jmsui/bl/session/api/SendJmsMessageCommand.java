@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 public class SendJmsMessageCommand {
     @NotNull
-    private String message;
+    private String body;
     private JmsHeaderRequestValues header;
 }

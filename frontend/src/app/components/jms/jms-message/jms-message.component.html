@@ -1,0 +1,7 @@
+<div class="jms-ui-row">
+    <div class="col-6 jms-ui-row" *ngFor="let v of getHeaders() | keyvalue">
+        <div>{{ v.key }}</div>
+        <div class="left">{{ v.value }}</div>
+    </div>
+</div>
+<app-ace-editor [(value)] = "jmsMessage.body" [key] = "key"></app-ace-editor>

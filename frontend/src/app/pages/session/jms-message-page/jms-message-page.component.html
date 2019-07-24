@@ -1,16 +1,52 @@
-<h2>{{ target }}</h2>
-<div class="jms-ui-row">
-  <mat-form-field class="example-full-width">
-    <input matInput placeholder="Favorite food" value="Sushi">
-  </mat-form-field>
-  <mat-form-field class="example-full-width">
-    <input matInput placeholder="Favorite food" value="Sushi">
-  </mat-form-field>
-  <button mat-raised-button style="width: 40px;"><mat-icon>add</mat-icon></button>
-</div>
+<mat-tab-group class="no-overflow">
+  <mat-tab [label]="target" class="no-overflow" style="overflow: hidden !important;">
+    <mat-toolbar>
+      <mat-toolbar-row>
+          <button mat-raised-button (click) = "doSend()"><mat-icon>call_made</mat-icon> Send</button>
+          <button mat-raised-button (click) = "doListen()"><mat-icon>call_received</mat-icon> Listen</button>
+          <span class="jms-ui-spacer"></span>
+          <app-loading *ngIf="loading$ | async"></app-loading>
+          <button mat-raised-button (click) = "doListen()"><mat-icon>save</mat-icon> save</button>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <app-jms-headers [(header)] = "jmsHeader"></app-jms-headers>
+    
+    <app-ace-editor [(value)] = "jmsMessage" [key] = "target"></app-ace-editor>
+    
+    <div>
+      <div class="col-10"></div>
+      <div class="col-2">Time:&nbsp;45ms</div>
+      <div class="col-1">status</div>
+    </div>
+  </mat-tab>
+</mat-tab-group>
 
-<div class="jms-ui-row">
-  <mat-form-field class="example-full-width">
-    <textarea matInput placeholder="Message to send"></textarea>
-  </mat-form-field>
+<mat-accordion>
+    <mat-expansion-panel *ngFor="let m of receivedMessages">
+      <mat-expansion-panel-header>
+        JMS message
+      </mat-expansion-panel-header>
+      <mat-panel-description>
+          Body length {{ m.body?.length }}
+      </mat-panel-description>
+      <app-jms-message [jms-message] = 'm'></app-jms-message>
+    </mat-expansion-panel>
+</mat-accordion>
+<div class="row">
+  <div class="col-md-6">
+      <div class="row">
+        <div class="col-md-6">FOO 2</div>
+        <div class="col-md-6">bar 2</div>
+      </div>
+  </div>
+  <div class="col-md-6">
+      <div class="row">
+        <div class="col-xs-6">FOO 2</div>
+        <div class="col-xs-6">bar 2</div>
+      </div>
+  </div>
+  <div class="col-md-6">
+      <div>FOO 3</div>
+      <div class="left">bar 3</div>
+  </div>
 </div>
