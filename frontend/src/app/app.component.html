@@ -1,7 +1,10 @@
-<!-- <app-nav></app-nav> -->
-<app-topnav></app-topnav>
-<app-sidebar></app-sidebar>
-<mat-progress-bar *ngIf="loading$ | async" style="z-index: 9999" mode="indeterminate" [color]="'accent'"></mat-progress-bar>
-<div class="main-container container-fluid">
+<app-header [fixed]="true">
+  <!-- buttons can be added here ... -->
+</app-header>
+<div class="app-body">
+  <app-sidebar></app-sidebar>
+  <!-- Main content leaving the div content class -->
+  <main class="main">
     <router-outlet></router-outlet>
+  </main>
 </div>

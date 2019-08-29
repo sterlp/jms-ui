@@ -1,0 +1,45 @@
+<div class="sidebar">
+    <nav class="sidebar-nav">
+      <ul class="nav">
+        <li class="nav-title">Nav Title</li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="home" routerLinkActive="active">
+            <!-- core ui icon -->
+            <i class="nav-icon cui-home"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="jms-connectors" routerLinkActive="active">
+            <!-- fontawesome icon -->
+            <i class="nav-icon fa fa-table"></i> JMS-Connectors
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/sterlp/admin-template">
+            <!-- fontawesome icon -->
+            <i class="nav-icon fa fa-github"></i> Github
+            <span class="badge badge-primary">NEW</span>
+          </a>
+        </li>
+        <li class="nav-item nav-dropdown" appToggle>
+          <a class="nav-link nav-dropdown-toggle">
+            <!-- material icon -->
+            <mat-icon class="nav-icon">android</mat-icon> Nav dropdown
+          </a>
+          <ul class="nav-dropdown-items">
+            <li class="nav-item">
+              <a class="nav-link">
+                  <i class="nav-icon cui-puzzle"></i>Nav dropdown item
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link">
+                <i class="nav-icon cui-puzzle"></i> Nav dropdown item
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <button class="sidebar-minimizer brand-minimizer" type="button" (click)="doMinimize()"></button>
+  </div>

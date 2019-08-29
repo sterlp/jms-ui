@@ -71,7 +71,8 @@ export class JmsSessionService {
       console.error(`${operation} failed: ${error.message}`, error); // log to console instead
       this.dialog.open(ErrorDialogComponent, {
         width: '80%',
-        data: {error, operation}
+        data: {error, operation},
+        closeOnNavigation: true
       });
       // Let the app keep running by returning an empty result.
       return of(result as T);

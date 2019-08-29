@@ -1,6 +1,5 @@
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { OnDestroy } from '@angular/core';
-import { validateBasis } from '@angular/flex-layout';
 
 export class ArrayUtils {
     static first<T>(values: T[]): T {

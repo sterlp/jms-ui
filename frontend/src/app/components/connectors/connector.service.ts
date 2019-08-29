@@ -15,10 +15,14 @@ import { LoadingService } from 'src/app/common/loading/loading.service';
 })
 export class ConnectorService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private loading: LoadingService) { }
 
   getSupported(): Observable<SupportedConnector[]> {
-    return this.http.get<SupportedConnector[]>('api/connectors');
+    return this.http.get<SupportedConnector[]>('api/connectors')
+      .pipe(
+        finalize(() => this.loading.finishedLoading()),
+        catchError(this.loading.handleError<SupportedConnector[]>('Load Supported Connectors', []))
+      );
   }
 
   save(data: ConnectorData): Observable<ConnectorData> {
