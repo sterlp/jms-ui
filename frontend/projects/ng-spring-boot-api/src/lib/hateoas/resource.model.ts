@@ -1,10 +1,11 @@
-export class Resources<T> {
+// WIP // stopped right now
+
+export interface Resources<T> {
     // tslint:disable-next-line: variable-name
     _embedded?: T;
-    page: Page;
+    page: ResourcePage;
 }
-
-export class Page {
+export interface ResourcePage {
     size: number;
     totalElements: number;
     totalPages: number;

@@ -1,20 +1,19 @@
 package org.sterl.jmsui;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
-import javax.jms.JMSContext;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.jms.core.JmsTemplate;
-import org.sterl.jmsui.api.ConfigMetaData;
-import org.sterl.jmsui.bl.connection.model.JmsConnection;
+import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnector;
 import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnectorFactory;
@@ -42,7 +41,7 @@ public class ConnectIbmMqTest {
     
     @Test
     public void testConnectionFactory() throws Exception {
-        JmsConnection jmsConnection = new JmsConnection();
+        JmsConnectionBE jmsConnection = new JmsConnectionBE();
         jmsConnection.setTimeout(1500L);
         jmsConnection.addOrSetConfig("queue_manager", QMGR)
             .addOrSetConfig("hostname", HOST)

@@ -17,6 +17,8 @@ import { LoadingComponent } from './common/loading/loading.component';
 import { SessionPageComponent } from './page/session/session-page/session-page.component';
 import { ConfigFieldComponent } from './components/connectors/config-field/config-field.component';
 import { HttpClientModule } from '@angular/common/http';
+import { NgSpringBootApiModule } from 'projects/ng-spring-boot-api/src/public-api';
+import { ConnectorPageComponent } from './page/connector.page/connector.page.component';
 
 
 @NgModule({
@@ -32,6 +34,7 @@ import { HttpClientModule } from '@angular/common/http';
     SessionPageComponent,
     ConnectorViewComponent,
     ConnectorsComponent,
+    ConnectorPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -39,7 +42,8 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserAnimationsModule,
     AppRoutingModule,
     MaterialModule,
-    HttpClientModule
+    HttpClientModule,
+    NgSpringBootApiModule
   ],
   providers: [],
   bootstrap: [AppComponent],

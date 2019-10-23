@@ -7,18 +7,18 @@
     .mat-button,
     .mat-raised-button {
         line-height: 21px;
-        color: #73818f;
+        color: var(--grey);
 
         :hover,
         :active {
-            color: #23282c;
+            color: var(--dark);
         }
     }
     .btn {
         text-decoration: none;
     }
     .fa {
-        color: #73818f;
+        color: var(--grey);
     }
 }
 .btn {
@@ -29,8 +29,10 @@
 }
 // a little css to set the width for material components to 100% in bootstrap grid
 .row {
-    .mat-card,
-    .mat-form-field {
+    .mat-card {
         width: 100%;
     }
+}
+.col-sm > .mat-form-field {
+    width: 100%;
 }

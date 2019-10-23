@@ -5,33 +5,30 @@ export enum ConfigType {
     PASSWORD = 'PASSWORD'
 }
 
-export class SupportedConnector {
+export interface SupportedConnector {
     id: string;
     name: string;
     configMeta: ConfigMetaData[];
 }
 
-export class ConfigMetaData {
+export interface ConfigMetaData {
     property: string;
     label?: string;
     description?: string;
     defaultValue?: string;
-    type: ConfigType = ConfigType.STRING;
-    mandatory = true;
+    type: ConfigType;
+    mandatory: boolean;
 }
 
-export class ConnectorData {
+export interface ConnectorView {
     id?: number;
-    type: string;
+    type?: string;
     version?: number;
     name: string;
-    clientName: string;
-    timeout: number;
-    configValues?: Map<string, string> = new Map();
+    clientName?: string;
 }
-/**
- * Haetos generic result type of the jms-connections endpoint.
- */
-export class ConnectorDataResource {
-    jmsConnections: ConnectorData[];
+
+export interface ConnectorData extends ConnectorView {
+    timeout?: number;
+    configValues?: Map<string, string>;
 }

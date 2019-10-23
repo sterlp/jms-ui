@@ -2,13 +2,11 @@ package org.sterl.jmsui.bl.session.control;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
@@ -76,8 +74,6 @@ public class JmsSessionBM {
         }
         return result;
     }
-    
-    
     
     
     private void setMeassageHeader(JmsHeaderRequestValues header, Message message) throws JMSException {

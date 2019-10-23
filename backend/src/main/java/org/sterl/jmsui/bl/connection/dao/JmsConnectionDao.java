@@ -2,12 +2,14 @@ package org.sterl.jmsui.bl.connection.dao;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.sterl.jmsui.bl.connection.model.JmsConnection;
+import org.sterl.jmsui.bl.connection.api.model.JmsConnectionView;
+import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 
-@RepositoryRestResource(collectionResourceRel = "jmsConnections", path = "jms-connections")
-public interface JmsConnectionDao extends JpaRepository<JmsConnection, Long> {
+public interface JmsConnectionDao extends JpaRepository<JmsConnectionBE, Long> {
 
-    public List<JmsConnection> findByType(String type);
+    public List<JmsConnectionBE> findByType(String type);
+    public Page<JmsConnectionView> findViewBy(Pageable page);
 }

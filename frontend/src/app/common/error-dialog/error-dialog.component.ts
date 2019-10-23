@@ -24,6 +24,11 @@ export class ErrorDialogComponent implements OnInit {
   }
 
   getErrorDetails() {
-    return this.data.error.error.trace || null;
+    if (this.data.error && this.data.error.error
+      && this.data.error.error.trace
+      && this.data.error.error.trace !== '') {
+      return this.data.error.error.trace;
+    }
+    return null;
   }
 }

@@ -1,0 +1,25 @@
+spring:
+  jackson:
+    mapper:
+      use-std-bean-naming: true
+  datasource:
+    url: jdbc:h2:mem:jms-ui-mem-db;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
+    hibernate:
+      ddl-auto: create-drop
+    # https://stackoverflow.com/questions/30549489/what-is-this-spring-jpa-open-in-view-true-property-in-spring-boot
+    open-in-view: false
+  data:
+    rest:
+      base-path: /api
+      default-page-size: 10
+  quartz:
+    job-store-type: JDBC
+    

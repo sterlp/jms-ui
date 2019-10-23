@@ -4,14 +4,14 @@ import java.util.Map.Entry;
 
 import org.springframework.core.convert.converter.Converter;
 import org.sterl.jmsui.bl.connection.api.model.JmsConnectionDetails;
-import org.sterl.jmsui.bl.connection.model.JmsConnection;
+import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 
 class ConnectionConverter {
-    enum ToJmsConnectionDetails  implements Converter<JmsConnection, JmsConnectionDetails> {
+    enum ToJmsConnectionDetails  implements Converter<JmsConnectionBE, JmsConnectionDetails> {
         INSTANCE;
 
         @Override
-        public JmsConnectionDetails convert(JmsConnection source) {
+        public JmsConnectionDetails convert(JmsConnectionBE source) {
             if (source == null) return null;
             final JmsConnectionDetails result = new JmsConnectionDetails();
             result.setClientName(source.getClientName());
@@ -25,17 +25,17 @@ class ConnectionConverter {
         }
         
     }
-    enum ToJmsConnection implements Converter<JmsConnectionDetails, JmsConnection> {
+    enum ToJmsConnection implements Converter<JmsConnectionDetails, JmsConnectionBE> {
         INSTANCE;
 
         @Override
-        public JmsConnection convert(JmsConnectionDetails source) {
+        public JmsConnectionBE convert(JmsConnectionDetails source) {
             if (source == null) return null;
-            JmsConnection result = new JmsConnection();
+            JmsConnectionBE result = new JmsConnectionBE();
             setValues(source, result);
             return result;
         }
-        static void setValues(JmsConnectionDetails s, JmsConnection t) {
+        static void setValues(JmsConnectionDetails s, JmsConnectionBE t) {
             t.setClientName(s.getClientName());
             t.setId(s.getId());
             t.setName(s.getName());

@@ -1,10 +1,11 @@
 package org.sterl.jmsui.bl.connectors.ibm;
 
-import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.jms.core.JmsTemplate;
-import org.sterl.jmsui.bl.connection.model.JmsConnection;
+import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnector;
 import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnectorFactory;
 
@@ -14,12 +15,8 @@ import com.ibm.msg.client.wmq.WMQConstants;
 public class IbmMqConnectorFactoryTest {
 
     @Test
-    public void contextLoads() {
-    }
-    
-    @Test
     public void testSettings() throws Exception {
-        JmsConnection jmsConnection = new JmsConnection();
+        JmsConnectionBE jmsConnection = new JmsConnectionBE();
         jmsConnection.setTimeout(1500L);
         jmsConnection.addOrSetConfig("queue_manager", "qmgr")
             .addOrSetConfig("hostname", "host")

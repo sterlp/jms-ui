@@ -24,17 +24,22 @@
     "@coreui/angular": "^2.5.2",
     "@coreui/coreui": "^2.1.12",
     "@coreui/icons": "^0.3.0",
+    "@stomp/stompjs": "^5.4.2",
+    "@types/sockjs-client": "^1.1.1",
+    "@types/stompjs": "^2.3.4",
     "font-awesome": "^4.7.0",
     "hammerjs": "^2.0.8",
     "material-icons": "^0.3.1",
     "perfect-scrollbar": "^1.4.0",
     "rxjs": "^6.4.0",
     "simple-line-icons": "^2.4.1",
+    "sockjs-client": "^1.4.0",
     "tslib": "^1.9.0",
     "zone.js": "~0.9.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.801.2",
+    "@angular-devkit/build-ng-packagr": "~0.801.2",
     "@angular/cli": "~8.1.2",
     "@angular/compiler-cli": "~8.1.2",
     "@angular/language-service": "~8.1.2",
@@ -49,8 +54,10 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~2.0.1",
     "karma-jasmine-html-reporter": "^1.4.0",
+    "ng-packagr": "^5.1.0",
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
+    "tsickle": "^0.35.0",
     "tslint": "~5.15.0",
     "typescript": "~3.4.3"
   }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { SupportedConnector, ConnectorData, ConnectorDataResource } from 'src/app/api/connector';
+import { ConnectorData } from 'src/app/api/connector';
 import { JmsResource, SendJmsMessageCommand, JmsResultMessage } from 'src/app/api/jms-session';
 import { ArrayUtils } from 'src/app/common/utils';
 import { LoadingService } from 'src/app/common/loading/loading.service';

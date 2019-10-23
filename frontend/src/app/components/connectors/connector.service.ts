@@ -1,36 +1,65 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { SupportedConnector, ConnectorData, ConnectorDataResource } from 'src/app/api/connector';
-import { Resources, Page } from 'src/app/common/api/hateoas';
+import { SupportedConnector, ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { ArrayUtils } from 'src/app/common/utils';
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject } from 'rxjs';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
 import { LoadingService } from 'src/app/common/loading/loading.service';
+import { Page, Pageable, EMPTY_PAGE } from 'projects/ng-spring-boot-api/src/public-api';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConnectorService {
+  supportedConnectors = new BehaviorSubject<SupportedConnector[]>([]);
+  supportedConnectors$ = this.supportedConnectors.asObservable();
 
   constructor(private http: HttpClient, private loading: LoadingService) { }
 
   getSupported(): Observable<SupportedConnector[]> {
-    return this.http.get<SupportedConnector[]>('api/connectors')
+    if (this.supportedConnectors.value.length === 0) {
+      this.reloadSupportedConnectors();
+    }
+    return this.supportedConnectors$;
+  }
+  reloadSupportedConnectors(): Observable<SupportedConnector[]> {
+    this.loading.isLoading();
+    this.http.get<SupportedConnector[]>('api/connectors')
       .pipe(
         finalize(() => this.loading.finishedLoading()),
         catchError(this.loading.handleError<SupportedConnector[]>('Load Supported Connectors', []))
-      );
+      )
+      .subscribe(result => this.supportedConnectors.next(result));
+    return this.supportedConnectors$;
   }
 
   save(data: ConnectorData): Observable<ConnectorData> {
-    return this.http.post<ConnectorData>('api/jms/connections', data);
+    this.loading.isLoading();
+    return this.http.post<ConnectorData>('api/jms/connections', data)
+      .pipe(
+        finalize(() => this.loading.finishedLoading()),
+        catchError(this.loading.handleError<ConnectorData>('Save JMS Connector', data))
+      );
+  }
+
+  delete(id: number) {
+    this.loading.isLoading();
+    return this.http.delete(`api/jms/connections/${id}`)
+      .pipe(
+        finalize(() => this.loading.finishedLoading()),
+        catchError(this.loading.handleError<ConnectorData>('Delete JMS Connector', null))
+      );
   }
 
   getConnectorWithConfig(id: number): Observable<ConnectorData> {
-    return this.http.get<ConnectorData>('api/jms/connections/' + id);
+    return this.http.get<ConnectorData>(`api/jms/connections/${id}`)
+      .pipe(
+        finalize(() => this.loading.finishedLoading()),
+        catchError(this.loading.handleError<ConnectorData>('Load JMS Connector', null))
+      );
   }
 
   /**
@@ -38,24 +67,23 @@ export class ConnectorService {
    * <li> _embedded.jmsConnections
    * <li> page
    */
-  listConnections(page: number = 0, size: number = 10): Observable<Resources<ConnectorDataResource>> {
-    return this.http.get<Resources<ConnectorDataResource>>('api/jms-connections', {
-      params: new HttpParams()
-        .set('page', page.toString()).set('size', size.toString())
+  listConnections(pageable: Pageable): Observable<Page<ConnectorView>> {
+    return this.http.get<Page<ConnectorView>>('api/jms/connections', {
+      params: pageable ? pageable.newHttpParams() : null
     });
   }
 }
 
-export class ConnertorDataSource implements DataSource<ConnectorData> {
+export class ConnertorViewDataSource implements DataSource<ConnectorView> {
   constructor(private $connector: ConnectorService, private $loading: LoadingService) {}
 
-  private connectorDataSubject = new BehaviorSubject<ConnectorData[]>([]);
-  private pageSubject = new BehaviorSubject<Page>(new Page());
+  private connectorDataSubject = new BehaviorSubject<ConnectorView[]>([]);
+  private pageSubject = new BehaviorSubject<Page<ConnectorView>>(EMPTY_PAGE);
 
   public loading$ = this.$loading.loading$;
   public page$ = this.pageSubject.asObservable();
 
-  connect(collectionViewer: CollectionViewer): Observable<ConnectorData[] | readonly ConnectorData[]> {
+  connect(collectionViewer: CollectionViewer): Observable<ConnectorView[] | readonly ConnectorView[]> {
     return this.connectorDataSubject.asObservable();
   }
 
@@ -67,11 +95,11 @@ export class ConnertorDataSource implements DataSource<ConnectorData> {
   loadConnectorData(page: number = 0, size: number = 10): void {
     console.info('loadConnectorData ...');
     this.$loading.isLoading();
-    this.$connector.listConnections(page, size)
+    this.$connector.listConnections(Pageable.of(page, size))
       .pipe(finalize(() => this.$loading.finishedLoading()))
       .subscribe(data => {
-        this.pageSubject.next(data.page);
-        this.connectorDataSubject.next(data._embedded ? data._embedded.jmsConnections : []);
+        this.pageSubject.next(data);
+        this.connectorDataSubject.next(data.content ? data.content : []);
       });
   }
 }

@@ -13,7 +13,7 @@ import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Component;
-import org.sterl.jmsui.bl.connection.model.JmsConnection;
+import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnector;
 import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnectorFactory;
 
@@ -31,7 +31,7 @@ class SessionBA implements Closeable {
     Set<Long> openSessions() {
         return SESSIONS.keySet();
     }
-    IbmMqConnector connect(JmsConnection connection) {
+    IbmMqConnector connect(JmsConnectionBE connection) {
         Optional<Entry<Long, IbmMqConnector>> storedSession = getStoredSession(connection.getId());
         IbmMqConnector connector;
 

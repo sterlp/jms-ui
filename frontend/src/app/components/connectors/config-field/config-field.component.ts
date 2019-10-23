@@ -7,19 +7,18 @@ import { ConfigMetaData, ConfigType } from './../../../api/connector'
   styleUrls: ['./config-field.component.scss']
 })
 export class ConfigFieldComponent implements OnInit {
-  
-  
-  _value: String;
+
+  _value: string;
   @Input("meta-field") metaField: ConfigMetaData;
   @Input()
-  get value(): String { return this._value;}
-  set value(value: String) {    
-    if (this._value != value) {
+  get value(): string { return this._value; }
+  set value(value: string) {
+    if (this._value !== value) {
       this._value = value;
       this.valueChange.emit(this._value);
     }
   }
-  @Output() valueChange: EventEmitter<String> = new EventEmitter();
+  @Output() valueChange: EventEmitter<string> = new EventEmitter();
 
   constructor() { }
 

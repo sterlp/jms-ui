@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.sterl.jmsui.api.ConfigMetaData;
 import org.sterl.jmsui.api.ConfigMetaData.ConfigType;
-import org.sterl.jmsui.bl.connection.model.ConfigValue;
+import org.sterl.jmsui.bl.connection.model.ConfigValueBE;
 
 public class ConfigParser {
 
@@ -38,27 +38,27 @@ public class ConfigParser {
         else return Integer.valueOf( String.valueOf(v) );
     }
     
-    public static Map<String, Object> parse(ConfigMetaData<?>[] configMeta, List<ConfigValue> configValues) {
+    public static Map<String, Object> parse(ConfigMetaData<?>[] configMeta, List<ConfigValueBE> configValueBEs) {
         Map<String, Object> result = new HashMap<>();
         for (int i = 0; i < configMeta.length; i++) {
             final ConfigMetaData<?> cmd = configMeta[i];
-            final Optional<ConfigValue> cv = configValues.stream().filter(v -> v.getName().equals(cmd.getProperty())).findFirst();
+            final Optional<ConfigValueBE> cv = configValueBEs.stream().filter(v -> v.getName().equals(cmd.getProperty())).findFirst();
 
             result.put(cmd.getProperty(), parse(cmd, cv));
         }
         return result;
     }
     
-    public static Object parse(ConfigMetaData<?> cmd, Optional<ConfigValue> value) {
+    public static Object parse(ConfigMetaData<?> cmd, Optional<ConfigValueBE> value) {
         if (value.isEmpty()) return null;
 
-        final ConfigValue configValue = value.get();
+        final ConfigValueBE configValueBE = value.get();
         if (cmd.getType() == ConfigType.NUMBER) {
-            return Integer.valueOf(configValue.getValue());
+            return Integer.valueOf(configValueBE.getValue());
         } else if (cmd.getType() == ConfigType.BOOLEAN) {
-            return Boolean.valueOf(configValue.getValue());
+            return Boolean.valueOf(configValueBE.getValue());
         } else {
-            return configValue.getValue();
+            return configValueBE.getValue();
         }
     }
 }

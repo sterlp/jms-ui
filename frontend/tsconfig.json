@@ -17,7 +17,15 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "ng-spring-boot-api": [
+        "dist/ng-spring-boot-api"
+      ],
+      "ng-spring-boot-api/*": [
+        "dist/ng-spring-boot-api/*"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

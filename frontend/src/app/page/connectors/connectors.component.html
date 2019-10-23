@@ -1,10 +1,11 @@
 <!-- action bar in breadcrumb -->
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-      <li class="breadcrumb-item active" aria-current="page">Home</li>
+      <li class="breadcrumb-item active" aria-current="page">Connectors</li>
       <!-- Breadcrumb Menu-->
       <li class="breadcrumb-menu">
           <div class="btn-group" role="group">
+              <a class="btn" [routerLink]="['/jms-connector']"><i class="fa fa-plus-circle"></i> New</a>
               <button type="button" class="btn btn-link" (click)="doLoad()"><mat-icon>loop</mat-icon> Reload</button>
           </div>
       </li>
@@ -12,34 +13,6 @@
 </nav>
 
 <div class="container-fluid">
-
-  <div class="row mb-2">
-    <div class="col-sm">
-      <mat-form-field>
-        <mat-label>JMS Type</mat-label>
-        <mat-select required [(value)] = "selectedConnector">
-          <mat-option *ngFor="let con of supportedConnectors" [value]="con">
-            {{con.name}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <div class="col-sm">
-      <button mat-raised-button (click)="addConnector(selectedConnector)" [disabled]="selectedConnector == null">
-        <mat-icon>add</mat-icon> Add JMS Connection
-      </button>
-    </div>
-  </div>
-
-  <mat-card class="mb-3" *ngIf="newConnector">
-    <app-connector-view [connectorData] = "newConnectorData" [connectorMetaData] = "selectedConnector"></app-connector-view> 
-
-    <mat-card-actions>
-        <button mat-button (click)="doSave()" color="primary"><mat-icon>save</mat-icon> Save</button>
-        <button mat-button (click)="cancelAdd()"><mat-icon>clear</mat-icon> Cancel</button>
-    </mat-card-actions>
-  </mat-card>
-
   <div class="row">
     <div class="col">
       <div class="mat-elevation-z8">
@@ -69,11 +42,13 @@
                     <button mat-button (click)="doConnect(element)">Connect</button> 
                   </div>
                   <div class="p-2">
-                    <button mat-button (click)="doEdit(element)" matTooltip="Edit: {{element.name}}"><mat-icon>create</mat-icon></button> 
+                    <button mat-button [routerLink]="['/jms-connector', element.id]" matTooltip="Edit: {{element.name}}"><mat-icon>create</mat-icon></button> 
                   </div>
+                  <!--
                   <div class="p-2">
                     <button mat-button (click)="doCopy(element)" matTooltip="Copy: {{element.name}}"><mat-icon>file_copy</mat-icon></button> 
                   </div>
+                  -->
                 </div>
               </td>
             </ng-container>

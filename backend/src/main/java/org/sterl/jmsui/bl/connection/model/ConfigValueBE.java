@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "CONFIG_VALUE", 
     uniqueConstraints = @UniqueConstraint(name = "UC_CONFIG_VALUE", columnNames = {"name", "connection_id"})
 )
-public class ConfigValue {
+public class ConfigValueBE {
 
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "system_role_id_generator")
     @Id
@@ -38,9 +38,9 @@ public class ConfigValue {
     @JsonIgnore
     @ManyToOne(cascade = {}, optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "connection_id", nullable = false, updatable = false, foreignKey = @ForeignKey(name = "FK_CONFIG_VALUE_TO_CONNECTION"))
-    private JmsConnection connection;
+    private JmsConnectionBE connection;
 
-    public ConfigValue(@Size(max = 128) String name, @Size(max = 255) String value, JmsConnection connection) {
+    public ConfigValueBE(@Size(max = 128) String name, @Size(max = 255) String value, JmsConnectionBE connection) {
         super();
         this.name = name;
         this.value = value;

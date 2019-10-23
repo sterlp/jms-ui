@@ -11,7 +11,7 @@ import java.util.Map;
 import org.springframework.jms.core.JmsTemplate;
 import org.sterl.jmsui.api.ConfigMetaData;
 import org.sterl.jmsui.api.ConfigMetaData.ConfigType;
-import org.sterl.jmsui.bl.connection.model.JmsConnection;
+import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
@@ -35,7 +35,7 @@ public class IbmMqConnectorFactory {
         return CONFIG;
     }
 
-    public IbmMqConnector create(JmsConnection jmsResource) throws Exception {
+    public IbmMqConnector create(JmsConnectionBE jmsResource) throws Exception {
         Map<String, Object> rawConfig = parse(CONFIG, jmsResource.getConfigValues());
         //System.out.println(rawConfig);
         Hashtable<String, Object> config = new Hashtable<>(rawConfig.size());
