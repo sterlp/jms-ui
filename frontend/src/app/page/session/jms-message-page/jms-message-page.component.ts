@@ -28,10 +28,10 @@ export class JmsMessagePageComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     this.loading$ = this.sessionService.loading$;
   }
-  
+
   ngAfterViewInit(): void {
     this.route.params.subscribe(params => {
-      this.connector = parseInt(params.id);
+      this.connector = params.id * 1;
       this.target = params.target;
       console.info('JmsMessagePageComponent', this.connector, this.target);
     });

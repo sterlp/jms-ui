@@ -1,6 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { AceModule } from 'ngx-ace-wrapper';
+import { ACE_CONFIG } from 'ngx-ace-wrapper';
+import { AceConfigInterface } from 'ngx-ace-wrapper';
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './dashboard/header/header.component';
@@ -19,7 +23,17 @@ import { ConfigFieldComponent } from './components/connectors/config-field/confi
 import { HttpClientModule } from '@angular/common/http';
 import { NgSpringBootApiModule } from 'projects/ng-spring-boot-api/src/public-api';
 import { ConnectorPageComponent } from './page/connector.page/connector.page.component';
+import { OpenSessionsComponent } from './components/jms-sessions/open-sessions/open-sessions.component';
+import { JmsMessagePageComponent } from './page/session/jms-message-page/jms-message-page.component';
+import { JmsMessageComponent } from './components/jms/jms-message/jms-message.component';
+import { JmsHeadersComponent } from './components/jms/jms-headers/jms-headers.component';
+import { AceEditorComponent } from './common/ace-editor/ace-editor.component';
 
+const DEFAULT_ACE_CONFIG: AceConfigInterface = {
+  tabSize: 2,
+  fontSize: 16,
+  showPrintMargin: false
+};
 
 @NgModule({
   declarations: [
@@ -35,6 +49,11 @@ import { ConnectorPageComponent } from './page/connector.page/connector.page.com
     ConnectorViewComponent,
     ConnectorsComponent,
     ConnectorPageComponent,
+    OpenSessionsComponent,
+    JmsMessagePageComponent,
+    JmsMessageComponent,
+    JmsHeadersComponent,
+    AceEditorComponent
   ],
   imports: [
     BrowserModule,
@@ -43,9 +62,12 @@ import { ConnectorPageComponent } from './page/connector.page/connector.page.com
     AppRoutingModule,
     MaterialModule,
     HttpClientModule,
-    NgSpringBootApiModule
+    NgSpringBootApiModule,
+    AceModule
   ],
-  providers: [],
+  providers: [{
+    provide: ACE_CONFIG, useValue: DEFAULT_ACE_CONFIG
+  }],
   bootstrap: [AppComponent],
   entryComponents: [
     ErrorDialogComponent

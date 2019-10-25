@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { ConnectorData } from 'src/app/api/connector';
+import { ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { JmsResource, SendJmsMessageCommand, JmsResultMessage } from 'src/app/api/jms-session';
 import { ArrayUtils } from 'src/app/common/utils';
 import { LoadingService } from 'src/app/common/loading/loading.service';
@@ -11,31 +11,34 @@ import { catchError, map, tap, finalize } from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
 import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 
-
+// /api/jms/sessions
 @Injectable({
   providedIn: 'root'
 })
 export class JmsSessionService {
 
-  public sessions$ = new BehaviorSubject<ConnectorData[]>([]);
+  public sessions$ = new BehaviorSubject<ConnectorView[]>([]);
   public loading$: Observable<boolean>;
 
   constructor(private http: HttpClient, private $loading: LoadingService, private dialog: MatDialog) {
     this.loading$ = $loading.loading$;
   }
-
-  openSession(session: ConnectorData): Observable<ConnectorData[]> {
+  /**
+   * Opens a session to the given connector.
+   * @returns subject of all currently open sessions
+   */
+  openSession(connector: ConnectorView): Observable<ConnectorView[]> {
     this.$loading.isLoading();
-    this.http.post<number>('api/jms/sessions/' + session.id, null)
+    this.http.post<number>(`/api/jms/sessions/${connector.id}`, null)
       .pipe(
         finalize(() => this.$loading.finishedLoading()),
-        catchError(this.handleError<number>('Load JMS Session ' + session.name, null))
+        catchError(this.handleError<number>('Faild to connect', null))
       )
-      .subscribe(r => {
-        if (r) {
+      .subscribe(id => {
+        if (id) {
           const current = this.sessions$.getValue();
-          if (current.filter(s => s.id === session.id).length === 0) {
-            current.push(session);
+          if (current.filter(s => s.id === id).length === 0) {
+            current.push(connector);
             this.sessions$.next(current);
           }
         }

@@ -1,32 +1,50 @@
-<div class="jms-ui-actions">
-  <mat-form-field>
-    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
-  </mat-form-field>
-</div>
+<!-- action bar in breadcrumb -->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+      <li class="breadcrumb-item" aria-current="page">Sessions</li>
+      <li class="breadcrumb-item active" aria-current="page">{{ conData?.name }}</li>
+      <!-- Breadcrumb Menu
+      <li class="breadcrumb-menu">
+          <div class="btn-group" role="group">
+              <a class="btn" [routerLink]="['/jms-connector']"><i class="fa fa-plus-circle"></i> New</a>
+              <button type="button" class="btn btn-link" (click)="doLoad()"><mat-icon>loop</mat-icon> Reload</button>
+          </div>
+      </li>
+      -->
+  </ol>
+</nav>
 
-<div class="mat-elevation-z8" *ngIf="dataSource">
-  <table mat-table [dataSource]="dataSource">
-
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef> Name </th>
-      <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-    </ng-container>
-    <ng-container matColumnDef="type">
-      <th mat-header-cell *matHeaderCellDef> Type </th>
-      <td mat-cell *matCellDef="let element"> {{element.type}} </td>
-    </ng-container>
-
-    <ng-container matColumnDef="action">
-      <!-- empty header is needed because material design widget -->
-      <th mat-header-cell *matHeaderCellDef>  </th>
-      <td mat-cell *matCellDef="let element"> 
-        <div class="jms-ui-table-actions">
-            <button mat-raised-button [routerLink]="['/sessions', conData.id, element.name]">Open</button>
-        </div>
-      </td>
-    </ng-container>
-    <tr mat-header-row *matHeaderRowDef="['name', 'type', 'action']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['name', 'type', 'action'];"></tr>
-  </table>
-  <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+<div class="container-fluid">
+  <div class="jms-ui-actions">
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+    </mat-form-field>
+  </div>
+  
+  <div class="mat-elevation-z8" *ngIf="dataSource">
+    <table mat-table [dataSource]="dataSource">
+  
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef> Type </th>
+        <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+      </ng-container>
+  
+      <ng-container matColumnDef="action">
+        <!-- empty header is needed because material design widget -->
+        <th mat-header-cell *matHeaderCellDef>  </th>
+        <td mat-cell *matCellDef="let element"> 
+          <div class="jms-ui-table-actions">
+              <button mat-raised-button [routerLink]="['/sessions', conData.id, element.name]">Open</button>
+          </div>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['name', 'type', 'action']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['name', 'type', 'action'];"></tr>
+    </table>
+    <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+  </div>
 </div>

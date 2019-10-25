@@ -14,24 +14,9 @@
             <i class="nav-icon fa fa-table"></i> JMS-Connectors
           </a>
         </li>
-        <li class="nav-item nav-dropdown" appToggle>
-          <a class="nav-link nav-dropdown-toggle">
-            <!-- material icon -->
-            <mat-icon class="nav-icon">android</mat-icon> Nav dropdown
-          </a>
-          <ul class="nav-dropdown-items">
-            <li class="nav-item">
-              <a class="nav-link">
-                  <i class="nav-icon cui-puzzle"></i>Nav dropdown item
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link">
-                <i class="nav-icon cui-puzzle"></i> Nav dropdown item
-              </a>
-            </li>
-          </ul>
-        </li>
+
+        <app-open-sessions></app-open-sessions>
+        
       </ul>
     </nav>
     <button class="sidebar-minimizer brand-minimizer" type="button" (click)="doMinimize()"></button>

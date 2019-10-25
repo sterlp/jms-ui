@@ -70,7 +70,11 @@ export class ConnectorService {
   listConnections(pageable: Pageable): Observable<Page<ConnectorView>> {
     return this.http.get<Page<ConnectorView>>('api/jms/connections', {
       params: pageable ? pageable.newHttpParams() : null
-    });
+    })
+    .pipe(
+      finalize(() => this.loading.finishedLoading()),
+      catchError(this.loading.handleError<Page<ConnectorView>>('Load JMS Connectors', null))
+    );
   }
 }
 

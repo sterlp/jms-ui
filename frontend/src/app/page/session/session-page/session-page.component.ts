@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, AfterContentInit } from '@angular/core';
 import { switchMap, filter, withLatestFrom, map } from 'rxjs/operators';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
 import { ConnectorService } from 'src/app/components/connectors/connector.service';
-import { ConnectorData } from 'src/app/api/connector';
+import { ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { Observable } from 'rxjs';
 import { JmsResource } from 'src/app/api/jms-session';
 import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
@@ -13,9 +13,9 @@ import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
   templateUrl: './session-page.component.html',
   styleUrls: ['./session-page.component.scss']
 })
-export class SessionPageComponent implements OnInit, AfterViewInit {
+export class SessionPageComponent implements OnInit, AfterContentInit {
 
-  conData: ConnectorData;
+  conData: ConnectorView;
   dataSource = new MatTableDataSource<JmsResource>([]);
 
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
@@ -31,16 +31,16 @@ export class SessionPageComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  ngAfterViewInit(): void {
+  ngAfterContentInit(): void {
     this.route.params.subscribe(params => {
       const id = parseInt(params.id);
-      this.conData = this.sessionService.sessions$.value.find(d => d.id == id);
+      this.conData = this.sessionService.sessions$.value.find(d => d.id === id);
       if (this.conData) {
         if (this.dataSource.data.length === 0) {
           this.loadQueues();
         }
       } else {
-        this.router.navigate(['/connectors']);
+        this.router.navigate(['/jms-connectors']);
       }
     });
   }

@@ -89,10 +89,10 @@ export class JmsHeadersComponent implements OnInit {
     }
   }
 
-  asNumber(value): string | number {
+  asNumber(value: any): string | number {
     if (!value || value.length === 0) return value;
     try {
-      const result = parseInt(value);
+      const result = value * 1;
       if (isNaN(result)) return value;
       else return result;
     } catch (e) {
