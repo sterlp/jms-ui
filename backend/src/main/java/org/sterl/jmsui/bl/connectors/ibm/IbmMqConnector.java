@@ -1,19 +1,23 @@
 package org.sterl.jmsui.bl.connectors.ibm;
 
-import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
 import javax.jms.JMSException;
+import javax.jms.Message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessagePostProcessor;
+import org.sterl.jmsui.api.JmsHeaderRequestValues;
 import org.sterl.jmsui.api.exception.JmsAuthorizationException;
+import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.connectors.ibm.converter.IbmConverter.ToJmsResourceType;
 import org.sterl.jmsui.bl.connectors.ibm.model.QTypes;
+import org.sterl.jmsui.bl.connectors.util.JmsHeaderUtil;
 
 import com.ibm.mq.MQException;
 import com.ibm.mq.MQQueueManager;
@@ -28,7 +32,7 @@ import com.ibm.msg.client.jms.DetailedJMSSecurityException;
 import lombok.AccessLevel;
 import lombok.Getter;
 
-public class IbmMqConnector implements Closeable {
+public class IbmMqConnector implements JmsConnectorInstance {
     private static final Logger LOG = LoggerFactory.getLogger(IbmMqConnector.class);
     
     private final String queueManagerName;
@@ -36,10 +40,43 @@ public class IbmMqConnector implements Closeable {
     private final JmsTemplate jmsTemplate;
     
     private final Object LOCK = new Object();
+    private final Long defaultTimeoutInMs;
     @Getter(value = AccessLevel.PACKAGE)
     private final Hashtable<String, Object> config;
     private MQQueueManager ibmMqManager;
     private PCFMessageAgent agent;
+    
+    public IbmMqConnector(String queueManagerName, 
+            Long defaultTimeoutInMs,
+            JmsTemplate jmsTemplate, Hashtable<String, Object> config) {
+        this.queueManagerName = queueManagerName;
+        this.jmsTemplate = jmsTemplate;
+        this.config = config;
+        this.defaultTimeoutInMs = defaultTimeoutInMs;
+    }
+
+    @Override
+    public void sendMessage(String destination, String message, JmsHeaderRequestValues header) {
+        if (header.getJMSPriority() != null) jmsTemplate.setPriority(header.getJMSPriority());
+        else jmsTemplate.setPriority(4);
+        
+        jmsTemplate.convertAndSend(destination, message, new MessagePostProcessor() {
+            @Override
+            public Message postProcessMessage(Message message) throws JMSException {
+                JmsHeaderUtil.setMeassageHeader(header, message);
+                return message;
+            }
+        });
+        
+    }
+
+    @Override
+    public Message receive(String destination, Long timeout) {
+        if (timeout != null) jmsTemplate.setReceiveTimeout(timeout);
+        else if (defaultTimeoutInMs != null) jmsTemplate.setReceiveTimeout(defaultTimeoutInMs);
+
+        return jmsTemplate.receive(destination);
+    }
     
     /**
      * Connects and disconnects again.
@@ -57,13 +94,7 @@ public class IbmMqConnector implements Closeable {
         }
     }
 
-    public IbmMqConnector(String queueManagerName, JmsTemplate jmsTemplate, Hashtable<String, Object> config) {
-        this.queueManagerName = queueManagerName;
-        this.jmsTemplate = jmsTemplate;
-        this.config = config;
-    }
-
-    public List<JmsResource> listQueues() {
+    public List<JmsResource> listResources() {
         List<JmsResource> result = new ArrayList<>();
         try {
             PCFMessageAgent messageAgent = getAgent();

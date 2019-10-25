@@ -12,12 +12,13 @@ import org.springframework.jms.core.JmsTemplate;
 import org.sterl.jmsui.api.ConfigMetaData;
 import org.sterl.jmsui.api.ConfigMetaData.ConfigType;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
+import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstanceFactory;
 
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
-public class IbmMqConnectorFactory {
+public class IbmMqConnectorFactory implements JmsConnectorInstanceFactory {
     
     private static final ConfigMetaData<?>[] CONFIG = {
         ConfigMetaData.<String>builder().property("APPNAME")
@@ -31,6 +32,9 @@ public class IbmMqConnectorFactory {
         ConfigMetaData.<String>builder().property("password").type(ConfigType.PASSWORD).mandatory(false).build()
     };
     
+    public String getName() {
+        return "IBM MQ";
+    }
     public ConfigMetaData<?>[] getConfigMetaData() {
         return CONFIG;
     }
@@ -65,6 +69,9 @@ public class IbmMqConnectorFactory {
         JmsTemplate jmsTemplate = new JmsTemplate(cf);
         if (jmsResource.getTimeout() != null) jmsTemplate.setReceiveTimeout(jmsResource.getTimeout());
         
-        return new IbmMqConnector(cf.getStringProperty(WMQConstants.WMQ_QUEUE_MANAGER), jmsTemplate, config);
+        return new IbmMqConnector(
+                cf.getStringProperty(WMQConstants.WMQ_QUEUE_MANAGER),
+                jmsResource.getTimeout(),
+                jmsTemplate, config);
     }
 }

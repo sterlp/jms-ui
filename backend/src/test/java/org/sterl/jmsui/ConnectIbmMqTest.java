@@ -62,7 +62,7 @@ public class ConnectIbmMqTest {
         System.out.println(((TextMessage) msg).getText());
         assertEquals("Simple message", ((TextMessage) msg).getText());
 
-        List<JmsResource> listQueues = ibmMQConnection.listQueues();
+        List<JmsResource> listQueues = ibmMQConnection.listResources();
         listQueues.forEach(System.out::println);
     }
 

@@ -28,7 +28,7 @@ import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 class JmsConnectionBFTest {
 
     @Autowired private JmsConnectionDao conectionDao;
-
+    
     @LocalServerPort private int port;
     @Autowired private TestRestTemplate restTemplate;
     
@@ -36,9 +36,9 @@ class JmsConnectionBFTest {
 
     @BeforeEach
     public void init() {
-        conectionDao.deleteAll();
-        baseUrl = "http://127.0.0.1:" + port;
-        conectionDao.save(new JmsConnectionBE().setName("Test1").addOrSetConfig("user", "pass"));
+        this.conectionDao.deleteAll();
+        this.baseUrl = "http://127.0.0.1:" + this.port;
+        this.conectionDao.save(new JmsConnectionBE().setName("Test1").addOrSetConfig("user", "pass"));
     }
     
     @Test
@@ -48,9 +48,9 @@ class JmsConnectionBFTest {
         toSave.setName("foo 1");
         toSave.addConfig("key1", "value1").addConfig("key2", "value2");
 
-        ResponseEntity<JmsConnectionDetails> exchange = restTemplate.exchange(
-                baseUrl + JmsConnectionBF.URL,
-                HttpMethod.POST, new HttpEntity(toSave), JmsConnectionDetails.class);
+        ResponseEntity<JmsConnectionDetails> exchange = this.restTemplate.exchange(
+                this.baseUrl + JmsConnectionBF.URL,
+                HttpMethod.POST, new HttpEntity<>(toSave), JmsConnectionDetails.class);
 
         assertThat(exchange.getStatusCode().is2xxSuccessful()).isTrue();
         assertNotNull(exchange.getBody().getId());
@@ -68,9 +68,9 @@ class JmsConnectionBFTest {
               .addConfig("key2", "value2")
               .addConfig("key3", "value3");
 
-        ResponseEntity<JmsConnectionDetails> exchange = restTemplate.exchange(
-                baseUrl + JmsConnectionBF.URL,
-                HttpMethod.POST, new HttpEntity(toSave), JmsConnectionDetails.class);
+        ResponseEntity<JmsConnectionDetails> exchange = this.restTemplate.exchange(
+                this.baseUrl + JmsConnectionBF.URL,
+                HttpMethod.POST, new HttpEntity<>(toSave), JmsConnectionDetails.class);
 
         assertThat(exchange.getStatusCode().is2xxSuccessful()).isTrue();
         toSave = exchange.getBody();
@@ -83,9 +83,9 @@ class JmsConnectionBFTest {
               .addConfig("key7", "value7"); // new, delete
         
         // save using PUT
-        exchange = restTemplate.exchange(
-                baseUrl + JmsConnectionBF.URL + "/" + toSave.getId(),
-                HttpMethod.PUT, new HttpEntity(toSave), JmsConnectionDetails.class);
+        exchange = this.restTemplate.exchange(
+                this.baseUrl + JmsConnectionBF.URL + "/" + toSave.getId(),
+                HttpMethod.PUT, new HttpEntity<>(toSave), JmsConnectionDetails.class);
 
         assertThat(exchange.getStatusCode().is2xxSuccessful()).isTrue();
         assertEquals("ahs", exchange.getBody().getName());
@@ -97,9 +97,9 @@ class JmsConnectionBFTest {
         
         // save using the POST end point
         toSave = exchange.getBody();
-        exchange = restTemplate.exchange(
-                baseUrl + JmsConnectionBF.URL,
-                HttpMethod.POST, new HttpEntity(toSave), JmsConnectionDetails.class);
+        exchange = this.restTemplate.exchange(
+                this.baseUrl + JmsConnectionBF.URL,
+                HttpMethod.POST, new HttpEntity<>(toSave), JmsConnectionDetails.class);
         
         assertThat(exchange.getStatusCode().is2xxSuccessful()).isTrue();
         assertEquals(toSave.getId(), exchange.getBody().getId());
@@ -109,10 +109,10 @@ class JmsConnectionBFTest {
     @Test
     public void testRead() {
         for (int i = 2; i < 5; i++) {
-            conectionDao.save(new JmsConnectionBE().setName("Test" + i).addOrSetConfig("user", "pass"));
+            this.conectionDao.save(new JmsConnectionBE().setName("Test" + i).addOrSetConfig("user", "pass"));
         }
-        ResponseEntity<String> result = restTemplate.exchange(
-                baseUrl + JmsConnectionBF.URL +
+        ResponseEntity<String> result = this.restTemplate.exchange(
+                this.baseUrl + JmsConnectionBF.URL +
                     "?page=0&size=5&sort=name,desc",
                 HttpMethod.GET, null, 
                 String.class);
@@ -123,8 +123,8 @@ class JmsConnectionBFTest {
             assertTrue(result.getBody().contains("Test" + i));
         }
         
-        result = restTemplate.exchange(
-                baseUrl + JmsConnectionBF.URL +
+        result = this.restTemplate.exchange(
+                this.baseUrl + JmsConnectionBF.URL +
                     "?page=30&size=5&sort=name,desc",
                 HttpMethod.GET, null, 
                 String.class);
@@ -133,7 +133,7 @@ class JmsConnectionBFTest {
     }
 
     Page<JmsConnectionView> getRestPage(String url) {
-        ResponseEntity<Page<JmsConnectionView>> exchange = restTemplate.exchange(url,
+        ResponseEntity<Page<JmsConnectionView>> exchange = this.restTemplate.exchange(url,
                 HttpMethod.GET, null, new ParameterizedTypeReference<Page<JmsConnectionView>>() {});
         
         return null;

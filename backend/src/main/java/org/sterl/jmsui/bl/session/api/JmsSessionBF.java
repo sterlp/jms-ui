@@ -23,8 +23,10 @@ import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.session.control.JmsSessionBM;
 
 @Transactional
-@JsonRestController("api/jms/sessions")
+@JsonRestController(JmsSessionBF.BASE_URL)
 public class JmsSessionBF {
+
+    public static final String BASE_URL = "/api/jms/sessions";
 
     @Autowired JmsSessionBM jmsSessionBM;
 
@@ -44,12 +46,13 @@ public class JmsSessionBF {
     }
     
     @PostMapping("/{connectorId}/message/{destination}")
-    public void sendMessage(@PathVariable long connectorId, @PathVariable String destination, @RequestBody @Valid SendJmsMessageCommand message) {
+    public void sendMessage(@PathVariable long connectorId, @PathVariable String destination, 
+            @RequestBody @Valid SendJmsMessageCommand message) {
         jmsSessionBM.sendMessage(connectorId, destination, message.getBody(), message.getHeader());
     }
     
     @GetMapping("/{connectorId}/message/{destination}")
-    public JmsResultMessage sendMessage(@PathVariable long connectorId, @PathVariable String destination, 
+    public JmsResultMessage receiveMessage(@PathVariable long connectorId, @PathVariable String destination, 
             @RequestParam(required = false) Long timeout) throws JMSException {
         Message msg = jmsSessionBM.receive(connectorId, destination, timeout);
         return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));

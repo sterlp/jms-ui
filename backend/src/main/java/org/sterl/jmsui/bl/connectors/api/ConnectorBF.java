@@ -1,27 +1,20 @@
 package org.sterl.jmsui.bl.connectors.api;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.sterl.jmsui.api.ConfigMetaData;
 import org.sterl.jmsui.bl.common.spring.JsonRestController;
-import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnectorFactory;
+import org.sterl.jmsui.bl.session.control.JmsSessionBM;
 
 @JsonRestController("/api/connectors")
 public class ConnectorBF {
+    public static final String BASE_URL = "/api/connectors";
 
-    private final IbmMqConnectorFactory ibmFactory = new IbmMqConnectorFactory();
+    @Autowired JmsSessionBM sessionBM;
 
     @GetMapping
-    public List<SupportedConnector> get() {
-        SupportedConnector t = SupportedConnector.builder().id("test").name("Test")
-            .configMeta(
-                    new ConfigMetaData[]
-                        {ConfigMetaData.<String>builder().property("userId").label("user").mandatory(false).build()})
-            .build();
-        return Arrays.asList(
-                //t,
-                SupportedConnector.builder().id(IbmMqConnectorFactory.class.getName()).name("IBM MQ").configMeta(ibmFactory.getConfigMetaData()).build());
+    public Collection<SupportedConnector> get() {
+        return sessionBM.getSupportedJmsFactories();
     }
 }

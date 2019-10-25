@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.springframework.jms.core.JmsTemplate;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
-import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnector;
-import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnectorFactory;
 
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.wmq.WMQConstants;

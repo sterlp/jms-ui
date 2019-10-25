@@ -24,7 +24,7 @@ public class JmsMessageConverter {
                     String key = propertyNames.nextElement();
                     properties.put(key, source.getObjectProperty(key));
                 }
-                
+
                 return JmsHeaderResultValues.builder()
                         .JMSType(source.getJMSType())
                         .JMSDeliveryMode(source.getJMSDeliveryMode())
@@ -39,7 +39,7 @@ public class JmsMessageConverter {
                         .JMSCorrelationID(source.getJMSCorrelationID())
                         .properties(properties)
                         .build();
-                
+
             } catch (JMSException e) {
                 throw new RuntimeException(e);
             }
@@ -48,5 +48,4 @@ public class JmsMessageConverter {
             return jmsDestination == null ? null : jmsDestination.toString();
         }
     }
-    
 }
