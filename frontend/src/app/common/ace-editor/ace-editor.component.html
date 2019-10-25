@@ -1,6 +1,8 @@
-<mat-toolbar>
-    <mat-toolbar-row>
+<div class="row ace-actions align-items-center">
+    <div class="col col-sm-2">
         <button mat-button (click) = "doFormat()">Format</button>
+    </div>
+    <div class="col col-sm-5">
         <mat-form-field>
             <mat-select [(ngModel)] = "config.mode" (selectionChange)="onConfigChange($event)">
             <mat-option value = "text">Text</mat-option>
@@ -8,7 +10,8 @@
             <mat-option value = "xml">XML</mat-option>
             </mat-select>
         </mat-form-field>
-        <span class="jms-ui-spacer"></span>
+    </div>
+    <div class="col col-sm-5">
         <mat-form-field>
             <mat-select [(ngModel)] = "inputSize" (selectionChange)="onConfigChange($event)">
             <mat-option value = "small">Small</mat-option>
@@ -16,8 +19,8 @@
             <mat-option value = "large">Large</mat-option>
             </mat-select>
         </mat-form-field>
-    </mat-toolbar-row>
-</mat-toolbar>
+    </div>
+</div>
 <ace [config]="config" [(value)]="value" 
     [ngClass]="inputSize"
     style="width: 100%">

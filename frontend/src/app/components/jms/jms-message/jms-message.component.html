@@ -1,7 +1,7 @@
-<div class="jms-ui-row">
-    <div class="col-6 jms-ui-row" *ngFor="let v of getHeaders() | keyvalue">
-        <div>{{ v.key }}</div>
-        <div class="left">{{ v.value }}</div>
-    </div>
+<div class="row mb-2">
+    <ng-container *ngFor="let v of getHeaders() | keyvalue">
+        <div class="col-md-4 col-lg-3 mb-1">{{ v.key }}</div>
+        <div class="col-md-8 col-lg-3 left mb-1"><strong>{{ format(v.key, v.value) }}</strong></div>
+    </ng-container>
 </div>
 <app-ace-editor [(value)] = "jmsMessage.body" [key] = "key"></app-ace-editor>

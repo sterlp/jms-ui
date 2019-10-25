@@ -1,6 +1,6 @@
-import { Component, OnInit, Input, EventEmitter, Output, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output, ViewChild, AfterViewInit, AfterContentInit, AfterViewChecked } from '@angular/core';
 import { AceConfigInterface, AceComponent, AceDirective } from 'ngx-ace-wrapper';
-declare var dp: any;
+declare var pd: any;
 //import * as pd from 'pretty-data';
 import 'brace';
 import 'brace/mode/text';
@@ -16,7 +16,7 @@ import 'brace/theme/xcode';
   templateUrl: './ace-editor.component.html',
   styleUrls: ['./ace-editor.component.scss']
 })
-export class AceEditorComponent implements OnInit, AfterViewInit {
+export class AceEditorComponent implements OnInit, AfterContentInit, AfterViewChecked {
   @ViewChild(AceComponent, { static: false }) componentRef?: AceComponent;
   @ViewChild(AceDirective, { static: false }) directiveRef?: AceDirective;
 
@@ -49,7 +49,9 @@ export class AceEditorComponent implements OnInit, AfterViewInit {
     this.config.mode = localStorage.getItem('js-ui-ace-mode-' + this.key) || this.config.mode;
     this.inputSize = localStorage.getItem('js-ui-ace-size-' + this.key) || this.inputSize;
   }
-  ngAfterViewInit(): void {
+  ngAfterContentInit(): void {
+  }
+  ngAfterViewChecked(): void {
     if (this.componentRef.directiveRef.getValue() !== this.content) {
       this.componentRef.directiveRef.setValue(this.content);
     }

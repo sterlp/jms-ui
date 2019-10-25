@@ -1,28 +1,30 @@
 <div class="container-fluid">
 
   <mat-card class="mb-2">
-    <mat-tab-group class="no-overflow">
-      <mat-tab [label]="target" class="no-overflow" style="overflow: hidden !important;">
-        <mat-toolbar>
-          <mat-toolbar-row>
-              <button mat-raised-button (click) = "doSend()"><mat-icon>call_made</mat-icon> Send</button>
-              <button mat-raised-button (click) = "doListen()"><mat-icon>call_received</mat-icon> Listen</button>
-              <span class="jms-ui-spacer"></span>
-              <app-loading *ngIf="loading$ | async"></app-loading>
-              <button mat-raised-button (click) = "doListen()"><mat-icon>save</mat-icon> save</button>
-          </mat-toolbar-row>
-        </mat-toolbar>
-        <app-jms-headers [(header)] = "jmsHeader"></app-jms-headers>
-        
-        <app-ace-editor [(value)] = "jmsMessage" [key] = "target"></app-ace-editor>
-        
-        <div>
-          <div class="col-10"></div>
-          <div class="col-2">Time:&nbsp;45ms</div>
-          <div class="col-1">status</div>
+    <mat-card-header>
+      <mat-card-title>{{ target }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="row justify-content-between mb-2">
+        <div class="col-auto btn-group" role="group">
+          <button type="button" (click) = "doSend()" class="btn btn-secondary"><mat-icon>call_made</mat-icon> Send</button>
+          <button type="button" (click) = "doListen()" class="btn btn-secondary"><mat-icon>call_received</mat-icon> Listen</button>
         </div>
-      </mat-tab>
-    </mat-tab-group>
+        <div class="col-auto">
+          <button type="button" class="btn btn-secondary" (click) = "doListen()"><i class="fa fa-floppy-o"></i> Save</button>
+        </div>
+      </div>
+
+      <app-jms-headers class="block mb-2" [(header)] = "jmsHeader"></app-jms-headers>
+      
+      <app-ace-editor [(value)] = "jmsMessage" [key] = "target"></app-ace-editor>
+      
+      <div class="row">
+        <div class="col-10"></div>
+        <div class="col-2">Time:&nbsp;45ms</div>
+        <div class="col-1">status</div>
+      </div>
+    </mat-card-content>
   </mat-card>
 
   
@@ -30,12 +32,16 @@
   <mat-accordion>
       <mat-expansion-panel *ngFor="let m of receivedMessages">
         <mat-expansion-panel-header>
-          JMS message
+          <mat-panel-title>
+            <mat-icon>email</mat-icon> Received at: {{ m.header.JMSDeliveryTime | date:'medium' }}
+          </mat-panel-title>
+          <mat-panel-description>
+              Body length {{ m.body?.length }}
+          </mat-panel-description>
         </mat-expansion-panel-header>
-        <mat-panel-description>
-            Body length {{ m.body?.length }}
-        </mat-panel-description>
+
         <app-jms-message [jms-message] = 'm'></app-jms-message>
+
       </mat-expansion-panel>
   </mat-accordion>
 </div>

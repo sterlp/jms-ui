@@ -28,6 +28,7 @@ import { JmsMessagePageComponent } from './page/session/jms-message-page/jms-mes
 import { JmsMessageComponent } from './components/jms/jms-message/jms-message.component';
 import { JmsHeadersComponent } from './components/jms/jms-headers/jms-headers.component';
 import { AceEditorComponent } from './common/ace-editor/ace-editor.component';
+import { DatePipe } from '@angular/common';
 
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {
   tabSize: 2,
@@ -65,9 +66,9 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     NgSpringBootApiModule,
     AceModule
   ],
-  providers: [{
-    provide: ACE_CONFIG, useValue: DEFAULT_ACE_CONFIG
-  }],
+  providers: [DatePipe,
+    { provide: ACE_CONFIG, useValue: DEFAULT_ACE_CONFIG }
+  ],
   bootstrap: [AppComponent],
   entryComponents: [
     ErrorDialogComponent

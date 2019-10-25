@@ -12,7 +12,7 @@
   </ol>
 </nav>
 
-<div class="container-fluid">
+<div class="container">
   <div class="row">
     <div class="col">
       <div class="mat-elevation-z8">
@@ -55,17 +55,13 @@
         
           <tr mat-header-row *matHeaderRowDef="['name', 'timeout', 'action']"></tr>
           <tr mat-row *matRowDef="let row; columns: ['name', 'timeout', 'action'];"></tr>
+
+          
         </table>
+
   
-        <mat-toolbar>
-          <mat-toolbar-row>
-              <button mat-button matTooltip="Reload" (click)="doLoad()"><mat-icon>loop</mat-icon></button>
-              <div class="ml-auto"></div>
-              <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
-          </mat-toolbar-row>
-        </mat-toolbar>
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]" showFirstLastButtons></mat-paginator>
       </div>
-    </div>
-    
+    </div>    
   </div>
 </div>

@@ -1,9 +1,11 @@
 table {
     width: 100%;
 }
-.mat-toolbar {
-    background: #fff
+
+.mat-paginator, .mat-elevation-z8 {
+    min-width: 450px;
 }
+
 
 .jms-loading {
     display: flex;

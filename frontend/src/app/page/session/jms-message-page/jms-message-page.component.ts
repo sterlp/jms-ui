@@ -10,7 +10,7 @@ import { ArrayUtils } from 'src/app/common/utils';
   templateUrl: './jms-message-page.component.html',
   styleUrls: ['./jms-message-page.component.scss']
 })
-export class JmsMessagePageComponent implements OnInit, AfterViewInit {
+export class JmsMessagePageComponent implements OnInit {
 
   connector: number;
   target: string;
@@ -27,23 +27,19 @@ export class JmsMessagePageComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.loading$ = this.sessionService.loading$;
-  }
-
-  ngAfterViewInit(): void {
     this.route.params.subscribe(params => {
       this.connector = params.id * 1;
       this.target = params.target;
       console.info('JmsMessagePageComponent', this.connector, this.target);
     });
-    const m = new Map();
-    m.set('fff', 1);
-    console.info( ArrayUtils.forEach({foo: 1}) );
-    console.info( ArrayUtils.forEach(m) );
+  }
+
+  ngAfterViewInit(): void {
   }
 
   doSend() {
     const body: SendJmsMessageCommand = {
-      body: this.jmsMessage,
+      body: this.jmsMessage || '',
       header: this.jmsHeader
     };
     this.sessionService.sendJmsMessage(this.connector, this.target, body)
@@ -56,9 +52,11 @@ export class JmsMessagePageComponent implements OnInit, AfterViewInit {
     this.sessionService.receiveJmsMessage(this.connector, this.target)
       .subscribe(r => {
         console.info("receive ...", r, r.header.JMSDestination);
-        if (r.header || r.body) {
+        if (r && (r.header || r.body)) {
           r._time = new Date().getDate() - startTime.getDate();
-          this.receivedMessages.push(r);
+          this.receivedMessages.unshift(r);
+        } else {
+          // TODO no message ...
         }
       });
   }

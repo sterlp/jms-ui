@@ -1,9 +1,13 @@
-.mat-toolbar-multiple-rows, .mat-toolbar-row {
-    height: 36px;
-    min-height: 36px;
-    background: #ebebeb;
-    font-size: 14px;
+.ace-actions {
+    background: #DADADA;
+    margin-right: 0px;
+    margin-left: 0px;
+
+    .mat-form-field {
+       width: 100%; 
+    }
 }
+
 .small {
     height: 150px;
 }

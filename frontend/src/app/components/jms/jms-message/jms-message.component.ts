@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { JmsMessage, JmsHeader } from 'src/app/api/jms-session';
 import { ArrayUtils } from 'src/app/common/utils';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-jms-message',
@@ -11,7 +12,7 @@ export class JmsMessageComponent implements OnInit {
 
   @Input('jms-message') jmsMessage: JmsMessage<JmsHeader>;
   @Input() key ? = 'default';
-  constructor() { }
+  constructor(private datePipe: DatePipe) { }
 
   ngOnInit() {
   }
@@ -28,5 +29,15 @@ export class JmsMessageComponent implements OnInit {
       }
     }
     return result;
+  }
+
+  format(type: string, val: any): any {
+    if (!val) return val;
+
+    if (type === 'JMSDeliveryTime' || type === 'JMSTimestamp') {
+      return this.datePipe.transform(val, 'medium');
+    } else {
+      return val;
+    }
   }
 }
