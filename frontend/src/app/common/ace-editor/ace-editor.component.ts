@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output, ViewChild, AfterViewInit, AfterContentInit, AfterViewChecked } from '@angular/core';
 import { AceConfigInterface, AceComponent, AceDirective } from 'ngx-ace-wrapper';
-declare var pd: any;
-//import * as pd from 'pretty-data';
+//declare var pd: any;
+import * as pd from '@sterlp/pretty-data';
 import 'brace';
 import 'brace/mode/text';
 import 'brace/mode/json';

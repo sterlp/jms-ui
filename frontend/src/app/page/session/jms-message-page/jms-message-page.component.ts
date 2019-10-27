@@ -15,14 +15,22 @@ import { transition, trigger, state, animate, style } from '@angular/animations'
   styleUrls: ['./jms-message-page.component.scss'],
   animations: [
     trigger('newMessage', [
+      transition(':enter', [
+        style({ backgroundColor: 'var(--orange)' }),
+        animate(500, style({ backgroundColor: 'var(--white)' })),
+      ])
+    ])
+    /*
+    trigger('newMessage', [
         state('active', style({
             backgroundColor: 'var(--orange)',
         })),
         state('inactive', style({
             backgroundColor: 'var(--white)',
         })),
-        transition('active => inactive', animate('1s'))
+        transition('active => inactive', animate(500))
     ])
+    */
   ]
 })
 // tslint:disable: curly no-console
@@ -30,7 +38,6 @@ export class JmsMessagePageComponent implements OnInit, OnDestroy {
 
   private subs = new SubscriptionsHolder();
 
-  state = 'active';
   connector: ConnectorView;
   target: string;
   jmsMessage: string;
@@ -92,10 +99,6 @@ export class JmsMessagePageComponent implements OnInit, OnDestroy {
           r._time = new Date().getDate() - startTime.getDate();
           this.receivedMessages.unshift(r);
 
-          this.state = 'active';
-          setTimeout(() => {
-              this.state = 'inactive';
-          }, 500);
         } else {
           // TODO no message ...
         }

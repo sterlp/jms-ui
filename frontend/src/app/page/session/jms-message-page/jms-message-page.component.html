@@ -46,7 +46,7 @@
   <mat-accordion>
       <mat-expansion-panel *ngFor="let m of receivedMessages; let index = index" 
         [expanded] = "index === 0"
-        [@newMessage] = "index === 0 ? state : 'inactive'">
+        [@newMessage]>
         <mat-expansion-panel-header>
           <mat-panel-title>
             <mat-icon>mail_outline</mat-icon> Received at: {{ m.header.JMSDeliveryTime | date:'medium' }}
