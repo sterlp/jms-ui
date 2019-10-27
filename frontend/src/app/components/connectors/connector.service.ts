@@ -27,13 +27,13 @@ export class ConnectorService {
   }
   reloadSupportedConnectors(): Observable<SupportedConnector[]> {
     this.loading.isLoading();
-    this.http.get<SupportedConnector[]>('api/connectors')
+    const res = this.http.get<SupportedConnector[]>('api/connectors')
       .pipe(
         finalize(() => this.loading.finishedLoading()),
         catchError(this.loading.handleError<SupportedConnector[]>('Load Supported Connectors', []))
-      )
-      .subscribe(result => this.supportedConnectors.next(result));
-    return this.supportedConnectors$;
+      );
+    res.subscribe(result => this.supportedConnectors.next(result));
+    return res;
   }
 
   save(data: ConnectorData): Observable<ConnectorData> {

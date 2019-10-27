@@ -38,7 +38,7 @@ class JmsConnectionBFTest {
     public void init() {
         this.conectionDao.deleteAll();
         this.baseUrl = "http://127.0.0.1:" + this.port;
-        this.conectionDao.save(new JmsConnectionBE().setName("Test1").addOrSetConfig("user", "pass"));
+        this.conectionDao.save(new JmsConnectionBE("Test1", "Bar1").addOrSetConfig("user", "pass"));
     }
     
     @Test
@@ -109,7 +109,7 @@ class JmsConnectionBFTest {
     @Test
     public void testRead() {
         for (int i = 2; i < 5; i++) {
-            this.conectionDao.save(new JmsConnectionBE().setName("Test" + i).addOrSetConfig("user", "pass"));
+            this.conectionDao.save(new JmsConnectionBE("Test" + i, "Foo").addOrSetConfig("user", "pass"));
         }
         ResponseEntity<String> result = this.restTemplate.exchange(
                 this.baseUrl + JmsConnectionBF.URL +

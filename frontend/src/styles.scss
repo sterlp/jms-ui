@@ -46,6 +46,11 @@
     overflow: hidden;
 }
 
+.col.table,
+.col.mat-form-field {
+    width: 100%;
+}
+
 .breadcrumb {
     .jms-loading {
         label {

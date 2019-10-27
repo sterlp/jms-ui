@@ -20,8 +20,8 @@
             <a class="nav-link nav-dropdown-toggle" appToggle>
                 <mat-icon class="nav-icon">power</mat-icon> Open Sessions
             </a>
-            <ul class="nav-dropdown-items" *ngFor="let s of sessions">
-                <li class="nav-item">
+            <ul class="nav-dropdown-items">
+                <li class="nav-item" *ngFor="let s of sessions">
                     <a class="nav-link" routerLinkActive="active" [routerLink]="['/sessions', s.id]">
                         <mat-icon class="nav-icon">power</mat-icon> {{ s.name }}
                     </a>

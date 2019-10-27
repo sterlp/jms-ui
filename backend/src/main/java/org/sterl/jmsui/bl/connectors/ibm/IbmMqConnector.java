@@ -168,4 +168,9 @@ public class IbmMqConnector implements JmsConnectorInstance {
         if (value == null) return value;
         else return value.trim();
     }
+
+    @Override
+    public boolean isClosed() {
+        return ibmMqManager != null && !ibmMqManager.isConnected();
+    }
 }

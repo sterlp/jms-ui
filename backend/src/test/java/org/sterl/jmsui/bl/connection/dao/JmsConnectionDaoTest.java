@@ -19,9 +19,9 @@ class JmsConnectionDaoTest {
 
     @Test
     void testRead() {
-        JmsConnectionBE s1 = subject.save(new JmsConnectionBE().setName("Foo1"));
-        JmsConnectionBE s2 = subject.save(new JmsConnectionBE().setName("Foo2"));
-        JmsConnectionBE s3 = subject.save(new JmsConnectionBE().setName("Foo3"));
+        JmsConnectionBE s1 = subject.save(new JmsConnectionBE("Foo1", "Bar1"));
+        JmsConnectionBE s2 = subject.save(new JmsConnectionBE("Foo2", "Bar1"));
+        JmsConnectionBE s3 = subject.save(new JmsConnectionBE("Foo3", "Bar1"));
         
         List<JmsConnectionView> results = subject.findByIdIn(Arrays.asList(s2.getId(), s3.getId()));
         assertNotNull(results);

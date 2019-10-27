@@ -47,4 +47,8 @@ export class ConnectorPageComponent implements OnInit, OnDestroy {
       this.router.navigate(this.BACK_URL);
     });
   }
+  doCopy() {
+    this.connectorData.id = null;
+    this.connectorData.name = 'Copy of ' + this.connectorData.name;
+  }
 }

@@ -26,7 +26,7 @@ export class LoadingService implements Closable, OnDestroy {
     return (error: any): Observable<T> => {
       console.error(`${operation} failed: ${error.message}`, error); // log to console instead
       this.dialog.open(ErrorDialogComponent, {
-        width: '60%',
+        width: '70%',
         data: {error, operation},
         closeOnNavigation: true
       });

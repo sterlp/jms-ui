@@ -18,16 +18,23 @@ import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sterl.jmsui.bl.bookmarks.model.BookmarkBE;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @NoArgsConstructor
 @Data @Accessors(chain = true)
 @EqualsAndHashCode(of = "id")
-@ToString(of = {"id", "name", "clientName", "type", "version"})
+@ToString(of = {"id", "name", "clientName", "type", "version", "timeout"})
 @Entity
 @Table(name =  "JMS_CONNECTON", indexes = @Index(name = "IDX_JMS_CONNECTION_TYPE", columnList = "type"))
 public class JmsConnectionBE {
@@ -35,6 +42,8 @@ public class JmsConnectionBE {
     @Id
     private Long id;
 
+    @NotNull
+    @Size(min = 1, max = 128)
     private String type;
 
     @Version
@@ -52,6 +61,21 @@ public class JmsConnectionBE {
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "connection")
     private List<ConfigValueBE> configValues = new ArrayList<>();
+    
+    @JsonIgnore @Getter(AccessLevel.PACKAGE) @Setter(AccessLevel.PACKAGE)
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE}, mappedBy = "connection", orphanRemoval = true)
+    private List<BookmarkBE> bookmarks = new ArrayList<>();
+    
+    public JmsConnectionBE(Long id) {
+        super();
+        this.id = id;
+    }
+    
+    public JmsConnectionBE(@NotNull String type, @NotNull @Size(min = 1, max = 128) String name) {
+        super();
+        this.type = type;
+        this.name = name;
+    }
 
     public JmsConnectionBE addOrSetConfig(String key, String value) {
         ConfigValueBE configValueBE = configValues.stream()

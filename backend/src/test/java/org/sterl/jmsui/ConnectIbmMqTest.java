@@ -11,6 +11,7 @@ import java.util.List;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.jms.core.JmsTemplate;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
@@ -29,6 +30,7 @@ import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
+@Disabled
 public class ConnectIbmMqTest {
 
     private static final String QMGR = "PAUL.DEV";

@@ -33,4 +33,6 @@ public interface JmsConnectorInstance extends Closeable {
      * @return the message received // maybe <code>null</code>
      */
     Message receive(String destination, Long timeout);
+    
+    boolean isClosed();
 }

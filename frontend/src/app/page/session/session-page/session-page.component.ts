@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 import { JmsResource } from 'src/app/api/jms-session';
 import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
 import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api';
+import { BookmarksComponent } from 'src/app/components/bookmarks/list/bookmarks.component';
 
 @Component({
   selector: 'app-session-page',
@@ -16,13 +17,14 @@ import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api'
 })
 // tslint:disable: curly
 export class SessionPageComponent implements OnInit, AfterContentInit, OnDestroy {
-  private id: number;
+  id: number;
   private subs = new SubscriptionsHolder();
 
   loading$: Observable<boolean>;
   conData: ConnectorView;
   dataSource = new MatTableDataSource<JmsResource>([]);
 
+  @ViewChild(BookmarksComponent, {static: false}) bookmarkComponent: BookmarksComponent;
   @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
   @ViewChild(MatSort, {static: false}) sort: MatSort;
 

@@ -81,9 +81,14 @@ class SessionBA implements Closeable {
     }
     Optional<Entry<Long, JmsConnectorInstance>> getStoredSession(
             @NotNull long connectorId) {
-        return SESSIONS.entrySet().stream()
+        Optional<Entry<Long, JmsConnectorInstance>> session = SESSIONS.entrySet().stream()
                 .filter(e -> connectorId == e.getKey().longValue())
                 .findFirst();
+        if (session.isPresent() && session.get().getValue().isClosed()) {
+            disconnect(session.get().getKey());
+            session = Optional.empty();
+        }
+        return session;
     }
     public Collection<SupportedConnector> getJmsFactories() {
         return FACTORIES.entrySet().stream().map(e -> {

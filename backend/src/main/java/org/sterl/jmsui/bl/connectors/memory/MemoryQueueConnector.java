@@ -46,4 +46,8 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     public Message receive(String destination, Long timeout) {
         return memoryQueue.poll();
     }
+    @Override
+    public boolean isClosed() {
+        return false;
+    }
 }

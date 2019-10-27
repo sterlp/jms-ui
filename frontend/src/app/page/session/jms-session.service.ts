@@ -86,8 +86,10 @@ export class JmsSessionService {
 
   getQueues(connectorId: number): Observable<JmsResource[]> {
     this.$loading.isLoading();
-    return this.http.get<JmsResource[]>('api/jms/sessions/' + connectorId + '/queues')
-               .pipe(finalize(() => this.$loading.finishedLoading()));
+    return this.http.get<JmsResource[]>('api/jms/sessions/' + connectorId + '/queues').pipe(
+      finalize(() => this.$loading.finishedLoading()),
+      catchError(this.handleError<JmsResource[]>('Failed to load the resources.' , []))
+    );
   }
 
   private handleError<T>(operation = 'operation', result?: T) {

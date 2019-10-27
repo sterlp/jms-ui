@@ -9,6 +9,7 @@
         <li class="breadcrumb-menu">
             <div class="btn-group" role="group">
                 <button class="btn" (click)="doSave()"><i class="fa fa-floppy-o"></i> Save</button>
+                <button class="btn" *ngIf="connectorData.id" (click)="doCopy()"><i class="fa fa-clone"></i> Copy</button>
                 <button class="btn" [routerLink]="BACK_URL"><i class="cui-action-undo"></i> Close</button>
             </div>
         </li>

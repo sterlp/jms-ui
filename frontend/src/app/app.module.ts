@@ -10,7 +10,6 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './dashboard/header/header.component';
 import { SidebarComponent } from './dashboard/sidebar/sidebar.component';
 import { ToggleDirective } from './dashboard/toggle.directive';
-import { HomeComponent } from './page/home/home.component';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialModule} from './material-module';
@@ -28,6 +27,7 @@ import { JmsMessageComponent } from './components/jms/jms-message/jms-message.co
 import { JmsHeadersComponent } from './components/jms/jms-headers/jms-headers.component';
 import { AceEditorComponent } from './common/ace-editor/ace-editor.component';
 import { DatePipe } from '@angular/common';
+import { BookmarksComponent } from './components/bookmarks/list/bookmarks.component';
 
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {
   tabSize: 2,
@@ -44,7 +44,6 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     ConfigFieldComponent,
     ErrorDialogComponent,
     LoadingComponent,
-    HomeComponent,
     SessionPageComponent,
     ConnectorViewComponent,
     ConnectorsComponent,
@@ -52,7 +51,8 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     JmsMessagePageComponent,
     JmsMessageComponent,
     JmsHeadersComponent,
-    AceEditorComponent
+    AceEditorComponent,
+    BookmarksComponent
   ],
   imports: [
     BrowserModule,
