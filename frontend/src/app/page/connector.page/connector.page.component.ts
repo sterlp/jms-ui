@@ -36,7 +36,7 @@ export class ConnectorPageComponent implements OnInit, OnDestroy {
     this.subs.close();
   }
 
-  doSave(close: false) {
+  doSave(close?: boolean) {
     this.connectorService.save(this.connectorData).subscribe(result => {
       this.connectorData = result;
       if (close) this.router.navigate(this.BACK_URL);

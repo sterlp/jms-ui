@@ -32,6 +32,7 @@
                     <filesets>
                         <fileset>
                             <directory>node_modules</directory>
+                            <directory>dist</directory>
                         </fileset>
                     </filesets>
                 </configuration>

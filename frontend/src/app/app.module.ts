@@ -26,7 +26,7 @@ import { JmsMessagePageComponent } from './page/session/jms-message-page/jms-mes
 import { JmsMessageComponent } from './components/jms/jms-message/jms-message.component';
 import { JmsHeadersComponent } from './components/jms/jms-headers/jms-headers.component';
 import { AceEditorComponent } from './common/ace-editor/ace-editor.component';
-import { DatePipe } from '@angular/common';
+import { DatePipe, LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { BookmarksComponent } from './components/bookmarks/list/bookmarks.component';
 
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {
@@ -65,7 +65,11 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     AceModule
   ],
   providers: [DatePipe,
-    { provide: ACE_CONFIG, useValue: DEFAULT_ACE_CONFIG }
+    { provide: ACE_CONFIG, useValue: DEFAULT_ACE_CONFIG },
+    {
+      provide: LocationStrategy,
+      useClass: HashLocationStrategy
+    }
   ],
   bootstrap: [AppComponent],
   entryComponents: [

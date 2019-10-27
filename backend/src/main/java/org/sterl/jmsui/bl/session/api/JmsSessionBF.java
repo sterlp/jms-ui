@@ -1,6 +1,7 @@
 package org.sterl.jmsui.bl.session.api;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -59,7 +60,13 @@ public class JmsSessionBF {
     @DeleteMapping("/{connectorId}")
     public SimplePage<JmsConnectionView> close(@PathVariable long connectorId) {
         Set<Long> sessions = jmsSessionBM.disconnect(connectorId);
-        return connectionBF.list(sessions, null);
+        SimplePage<JmsConnectionView> result;
+        if (sessions == null || sessions.isEmpty()) {
+            result = SimplePage.of(new ArrayList<>());
+        } else {
+            result = connectionBF.list(sessions, null);
+        }
+        return result;
     }
     
     @PostMapping("/{connectorId}/message/{destination}")
