@@ -22,6 +22,15 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data @NoArgsConstructor
 public class SimplePage<T> {
+    public static <T> SimplePage<T> of(List<T> items) {
+        SimplePage<T> result = new SimplePage<>();
+        result.content = items;
+        result.number = 0;
+        result.numberOfElements = items.size();
+        result.size = items.size();
+        result.totalElements = items.size();
+        return result;
+    }
 
     private List<T> content = new ArrayList<>();
     /**

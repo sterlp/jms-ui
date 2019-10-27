@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, Inject, Renderer2, OnDestroy } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
+import { ConnectorView } from 'src/app/api/connector';
 
 /**
  * https://coreui.io/v1/docs/layout/options/
@@ -10,25 +12,30 @@ import { DOCUMENT } from '@angular/common';
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit, OnDestroy {
-  
+
+  private sidebarMinimized = false;
+  sessions: ConnectorView[] = [];
+
   constructor(
     @Inject(DOCUMENT) private document: any,
-    private renderer: Renderer2) { }
+    private renderer: Renderer2,
+    private sessionsService: JmsSessionService) { }
 
   // make the side bar full hight
-  // app-sidebar-nav-divider 
+  // app-sidebar-nav-divider
   ngOnInit() {
-    this.renderer.addClass(this.document.body, 'sidebar-fixed');
+      this.renderer.addClass(this.document.body, 'sidebar-fixed');
+      this.sessionsService.sessions$.subscribe(s => this.sessions = s);
   }
+
   ngOnDestroy(): void {
     this.renderer.removeClass(this.document.body, 'sidebar-fixed');
   }
 
-  private sidebarMinimized = false;
+  // tslint:disable: curly
   doMinimize() {
     if (this.sidebarMinimized) this.renderer.removeClass(this.document.body, 'sidebar-minimized');
     else this.renderer.addClass(this.document.body, 'sidebar-minimized');
-
     this.sidebarMinimized = !this.sidebarMinimized;
   }
   showMinimize(): boolean {

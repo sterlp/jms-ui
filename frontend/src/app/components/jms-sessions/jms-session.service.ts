@@ -10,6 +10,7 @@ import { BehaviorSubject, Subscription } from 'rxjs';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
 import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
+import { Page } from 'projects/ng-spring-boot-api/src/public-api';
 
 // /api/jms/sessions
 @Injectable({
@@ -23,27 +24,31 @@ export class JmsSessionService {
   constructor(private http: HttpClient, private $loading: LoadingService, private dialog: MatDialog) {
     this.loading$ = $loading.loading$;
   }
+
+  getStoredSession(connectorId: number, connectors?: ConnectorView[]): ConnectorView {
+    // tslint:disable-next-line: curly
+    if (!connectors) connectors = this.sessions$.value;
+    return connectors.find(s => s.id === connectorId);
+  }
+
   /**
    * Opens a session to the given connector.
    * @returns subject of all currently open sessions
    */
-  openSession(connector: ConnectorView): Observable<ConnectorView[]> {
+  openSession(connectorId: number): Observable<ConnectorView[]> {
     this.$loading.isLoading();
-    this.http.post<number>(`/api/jms/sessions/${connector.id}`, null)
+    return this.http.post<Page<ConnectorView>>(`/api/jms/sessions/${connectorId}`, null)
       .pipe(
         finalize(() => this.$loading.finishedLoading()),
-        catchError(this.handleError<number>('Faild to connect', null))
-      )
-      .subscribe(id => {
-        if (id) {
-          const current = this.sessions$.getValue();
-          if (current.filter(s => s.id === id).length === 0) {
-            current.push(connector);
-            this.sessions$.next(current);
+        catchError(this.handleError<Page<ConnectorView>>('Faild to connect', null)),
+        map(s => {
+          if (s && s.content) {
+            this.sessions$.next(s.content);
+            return s.content;
           }
-        }
-      });
-    return this.sessions$;
+          return [];
+        })
+      );
   }
 
   sendJmsMessage(connectorId: number, target: string, body: SendJmsMessageCommand): Observable<void> {

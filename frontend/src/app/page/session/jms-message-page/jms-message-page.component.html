@@ -1,3 +1,21 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item" aria-current="page" ><a [routerLink]="['/jms-connectors']">Connectors</a></li>
+    <li class="breadcrumb-item" aria-current="page" *ngIf="connector">
+      <a [routerLink]="['/sessions', connector.id]">{{ connector.name }}</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">{{ target }}</li>
+      <!-- Breadcrumb Menu
+      <li class="breadcrumb-menu">
+          <div class="btn-group" role="group">
+              <a class="btn" [routerLink]="['/jms-connector']"><i class="fa fa-plus-circle"></i> New</a>
+              <button type="button" class="btn btn-link" (click)="doLoad()"><mat-icon>loop</mat-icon> Reload</button>
+          </div>
+      </li>
+      -->
+  </ol>
+</nav>
+
 <div class="container-fluid">
 
   <mat-card class="mb-2">
@@ -9,6 +27,7 @@
         <div class="col-auto btn-group" role="group">
           <button type="button" (click) = "doSend()" class="btn btn-secondary"><mat-icon>call_made</mat-icon> Send</button>
           <button type="button" (click) = "doListen()" class="btn btn-secondary"><mat-icon>call_received</mat-icon> Listen</button>
+          <button type="button" (click) = "doClear()" class="btn btn-secondary"><i class="fa fa-trash" aria-hidden="true"></i> Clear</button>
         </div>
         <div class="col-auto">
           <button type="button" class="btn btn-secondary" (click) = "doListen()"><i class="fa fa-floppy-o"></i> Save</button>
@@ -19,28 +38,27 @@
       
       <app-ace-editor [(value)] = "jmsMessage" [key] = "target"></app-ace-editor>
       
-      <div class="row">
-        <div class="col-10"></div>
-        <div class="col-2">Time:&nbsp;45ms</div>
-        <div class="col-1">status</div>
-      </div>
     </mat-card-content>
   </mat-card>
 
   
   
   <mat-accordion>
-      <mat-expansion-panel *ngFor="let m of receivedMessages">
+      <mat-expansion-panel *ngFor="let m of receivedMessages; let index = index" 
+        [expanded] = "index === 0"
+        [@newMessage] = "index === 0 ? state : 'inactive'">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon>email</mat-icon> Received at: {{ m.header.JMSDeliveryTime | date:'medium' }}
+            <mat-icon>mail_outline</mat-icon> Received at: {{ m.header.JMSDeliveryTime | date:'medium' }}
           </mat-panel-title>
           <mat-panel-description>
               Body length {{ m.body?.length }}
           </mat-panel-description>
         </mat-expansion-panel-header>
 
-        <app-jms-message [jms-message] = 'm'></app-jms-message>
+        <ng-template matExpansionPanelContent>
+          <app-jms-message [jms-message] = 'm'></app-jms-message>
+        </ng-template>
 
       </mat-expansion-panel>
   </mat-accordion>

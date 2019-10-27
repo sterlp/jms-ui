@@ -23,7 +23,7 @@ export class ConnectorPageComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.subs.addAny(this.route.params.subscribe(params => {
-      const id = params.id;
+      const id = params.id * 1;
       if (id) {
         this.connectorService.getConnectorWithConfig(id).subscribe(d => this.connectorData = d);
       } else {

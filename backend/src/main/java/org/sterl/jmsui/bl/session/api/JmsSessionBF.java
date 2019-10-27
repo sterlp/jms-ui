@@ -2,6 +2,7 @@ package org.sterl.jmsui.bl.session.api;
 
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Set;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
@@ -18,7 +19,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.sterl.jmsui.api.JmsMessageConverter.ToJmsHeaderResultValues;
+import org.sterl.jmsui.bl.common.api.SimplePage;
 import org.sterl.jmsui.bl.common.spring.JsonRestController;
+import org.sterl.jmsui.bl.connection.api.JmsConnectionBF;
+import org.sterl.jmsui.bl.connection.api.model.JmsConnectionView;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.session.control.JmsSessionBM;
 
@@ -29,10 +33,18 @@ public class JmsSessionBF {
     public static final String BASE_URL = "/api/jms/sessions";
 
     @Autowired JmsSessionBM jmsSessionBM;
+    @Autowired JmsConnectionBF connectionBF;
 
+    /**
+     * Opens a session and returns the currently open sessions back.
+     * 
+     * @param connectorId the connection to open
+     * @return the open sessions
+     */
     @PostMapping("/{connectorId}")
-    public long open(@PathVariable long connectorId) throws Exception {
-        return jmsSessionBM.connect(connectorId);
+    public SimplePage<JmsConnectionView> open(@PathVariable long connectorId) {
+        Set<Long> sessions = jmsSessionBM.connect(connectorId);
+        return connectionBF.list(sessions, null);
     }
     
     @GetMapping("/{connectorId}/queues")

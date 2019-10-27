@@ -7,6 +7,7 @@ import { Directive, ElementRef, Renderer2, HostListener, Input, OnInit } from '@
   selector: '[appToggle]'
 })
 export class ToggleDirective implements OnInit {
+  @Input() useParent ? = true;
   @Input() appToggle?: string;
 
   constructor(private el: ElementRef, private renderer: Renderer2) { }
@@ -18,10 +19,11 @@ export class ToggleDirective implements OnInit {
 
   @HostListener('click')
   onClick() {
-    if (this.el.nativeElement.classList.contains(this.appToggle)) {
-      this.renderer.removeClass(this.el.nativeElement, this.appToggle);
+    const el = this.useParent ? this.el.nativeElement.parentNode : this.el.nativeElement;
+    if (el.classList.contains(this.appToggle)) {
+      this.renderer.removeClass(el, this.appToggle);
     } else {
-      this.renderer.addClass(this.el.nativeElement, this.appToggle);
+      this.renderer.addClass(el, this.appToggle);
     }
   }
 }

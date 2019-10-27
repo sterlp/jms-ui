@@ -1,5 +1,8 @@
 package org.sterl.jmsui.bl.connection.api;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.sterl.jmsui.bl.common.api.SimplePage;
 import org.sterl.jmsui.bl.common.spring.JsonRestController;
 import org.sterl.jmsui.bl.connection.api.ConnectionConverter.ToJmsConnection;
@@ -30,8 +34,14 @@ public class JmsConnectionBF {
     @Autowired JmsSessionBM jmsSessionsBM;
     
     @GetMapping
-    public SimplePage<JmsConnectionView> list(Pageable page) {
-        return new SimplePage<>(jmsConnectionDao.findViewBy(page));
+    public SimplePage<JmsConnectionView> list(
+            @RequestParam(name = "ids", required = false) Collection<Long> ids, Pageable page) {
+        if (ids == null || ids.isEmpty()) {            
+            return new SimplePage<>(jmsConnectionDao.findViewBy(page));
+        } else {
+            List<JmsConnectionView> found = jmsConnectionDao.findByIdIn(ids);
+            return SimplePage.of(found);
+        }
     }
     
     @GetMapping("/{id}")

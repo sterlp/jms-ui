@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.jms.Message;
 
@@ -36,16 +37,17 @@ public class JmsSessionBM {
         JmsConnectorInstance connector = getOrConnect(connectorId);
         return connector.listResources();
     }
-    public long connect(long connectorId) {
+    /**
+     * Creates a connections to the given connector and returns all open sessions id's.
+     * @param connectorId the connector to connect to
+     * @return the {@link Set} of open sessions
+     */
+    public Set<Long> connect(long connectorId) {
         Optional<Entry<Long, JmsConnectorInstance>> storedSession = sessionBA.getStoredSession(connectorId);
-        long result;
-        if (storedSession.isPresent()) {
-            result = connectorId;
-        } else {
+        if (!storedSession.isPresent()) {
             sessionBA.connect(connectionBM.getWithConfig(connectorId));
-            result = connectorId;
         }
-        return result;
+        return sessionBA.openSessions();
     }
     public void disconnect(long connectorId) {
         sessionBA.disconnect(connectorId);

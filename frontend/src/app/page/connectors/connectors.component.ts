@@ -38,21 +38,13 @@ export class ConnectorsComponent implements OnInit, AfterViewInit {
   }
 
   doConnect(conData: ConnectorData) {
-    this.$session.openSession(conData).subscribe(
+    this.$session.openSession(conData.id).subscribe(
       openSessions => {
         // only if we session was created
-        if (openSessions.find( s => s.id === conData.id)) {
+        if (openSessions.find(s => s.id === conData.id)) {
           this.$router.navigate(['/sessions', conData.id]);
         }
       },
     );
-  }
-
-  private showError(operation = '', error: any) {
-    console.error(`${operation} failed: ${error.message}`, error); // log to console instead
-    this.dialog.open(ErrorDialogComponent, {
-      width: '250px',
-      data: {error, operation}
-    });
   }
 }

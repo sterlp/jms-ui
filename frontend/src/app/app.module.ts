@@ -23,7 +23,6 @@ import { ConfigFieldComponent } from './components/connectors/config-field/confi
 import { HttpClientModule } from '@angular/common/http';
 import { NgSpringBootApiModule } from 'projects/ng-spring-boot-api/src/public-api';
 import { ConnectorPageComponent } from './page/connector.page/connector.page.component';
-import { OpenSessionsComponent } from './components/jms-sessions/open-sessions/open-sessions.component';
 import { JmsMessagePageComponent } from './page/session/jms-message-page/jms-message-page.component';
 import { JmsMessageComponent } from './components/jms/jms-message/jms-message.component';
 import { JmsHeadersComponent } from './components/jms/jms-headers/jms-headers.component';
@@ -50,7 +49,6 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     ConnectorViewComponent,
     ConnectorsComponent,
     ConnectorPageComponent,
-    OpenSessionsComponent,
     JmsMessagePageComponent,
     JmsMessageComponent,
     JmsHeadersComponent,

@@ -1,40 +1,75 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
 import { ConnectorService } from 'src/app/components/connectors/connector.service';
 import { SendJmsMessageCommand, JmsResultMessage, JmsHeaderRequestValues } from 'src/app/api/jms-session';
 import { ArrayUtils } from 'src/app/common/utils';
+import { Observable } from 'rxjs';
+import { ConnectorView } from 'src/app/api/connector';
+import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api';
+import { transition, trigger, state, animate, style } from '@angular/animations';
 
 @Component({
   selector: 'app-jms-message-page',
   templateUrl: './jms-message-page.component.html',
-  styleUrls: ['./jms-message-page.component.scss']
+  styleUrls: ['./jms-message-page.component.scss'],
+  animations: [
+    trigger('newMessage', [
+        state('active', style({
+            backgroundColor: 'var(--orange)',
+        })),
+        state('inactive', style({
+            backgroundColor: 'var(--white)',
+        })),
+        transition('active => inactive', animate('1s'))
+    ])
+  ]
 })
-export class JmsMessagePageComponent implements OnInit {
+// tslint:disable: curly no-console
+export class JmsMessagePageComponent implements OnInit, OnDestroy {
 
-  connector: number;
+  private subs = new SubscriptionsHolder();
+
+  state = 'active';
+  connector: ConnectorView;
   target: string;
   jmsMessage: string;
-  loading$;
+  loading$: Observable<boolean>;
   jmsHeader = {} as JmsHeaderRequestValues;
 
   receivedMessages: JmsResultMessage[] = [];
 
   constructor(private route: ActivatedRoute,
-    private router: Router,
-    private sessionService: JmsSessionService,
-    private connectorService: ConnectorService) { }
+              private router: Router,
+              private sessionService: JmsSessionService,
+              private connectorService: ConnectorService) { }
 
   ngOnInit() {
     this.loading$ = this.sessionService.loading$;
-    this.route.params.subscribe(params => {
-      this.connector = params.id * 1;
+    const s = this.route.params.subscribe(params => {
       this.target = params.target;
-      console.info('JmsMessagePageComponent', this.connector, this.target);
+      const id =  params.id * 1;
+      console.info('JmsMessagePageComponent', params, id, this.target, this.connector);
+      if (isNaN(id)) {
+        this.goBack();
+      } else {
+        if (!this.connector || this.connector.id !== id) {
+          this.sessionService.openSession(id).subscribe(sessions => {
+            this.connector = this.sessionService.getStoredSession(id, sessions);
+            if (!this.connector) this.goBack();
+          });
+        }
+      }
     });
+    this.subs.addAny(s);
   }
 
-  ngAfterViewInit(): void {
+  ngOnDestroy(): void {
+    this.subs.close();
+  }
+
+  goBack() {
+    this.router.navigate(['/jms-connectors']);
   }
 
   doSend() {
@@ -42,22 +77,32 @@ export class JmsMessagePageComponent implements OnInit {
       body: this.jmsMessage || '',
       header: this.jmsHeader
     };
-    this.sessionService.sendJmsMessage(this.connector, this.target, body)
+    this.sessionService.sendJmsMessage(this.connector.id, this.target, body)
       .subscribe(r => {
         console.info("send ...", r);
-      });
+      }
+    );
   }
   doListen() {
     const startTime = new Date();
-    this.sessionService.receiveJmsMessage(this.connector, this.target)
+    this.sessionService.receiveJmsMessage(this.connector.id, this.target)
       .subscribe(r => {
-        console.info("receive ...", r, r.header.JMSDestination);
+        console.info("receive ...", r);
         if (r && (r.header || r.body)) {
           r._time = new Date().getDate() - startTime.getDate();
           this.receivedMessages.unshift(r);
+
+          this.state = 'active';
+          setTimeout(() => {
+              this.state = 'inactive';
+          }, 500);
         } else {
           // TODO no message ...
         }
-      });
+      }
+    );
+  }
+  doClear(): void {
+    this.receivedMessages = [];
   }
 }

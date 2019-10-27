@@ -1,13 +1,14 @@
 <div class="sidebar">
     <nav class="sidebar-nav">
       <ul class="nav">
+        <!--
         <li class="nav-title">Nav Title</li>
         <li class="nav-item">
           <a class="nav-link" routerLink="home" routerLinkActive="active">
-            <!-- core ui icon -->
             <i class="nav-icon cui-home"></i> Home
           </a>
         </li>
+        -->
         <li class="nav-item">
           <a class="nav-link" routerLink="jms-connectors" routerLinkActive="active">
             <!-- fontawesome icon -->
@@ -15,8 +16,18 @@
           </a>
         </li>
 
-        <app-open-sessions></app-open-sessions>
-        
+        <li class="nav-item nav-dropdown open" *ngIf="sessions.length > 0">
+            <a class="nav-link nav-dropdown-toggle" appToggle>
+                <mat-icon class="nav-icon">power</mat-icon> Open Sessions
+            </a>
+            <ul class="nav-dropdown-items" *ngFor="let s of sessions">
+                <li class="nav-item">
+                    <a class="nav-link" routerLinkActive="active" [routerLink]="['/sessions', s.id]">
+                        <mat-icon class="nav-icon">power</mat-icon> {{ s.name }}
+                    </a>
+                </li>
+            </ul>
+        </li>
       </ul>
     </nav>
     <button class="sidebar-minimizer brand-minimizer" type="button" (click)="doMinimize()"></button>

@@ -10,8 +10,8 @@ import { JmsMessagePageComponent } from './page/session/jms-message-page/jms-mes
 const routes: Routes = [
   {path: 'home', component: HomeComponent},
   {path: 'jms-connectors', component: ConnectorsComponent},
-  {path: 'jms-connector', component: ConnectorPageComponent},
   {path: 'jms-connector/:id', component: ConnectorPageComponent},
+  {path: 'jms-connector', component: ConnectorPageComponent},
   {path: 'sessions/:id', component: SessionPageComponent},
   {path: 'sessions/:id/:target', component: JmsMessagePageComponent},
   {path: '', redirectTo: '/jms-connectors', pathMatch: 'full'},

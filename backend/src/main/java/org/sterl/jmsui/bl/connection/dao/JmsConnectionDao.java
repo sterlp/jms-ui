@@ -1,5 +1,6 @@
 package org.sterl.jmsui.bl.connection.dao;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -12,4 +13,6 @@ public interface JmsConnectionDao extends JpaRepository<JmsConnectionBE, Long> {
 
     public List<JmsConnectionBE> findByType(String type);
     public Page<JmsConnectionView> findViewBy(Pageable page);
+    
+    public List<JmsConnectionView> findByIdIn(Collection<Long> ids);
 }

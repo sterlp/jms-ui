@@ -1,8 +1,9 @@
 <!-- action bar in breadcrumb -->
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-      <li class="breadcrumb-item" aria-current="page">Sessions</li>
-      <li class="breadcrumb-item active" aria-current="page">{{ conData?.name }}</li>
+    <li class="breadcrumb-item" aria-current="page" ><a [routerLink]="['/jms-connectors']">Connectors</a></li>  
+    <li class="breadcrumb-item" aria-current="page">Sessions</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ conData?.name }}</li>
       <!-- Breadcrumb Menu
       <li class="breadcrumb-menu">
           <div class="btn-group" role="group">

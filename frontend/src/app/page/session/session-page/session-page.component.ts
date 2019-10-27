@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, AfterContentInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, AfterContentInit, OnDestroy } from '@angular/core';
 import { switchMap, filter, withLatestFrom, map } from 'rxjs/operators';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
@@ -7,14 +7,17 @@ import { ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { Observable } from 'rxjs';
 import { JmsResource } from 'src/app/api/jms-session';
 import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api';
 
 @Component({
   selector: 'app-session-page',
   templateUrl: './session-page.component.html',
   styleUrls: ['./session-page.component.scss']
 })
-export class SessionPageComponent implements OnInit, AfterContentInit {
-
+// tslint:disable: curly
+export class SessionPageComponent implements OnInit, AfterContentInit, OnDestroy {
+  private id;
+  private subs = new SubscriptionsHolder();
   conData: ConnectorView;
   dataSource = new MatTableDataSource<JmsResource>([]);
 
@@ -32,17 +35,38 @@ export class SessionPageComponent implements OnInit, AfterContentInit {
     this.dataSource.sort = this.sort;
   }
   ngAfterContentInit(): void {
-    this.route.params.subscribe(params => {
-      const id = parseInt(params.id);
-      this.conData = this.sessionService.sessions$.value.find(d => d.id === id);
-      if (this.conData) {
-        if (this.dataSource.data.length === 0) {
-          this.loadQueues();
-        }
-      } else {
-        this.router.navigate(['/jms-connectors']);
+    const s = this.route.params.subscribe(params => {
+      if (this.id !== params.id) {
+        this.id = params.id;
+        this.handleId(params.id);
       }
     });
+    this.subs.addAny(s);
+  }
+  ngOnDestroy(): void {
+    this.subs.close();
+  }
+
+  private handleId(id: any) {
+    id = id * 1;
+    if (isNaN(id)) {
+      this.goBack();
+    } else {
+      if (!this.conData || this.conData.id !== id) {
+        const s = this.sessionService.openSession(id).subscribe(sessions => {
+          const v = this.sessionService.getStoredSession(id, sessions);
+          if ( v && !this.conData || (this.conData && v && this.conData.id !== v.id)) {
+            this.conData = v;
+            this.loadQueues();
+          }
+        });
+        this.subs.addAny(s);
+      }
+    }
+  }
+
+  goBack() {
+    this.router.navigate(['/jms-connectors']);
   }
 
   applyFilter(filterValue: string) {
@@ -56,6 +80,7 @@ export class SessionPageComponent implements OnInit, AfterContentInit {
   // https://stackblitz.com/angular/dnbermjydavk?file=app%2Ftable-overview-example.ts
   loadQueues() {
     this.sessionService.getQueues(this.conData.id).subscribe(queues => {
+      this.dataSource.disconnect();
       this.dataSource = new MatTableDataSource(queues);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
