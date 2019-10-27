@@ -49,8 +49,9 @@ public class JmsSessionBM {
         }
         return sessionBA.openSessions();
     }
-    public void disconnect(long connectorId) {
+    public Set<Long> disconnect(long connectorId) {
         sessionBA.disconnect(connectorId);
+        return sessionBA.openSessions();
     }
     
     private JmsConnectorInstance getOrConnect(long connectorId) {

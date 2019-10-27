@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
+import { JmsSessionService } from 'src/app/page/session/jms-session.service';
 import { ConnectorService } from 'src/app/components/connectors/connector.service';
 import { SendJmsMessageCommand, JmsResultMessage, JmsHeaderRequestValues } from 'src/app/api/jms-session';
 import { ArrayUtils } from 'src/app/common/utils';

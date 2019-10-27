@@ -60,6 +60,8 @@ public class SimplePage<T> {
         this.numberOfElements = in.getNumberOfElements();
         this.size = in.getSize();
         this.totalElements = in.getTotalElements();
-        if (null != in.getPageable()) this.pageable = new SimplePageable(in.getPageable());
+        if (null != in.getPageable() && in.getPageable().isPaged()) {
+            this.pageable = new SimplePageable(in.getPageable());
+        }
     }
 }

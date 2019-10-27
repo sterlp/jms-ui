@@ -21,9 +21,7 @@ public class SimplePageable {
     private int pageNumber;
 
     public SimplePageable(Pageable in) {
-        if (in != null) {
-            this.offset = in.getOffset();
-            this.pageNumber = in.getPageNumber();
-        }
+        this.offset = in.getOffset();
+        this.pageNumber = in.getPageNumber();
     }
 }

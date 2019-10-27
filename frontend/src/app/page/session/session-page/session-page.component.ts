@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, AfterViewInit, AfterContentInit, OnDestroy } from '@angular/core';
 import { switchMap, filter, withLatestFrom, map } from 'rxjs/operators';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
+import { JmsSessionService } from 'src/app/page/session/jms-session.service';
 import { ConnectorService } from 'src/app/components/connectors/connector.service';
 import { ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { Observable } from 'rxjs';
@@ -16,8 +16,10 @@ import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api'
 })
 // tslint:disable: curly
 export class SessionPageComponent implements OnInit, AfterContentInit, OnDestroy {
-  private id;
+  private id: number;
   private subs = new SubscriptionsHolder();
+
+  loading$: Observable<boolean>;
   conData: ConnectorView;
   dataSource = new MatTableDataSource<JmsResource>([]);
 
@@ -33,6 +35,7 @@ export class SessionPageComponent implements OnInit, AfterContentInit, OnDestroy
   ngOnInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.loading$ = this.sessionService.loading$;
   }
   ngAfterContentInit(): void {
     const s = this.route.params.subscribe(params => {
@@ -67,6 +70,10 @@ export class SessionPageComponent implements OnInit, AfterContentInit, OnDestroy
 
   goBack() {
     this.router.navigate(['/jms-connectors']);
+  }
+
+  doDisconnect() {
+    this.sessionService.closeSession(this.id).subscribe(v => this.goBack());
   }
 
   applyFilter(filterValue: string) {

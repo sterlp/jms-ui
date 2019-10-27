@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Inject, Renderer2, OnDestroy } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
-import { JmsSessionService } from 'src/app/components/jms-sessions/jms-session.service';
+import { JmsSessionService } from 'src/app/page/session/jms-session.service';
 import { ConnectorView } from 'src/app/api/connector';
 
 /**

@@ -51,10 +51,15 @@ public class JmsSessionBF {
     public List<JmsResource> listQueues(@PathVariable long connectorId) {
         return jmsSessionBM.listQueues(connectorId);
     }
-    
+    /**
+     * Closes the given session and returns all still open ones.
+     * @param connectorId the session id to close
+     * @return the still open sessions
+     */
     @DeleteMapping("/{connectorId}")
-    public void close(@PathVariable long connectorId) throws Exception {
-        jmsSessionBM.disconnect(connectorId);
+    public SimplePage<JmsConnectionView> close(@PathVariable long connectorId) {
+        Set<Long> sessions = jmsSessionBM.disconnect(connectorId);
+        return connectionBF.list(sessions, null);
     }
     
     @PostMapping("/{connectorId}/message/{destination}")

@@ -24,7 +24,7 @@
 .btn {
     .mat-icon {
         font-size: 1.09375rem;
-        vertical-align: text-top;
+        vertical-align: middle;
         width: initial;
         height: initial;
     }
@@ -35,9 +35,6 @@
         width: 100%;
     }
 }
-.col-sm > .mat-form-field {
-    width: 100%;
-}
 
 // if the mat paginator gets smaller as 450px it will float the buttons
 // and break the design
@@ -47,4 +44,13 @@
 
 .nav-dropdown-items {
     overflow: hidden;
+}
+
+.breadcrumb {
+    .jms-loading {
+        label {
+            margin-top: 0px !important;
+            margin-bottom: 0px !important;
+        }
+    }
 }

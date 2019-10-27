@@ -24,6 +24,7 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     }
     @Override
     public void close() throws IOException {
+        memoryQueue.clear();
     }
 
     @Override

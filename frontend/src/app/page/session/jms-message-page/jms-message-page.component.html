@@ -3,8 +3,10 @@
     <li class="breadcrumb-item" aria-current="page" ><a [routerLink]="['/jms-connectors']">Connectors</a></li>
     <li class="breadcrumb-item" aria-current="page" *ngIf="connector">
       <a [routerLink]="['/sessions', connector.id]">{{ connector.name }}</a>
-    </li>
+    </li>    
     <li class="breadcrumb-item active" aria-current="page">{{ target }}</li>
+
+    <app-loading *ngIf="loading$ | async"></app-loading>
       <!-- Breadcrumb Menu
       <li class="breadcrumb-menu">
           <div class="btn-group" role="group">
@@ -49,7 +51,7 @@
         [@newMessage]>
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <mat-icon>mail_outline</mat-icon> Received at: {{ m.header.JMSDeliveryTime | date:'medium' }}
+            <mat-icon>mail_outline</mat-icon> Received at: {{ m.header.JMSTimestamp | date:'medium' }}
           </mat-panel-title>
           <mat-panel-description>
               Body length {{ m.body?.length }}

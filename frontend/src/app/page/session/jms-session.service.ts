@@ -40,7 +40,23 @@ export class JmsSessionService {
     return this.http.post<Page<ConnectorView>>(`/api/jms/sessions/${connectorId}`, null)
       .pipe(
         finalize(() => this.$loading.finishedLoading()),
-        catchError(this.handleError<Page<ConnectorView>>('Faild to connect', null)),
+        catchError(this.handleError<Page<ConnectorView>>('Failed to connect', null)),
+        map(s => {
+          if (s && s.content) {
+            this.sessions$.next(s.content);
+            return s.content;
+          }
+          return [];
+        })
+      );
+  }
+
+  closeSession(connectorId: number): Observable<ConnectorView[]> {
+    this.$loading.isLoading();
+    return this.http.delete<Page<ConnectorView>>(`/api/jms/sessions/${connectorId}`)
+      .pipe(
+        finalize(() => this.$loading.finishedLoading()),
+        catchError(this.handleError<Page<ConnectorView>>('Failed to disconnect', null)),
         map(s => {
           if (s && s.content) {
             this.sessions$.next(s.content);
