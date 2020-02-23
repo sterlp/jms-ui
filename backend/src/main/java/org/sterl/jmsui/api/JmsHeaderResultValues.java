@@ -3,8 +3,6 @@ package org.sterl.jmsui.api;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +20,6 @@ public class JmsHeaderResultValues {
     
     private boolean JMSRedelivered;
     private String JMSDestination;
-    @JsonProperty("JMSReplyTo")
     private String JMSReplyTo;
     
     private long JMSTimestamp;

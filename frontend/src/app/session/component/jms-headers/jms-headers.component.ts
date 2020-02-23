@@ -16,11 +16,17 @@ interface HeaderEntry {
 export class JmsHeadersComponent implements OnInit {
 
   constructor() { }
+
+  oldKey: string;
+
   private internalHeader: JmsHeaderRequestValues;
   headers: Array<HeaderEntry> = [];
-  jmsOptions: string[] = ['JMSCorrelationID', 'JMSDeliveryMode', 'JMSExpiration', 'JMSMessageID', 'JMSPriority',
-                          'JMSTimestamp', 'JMSType', 'MQMDS_PRIORITY'];
-  private jmsNumberOptions: string[] = ['JMSDeliveryMode', 'JMSExpiration', 'JMSPriority', 'JMSTimestamp', 'MQMDS_PRIORITY'];
+  readonly jmsOptions: string[] = ['JMSCorrelationID', 'JMSDeliveryMode', 'JMSExpiration', 'JMSMessageID', 'JMSPriority',
+                                   'JMSTimestamp', 'JMSType', 'MQMDS_PRIORITY'];
+  readonly jmsNumberOptions: string[] = ['JMSDeliveryMode', 'JMSExpiration', 'JMSPriority', 'JMSTimestamp', 'MQMDS_PRIORITY'];
+
+  private readonly jmsFields = ['JMSType', 'JMSDeliveryMode', 'JMSPriority', 'JMSTimestamp',
+                                'JMSExpiration', 'JMSMessageID', 'JMSCorrelationID'];
 
   @Output() headersChange = new EventEmitter<JmsHeaderRequestValues>();
   @Input()
@@ -60,33 +66,22 @@ export class JmsHeadersComponent implements OnInit {
     this.headers = this.headers.filter(h => h !== header);
     if (this.headers.length === 0) this.addHeader();
   }
-  dataChange() {
-    let changed = false;
-    this.headers.forEach(entry => {
-      if (entry.key && entry.key.length > 0) { // only if a key is already set
-        if (this.jmsNumberOptions.indexOf(entry.key) > -1) {
-          if (this.internalHeader[entry.key] !== entry.value) {
-            this.internalHeader[entry.key] = this.asNumber(entry.value);
-            changed = true;
-          }
-        } else if (this.jmsOptions.indexOf(entry.key) > -1) {
-          if (this.internalHeader[entry.key] !== entry.value) {
-            this.internalHeader[entry.key] = entry.value;
-            changed = true;
-          }
-        } else {
-          const oldval = this.internalHeader.properties.get(entry.key);
-          if (oldval !== entry.value) {
-            this.internalHeader.properties.set(entry.key, entry.value);
-            changed = true;
-          }
-        }
-      }
-    });
-    if (changed) {
-      console.debug('JmsHeadersComponent: data change-->', this.internalHeader);
-      this.headersChange.emit(this.internalHeader);
+  dataChange(key: string, value: string | number, oldKey: any) {
+    // is it a field?
+    console.info('dataChange->', key, value, oldKey);
+    if (this.jmsFields.indexOf(key) > -1) {
+        this.internalHeader[key] = value;
+    } else {
+        this.internalHeader.properties[key] = value;
     }
+    if (oldKey && oldKey !== key) {
+        if (this.jmsFields.indexOf(oldKey) > -1) {
+            this.internalHeader[oldKey] = null;
+        } else {
+            delete this.internalHeader.properties[oldKey];
+        }
+    }
+    this.headersChange.emit(this.internalHeader);
   }
 
   asNumber(value: any): string | number {

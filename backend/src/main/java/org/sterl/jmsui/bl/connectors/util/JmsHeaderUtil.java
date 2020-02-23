@@ -22,8 +22,14 @@ public class JmsHeaderUtil {
                 for (Entry<String, Object> headerValue : header.getProperties().entrySet()) {
                     if (headerValue.getValue() instanceof Boolean) {
                         message.setBooleanProperty(headerValue.getKey(), (Boolean)headerValue.getValue());
+                    } if (headerValue.getValue() instanceof Integer) {
+                        message.setIntProperty(headerValue.getKey(), (Integer)headerValue.getValue());
+                    } if (headerValue.getValue() instanceof Long) {
+                        message.setLongProperty(headerValue.getKey(), (Long)headerValue.getValue());
                     } if (headerValue.getValue() instanceof Double) {
                         message.setDoubleProperty(headerValue.getKey(), (Double)headerValue.getValue());
+                    } if (headerValue.getValue() instanceof Number) {
+                        message.setDoubleProperty(headerValue.getKey(), ((Number)headerValue.getValue()).doubleValue());
                     } if (headerValue.getValue() instanceof String) {
                         message.setStringProperty(headerValue.getKey(), (String)headerValue.getValue());
                     } else {
