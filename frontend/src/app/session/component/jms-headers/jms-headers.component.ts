@@ -66,9 +66,8 @@ export class JmsHeadersComponent implements OnInit {
     this.headers = this.headers.filter(h => h !== header);
     if (this.headers.length === 0) this.addHeader();
   }
-  dataChange(key: string, value: string | number, oldKey: any) {
+  dataChange(key: string, value: string | number, oldKey?: any) {
     // is it a field?
-    console.info('dataChange->', key, value, oldKey);
     if (this.jmsFields.indexOf(key) > -1) {
         this.internalHeader[key] = value;
     } else {
