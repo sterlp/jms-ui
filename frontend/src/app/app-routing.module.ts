@@ -1,18 +1,15 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ConnectorsComponent } from './page/connectors/connectors.component';
-import { ConnectorPageComponent } from './page/connector.page/connector.page.component';
-import { SessionPageComponent } from './page/session/session-page/session-page.component';
-import { JmsMessagePageComponent } from './page/session/jms-message-page/jms-message-page.component';
+import { ConnectorsPage } from './connectors/page/connectors/connectors.page';
+import { ConnectorPage } from './connectors/page/connector/connector.page';
 
 
 const routes: Routes = [
-  {path: 'jms-connectors', component: ConnectorsComponent},
-  {path: 'jms-connector/:id', component: ConnectorPageComponent},
-  {path: 'jms-connector', component: ConnectorPageComponent},
-  {path: 'sessions/:id', component: SessionPageComponent},
-  {path: 'sessions/:id/:target', component: JmsMessagePageComponent},
+  {path: 'jms-connectors', component: ConnectorsPage},
+  {path: 'jms-connector/:id', component: ConnectorPage},
+  {path: 'jms-connector', component: ConnectorPage},
   {path: '', redirectTo: '/jms-connectors', pathMatch: 'full'},
+  { path: 'sessions', loadChildren: () => import('./session/session.module').then(m => m.SessionModule) },
 ];
 
 @NgModule({
