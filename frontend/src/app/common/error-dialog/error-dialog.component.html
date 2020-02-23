@@ -1,0 +1,20 @@
+<h1 mat-dialog-title>{{data.operation}} failed</h1>
+<div mat-dialog-content>
+  
+  <p style="overflow: auto">{{ getError() }}</p>
+
+  <mat-expansion-panel *ngIf="getErrorDetails()" class="mb-2">
+    <mat-expansion-panel-header color>
+      <mat-panel-title>
+        Error details
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <!-- render body lazy -->
+    <ng-template matExpansionPanelContent>
+        <pre style="overflow-x: auto">{{ getErrorDetails() }}</pre>
+    </ng-template>
+  </mat-expansion-panel>
+</div>
+<div mat-dialog-actions>
+  <button mat-button [mat-dialog-close]="data" color="primary" cdkFocusInitial>Ok</button>
+</div>

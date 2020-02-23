@@ -1,0 +1,26 @@
+<div *ngIf="connectorMetaData">
+  <div class="row">
+    <mat-form-field class="col">
+      <input matInput placeholder="Connection name" [(ngModel)]="connectorData.name">
+    </mat-form-field>
+    <mat-form-field class="col">
+      <input matInput placeholder="Timeout" type="number" [(ngModel)]="connectorData.timeout">
+    </mat-form-field>
+    <mat-form-field class="col">
+        <mat-label>JMS Type</mat-label>
+        <mat-select required (selectionChange) = "doTypeChanged()" [(value)] = "connectorMetaData">
+            <mat-option *ngFor="let c of supported" [value]="c">
+            {{c.name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+  </div>
+  
+  <mat-divider></mat-divider>
+  
+  <div class="row mt-3">
+    <div class="col-sm-12 col-md-6" *ngFor="let cm of connectorMetaData.configMeta">
+      <app-config-field [(value)] = "connectorData.configValues[cm.property]" [meta-field]="cm"></app-config-field>
+    </div>
+  </div>
+</div>

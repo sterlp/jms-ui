@@ -1,0 +1,9 @@
+<mat-form-field>
+  <mat-label>{{ metaField.label || metaField.property }}</mat-label>
+  <input matInput [name] = "metaField.property"
+        [placeholder]="metaField.description" 
+        [required] = "metaField.mandatory" 
+        [type]="getType()"
+        [(ngModel)]="value"
+        >
+</mat-form-field>

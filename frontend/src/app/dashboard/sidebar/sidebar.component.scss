@@ -1,0 +1,11 @@
+.nav-icon.mat-icon {
+    font-size: 1.09375rem;
+    vertical-align: text-top;
+}
+.nav-dropdown {
+    cursor: pointer;
+}
+// material dialog has the z-index 1000
+.sidebar {
+    z-index: 999;
+}
