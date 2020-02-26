@@ -8,7 +8,7 @@ import { LoadingService } from 'src/app/common/loading/loading.service';
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
 import { Page } from 'projects/ng-spring-boot-api/src/public-api';
 

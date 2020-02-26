@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { JmsResource } from 'src/app/api/jms-session';
 import { Bookmark } from '../../service/bookmarks/bookmarks.model';
 import { BookmarksService } from '../../service/bookmarks/bookmarks.service';
@@ -12,8 +14,8 @@ import { BookmarksService } from '../../service/bookmarks/bookmarks.service';
 // tslint:disable: curly
 export class BookmarksComponent implements OnInit {
 
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   @Input() connectorId: number;
   dataSource = new MatTableDataSource<Bookmark>([]);

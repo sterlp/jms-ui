@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { MatPaginator, MatSort, MatTableDataSource, MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { SupportedConnector, ConnectorData } from 'src/app/api/connector';
 import { ArrayUtils } from 'src/app/common/utils';
 import { ConnectorService, ConnertorViewDataSource } from 'src/app/connectors/service/connector.service';
@@ -16,7 +19,7 @@ import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.c
 })
 // tslint:disable-next-line: component-class-suffix
 export class ConnectorsPage implements OnInit, AfterViewInit {
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   dataSource: ConnertorViewDataSource;
 

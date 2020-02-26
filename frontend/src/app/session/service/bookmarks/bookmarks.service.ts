@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { Closable, Page, Pageable, EMPTY_PAGE } from 'projects/ng-spring-boot-api/src/public-api';
 import { HttpClient } from '@angular/common/http';
 import { LoadingService } from 'src/app/common/loading/loading.service';

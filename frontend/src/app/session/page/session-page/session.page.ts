@@ -4,7 +4,9 @@ import { JmsSessionService } from 'src/app/session/service/session/jms-session.s
 import { ConnectorView } from 'src/app/api/connector';
 import { Observable } from 'rxjs';
 import { JmsResource } from 'src/app/api/jms-session';
-import { MatTableDataSource, MatPaginator, MatSort } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api';
 import { BookmarksComponent } from '../../component/bookmarks/bookmarks.component';
 
@@ -21,9 +23,9 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
   conData: ConnectorView;
   dataSource = new MatTableDataSource<JmsResource>([]);
 
-  @ViewChild(BookmarksComponent, {static: false}) bookmarkComponent: BookmarksComponent;
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-  @ViewChild(MatSort, {static: false}) sort: MatSort;
+  @ViewChild(BookmarksComponent) bookmarkComponent: BookmarksComponent;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(
     private route: ActivatedRoute,

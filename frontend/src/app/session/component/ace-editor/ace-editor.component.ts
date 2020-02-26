@@ -17,8 +17,8 @@ import 'brace/theme/xcode';
   styleUrls: ['./ace-editor.component.scss']
 })
 export class AceEditorComponent implements OnInit, AfterContentInit, AfterViewChecked {
-  @ViewChild(AceComponent, { static: false }) componentRef?: AceComponent;
-  @ViewChild(AceDirective, { static: false }) directiveRef?: AceDirective;
+  @ViewChild(AceComponent) componentRef?: AceComponent;
+  @ViewChild(AceDirective) directiveRef?: AceDirective;
 
   config: AceConfigInterface = {
     mode: 'json',

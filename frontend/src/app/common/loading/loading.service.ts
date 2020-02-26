@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { ErrorDialogComponent } from '../error-dialog/error-dialog.component';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { Closable } from 'projects/ng-spring-boot-api/src/public-api';
 
 @Injectable({
