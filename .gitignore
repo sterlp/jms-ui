@@ -31,3 +31,4 @@ target/
 .vscode/
 frontend/.editorconfig
 backend/jms-ui.mv.db
+jms-ui.mv.db
