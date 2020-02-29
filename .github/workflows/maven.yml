@@ -15,4 +15,5 @@ jobs:
     - uses: actions/setup-java@v1
       with:
         java-version: 11
+    - run: npm install -g @angular/cli > /dev/null
     - run: mvn -B package --file pom.xml
