@@ -28,11 +28,11 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/@coreui/icons/css/coreui-icons.css",
+              "node_modules/@coreui/icons/css/free.css",
               "node_modules/font-awesome/css/font-awesome.css",
-              "node_modules/simple-line-icons/css/simple-line-icons.css",
               "node_modules/material-icons/iconfont/material-icons.scss",
-              "src/styles.scss"
+              "src/style/dashboard.scss",
+              "src/style/styles.scss"
             ],
             "scripts": []
           },
@@ -95,11 +95,11 @@
               "src/assets"
             ],
             "styles": [
-              "node_modules/@coreui/icons/css/coreui-icons.css",
+              "node_modules/@coreui/icons/css/free.css",
               "node_modules/font-awesome/css/font-awesome.css",
-              "node_modules/simple-line-icons/css/simple-line-icons.css",
               "node_modules/material-icons/iconfont/material-icons.scss",
-              "src/styles.scss"
+              "src/style/dashboard.scss",
+              "src/style/styles.scss"
             ],
             "scripts": []
           }
@@ -143,12 +143,13 @@
             "tsConfig": "projects/ng-spring-boot-api/tsconfig.lib.json",
             "project": "projects/ng-spring-boot-api/ng-package.json"
           }
-        ,          "configurations": {
+        ,
+        "configurations": {
             "production": {
               "tsConfig": "projects/ng-spring-boot-api/tsconfig.lib.prod.json"
             }
           }
-},
+        },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
           "options": {

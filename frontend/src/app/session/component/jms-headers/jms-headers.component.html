@@ -1,5 +1,5 @@
 <div class="row align-items-center" *ngFor="let h of headers; index as i">
-  <div class="col">
+  <div class="col-sm-4 col-lg-5">
     <mat-form-field>
       <input matInput placeholder="Header Key" name="jms-header-key" [matAutocomplete]="auto" [(ngModel)] = "h.key"
              (ngModelChange)="dataChange(h.key, h.value, oldKey); oldKey = $event;">
@@ -10,12 +10,12 @@
       </mat-autocomplete>
     </mat-form-field>
   </div>
-  <div class="col">
+  <div class="col-sm-4 col-lg-5">
     <mat-form-field>
       <input matInput placeholder="Header Value" name="jms-header-value" [(ngModel)] = "h.value" (ngModelChange)="dataChange(h.key, h.value)">
     </mat-form-field>
   </div>
-  <div class="col btn-group">
+  <div class="col-sm-4 col-lg-2 btn-group">
     <button type="button" class="btn btn-primary" (click)="addHeader()"><mat-icon>add</mat-icon></button>
     <button type="button" class="btn btn-danger" (click)="removeHeader(h)"><mat-icon>remove</mat-icon></button>
   </div>

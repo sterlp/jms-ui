@@ -2,6 +2,38 @@
 @import "~@coreui/coreui/scss/coreui";
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
+.c-header-shadow {
+    border: 0;
+    box-shadow: 0 2px 2px 0 rgba(60,75,100,.14), 0 3px 1px -2px rgba(60,75,100,.12), 0 1px 5px 0 rgba(60,75,100,.2);
+    -webkit-clip-path: inset(0 0 -1000px 0);
+    clip-path: inset(0 0 -1000px 0);
+}
+
+// menu material icon support
+.nav-icon.mat-icon {
+    font-size: 1.09375rem;
+    vertical-align: text-top;
+}
+.c-sidebar-nav-icon.mat-icon {
+    height: unset;
+}
+
+// grid integration for material
+.row {
+    // a little css to set the width for material components to 100% in bootstrap grid
+    .mat-card {
+        width: 100%;
+    }
+}
+
+// material dialog
+// material dialog has the z-index 1000
+.c-sidebar.c-sidebar-fixed,
+.c-header.c-header-fixed,
+.sticky-top {
+    z-index: 999;
+}
+
 // allow material buttons in breadcrumb
 .breadcrumb-menu {
     .mat-button,
@@ -29,12 +61,7 @@
         height: initial;
     }
 }
-// a little css to set the width for material components to 100% in bootstrap grid
-.row {
-    .mat-card {
-        width: 100%;
-    }
-}
+
 
 // if the mat paginator gets smaller as 450px it will float the buttons
 // and break the design
@@ -49,13 +76,4 @@
 .col.table,
 .col.mat-form-field {
     width: 100%;
-}
-
-.breadcrumb {
-    .jms-loading {
-        label {
-            margin-top: 0px !important;
-            margin-bottom: 0px !important;
-        }
-    }
 }
