@@ -3,9 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { JmsResource, SendJmsMessageCommand, JmsResultMessage } from 'src/app/api/jms-session';
-import { ArrayUtils } from 'src/app/common/utils';
 import { LoadingService } from 'src/app/common/loading/loading.service';
-import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject, Subscription } from 'rxjs';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
@@ -88,7 +86,18 @@ export class JmsSessionService {
     this.$loading.isLoading();
     return this.http.get<JmsResource[]>('api/jms/sessions/' + connectorId + '/queues').pipe(
       finalize(() => this.$loading.finishedLoading()),
-      catchError(this.handleError<JmsResource[]>('Failed to load the resources.' , []))
+      catchError(this.handleError<JmsResource[]>('Failed to load the Queue List.' , []))
+    );
+  }
+
+  /**
+   * Returns a object map of the current queue length. Call this method only with queues.
+   */
+  getDepths(connectorId: number, queues: string[]): Observable<object> {
+    this.$loading.isLoading();
+    return this.http.post<object>('api/jms/sessions/' + connectorId + '/depths', queues).pipe(
+      finalize(() => this.$loading.finishedLoading()),
+      catchError(this.handleError<object>('Failed to load the Queue depth.' , null))
     );
   }
 

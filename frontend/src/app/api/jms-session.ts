@@ -1,7 +1,17 @@
-export class JmsResource {
+export interface JmsResource {
     name: string;
     type: JmsResourceType;
     vendorType: string;
+    // dynamically loaded in some areas ...
+    _depth?: number;
+}
+
+export class JmsResourceModel {
+    static readonly COLUMNS = [
+        { id: 'name',       header: 'Name',         cell: (e: JmsResource) => e.name        },
+        { id: 'depth',      header: 'Depth',        cell: (e: JmsResource) => e._depth      },
+        { id: 'type',       header: 'Type',         cell: (e: JmsResource) => e.type        }
+    ];
 }
 
 export enum JmsResourceType {

@@ -50,4 +50,8 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     public boolean isClosed() {
         return false;
     }
+    @Override
+    public int getQueueDepth(String queueName) throws JMSException {
+        return memoryQueue.size();
+    }
 }

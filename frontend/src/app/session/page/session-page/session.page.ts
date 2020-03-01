@@ -21,11 +21,9 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
 
   loading$: Observable<boolean>;
   conData: ConnectorView;
-  dataSource = new MatTableDataSource<JmsResource>([]);
 
   @ViewChild(BookmarksComponent) bookmarkComponent: BookmarksComponent;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -33,8 +31,6 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
     private sessionService: JmsSessionService) { }
 
   ngOnInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
     this.loading$ = this.sessionService.loading$;
   }
   ngAfterContentInit(): void {
@@ -60,7 +56,6 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
           const v = this.sessionService.getStoredSession(id, sessions);
           if ( v && !this.conData || (this.conData && v && this.conData.id !== v.id)) {
             this.conData = v;
-            this.loadQueues();
           }
         });
         this.subs.addAny(s);
@@ -74,24 +69,5 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
 
   doDisconnect() {
     this.sessionService.closeSession(this.id).subscribe(v => this.goBack());
-  }
-
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
-    if (this.dataSource.paginator) {
-        this.dataSource.paginator.firstPage();
-    }
-  }
-  // https://stackblitz.com/angular/dnbermjydavk?file=app%2Ftable-overview-example.ts
-  loadQueues() {
-    this.sessionService.getQueues(this.conData.id).subscribe(queues => {
-      this.dataSource.disconnect();
-      this.dataSource = new MatTableDataSource(queues);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-      if (this.paginator) this.paginator.length = queues.length;
-    });
   }
 }

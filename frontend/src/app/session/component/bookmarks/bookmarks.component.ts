@@ -5,6 +5,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { JmsResource } from 'src/app/api/jms-session';
 import { Bookmark } from '../../service/bookmarks/bookmarks.model';
 import { BookmarksService } from '../../service/bookmarks/bookmarks.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-bookmarks',
@@ -14,27 +15,30 @@ import { BookmarksService } from '../../service/bookmarks/bookmarks.service';
 // tslint:disable: curly
 export class BookmarksComponent implements OnInit {
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+    @ViewChild(MatSort) sort: MatSort;
+    @Input() connectorId: number;
 
-  @Input() connectorId: number;
-  dataSource = new MatTableDataSource<Bookmark>([]);
-  newBookmark: Bookmark = {};
+    dataSource = new MatTableDataSource<Bookmark>([]);
+    newBookmark: Bookmark = {};
 
-  constructor(private bookmarksService: BookmarksService) { }
+    loading$: Observable<boolean>;
 
-  ngOnInit() {
-    this.doLoad();
-  }
+    constructor(private bookmarksService: BookmarksService) { }
 
-  applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
-    if (this.dataSource.paginator) {
-        this.dataSource.paginator.firstPage();
+    ngOnInit() {
+      this.loading$ = this.bookmarksService.loading$;
+      setTimeout(() => this.doLoad());
     }
-  }
+
+    applyFilter(filterValue: string) {
+        filterValue = filterValue.trim(); // Remove whitespace
+        filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
+        this.dataSource.filter = filterValue;
+        if (this.dataSource.paginator) {
+            this.dataSource.paginator.firstPage();
+        }
+    }
 
   doLoad() {
     this.bookmarksService.list(this.connectorId, null).subscribe(result => {

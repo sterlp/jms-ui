@@ -3,6 +3,7 @@ package org.sterl.jmsui.bl.session.api;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jms.BytesMessage;
@@ -49,9 +50,15 @@ public class JmsSessionBF {
     }
     
     @GetMapping("/{connectorId}/queues")
-    public List<JmsResource> listQueues(@PathVariable long connectorId) {
+    public List<JmsResource> listQueues(@PathVariable long connectorId) throws JMSException {
         return jmsSessionBM.listQueues(connectorId);
     }
+    
+    @PostMapping("/{connectorId}/depths")
+    public Map<String, Integer> queuesDepths(@PathVariable long connectorId, @RequestBody List<String> queues) throws JMSException {
+        return jmsSessionBM.queueDepths(connectorId, queues);
+    }
+
     /**
      * Closes the given session and returns all still open ones.
      * @param connectorId the session id to close
@@ -71,7 +78,7 @@ public class JmsSessionBF {
     
     @PostMapping("/{connectorId}/message/{destination}")
     public void sendMessage(@PathVariable long connectorId, @PathVariable String destination, 
-            @RequestBody @Valid SendJmsMessageCommand message) {
+            @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
         jmsSessionBM.sendMessage(connectorId, destination, message.getBody(), message.getHeader());
     }
     

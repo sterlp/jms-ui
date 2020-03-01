@@ -7,7 +7,7 @@ import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class RepoConfig implements
     ApplicationListener<WebServerInitializedEvent> /* extends RepositoryRestConfigurerAdapter */ {
 /*

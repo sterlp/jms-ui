@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import javax.annotation.PreDestroy;
 import javax.validation.constraints.NotNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
@@ -25,6 +27,8 @@ import org.sterl.jmsui.bl.connectors.memory.MemoryQueueConnectorFactory;
 
 @Component
 class SessionBA implements Closeable {
+    private static final Logger LOG = LoggerFactory.getLogger(SessionBA.class);
+    
     private static final Map<String, JmsConnectorInstanceFactory> FACTORIES = new HashMap<>();
     private static final Map<Long, JmsConnectorInstance> SESSIONS = Collections.synchronizedMap(new Hashtable<>());
     
@@ -37,12 +41,12 @@ class SessionBA implements Closeable {
     public void close() {
         Collection<JmsConnectorInstance> sessions = SESSIONS.values();
         SESSIONS.clear();
+        LOG.info("Closing {} JMS sessions", sessions.size());
         sessions.forEach(t -> {
             try {
                 t.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                // ignored
             }
         });
     }

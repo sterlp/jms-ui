@@ -9,6 +9,7 @@ import javax.jms.Message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jms.UncategorizedJmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
 import org.sterl.jmsui.api.JmsHeaderRequestValues;
@@ -20,6 +21,7 @@ import org.sterl.jmsui.bl.connectors.ibm.model.QTypes;
 import org.sterl.jmsui.bl.connectors.util.JmsHeaderUtil;
 
 import com.ibm.mq.MQException;
+import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.CMQCFC;
@@ -35,7 +37,7 @@ import lombok.Getter;
 public class IbmMqConnector implements JmsConnectorInstance {
     private static final Logger LOG = LoggerFactory.getLogger(IbmMqConnector.class);
     
-    private static final String[] SYSTEM_PREFIXES = {"LOOPBACK", "AMQ.", "SYSTEM."};
+    private static final String[] SYSTEM_PREFIXES = {"LOOPBACK", "SYSTEM."};
     
     private final String queueManagerName;
     @Getter
@@ -73,6 +75,25 @@ public class IbmMqConnector implements JmsConnectorInstance {
         });
         
     }
+    
+    public int getQueueDepth(String queueName) throws JMSException {
+        MQQueue destQueue = null;
+        int depth = 0;
+        try {
+           destQueue = getMQQueueManager().accessQueue(queueName, CMQC.MQOO_INQUIRE);
+           depth = destQueue.getCurrentDepth();
+        } catch (MQException e) {
+            throw new UncategorizedJmsException("Failed to read queue depth of " + queueName + ". " + e.getMessage(), e);
+        } finally {
+           if (destQueue != null) {
+              try {
+                 destQueue.close();
+              } catch (MQException e) {}
+           }
+        }
+
+        return depth;
+     }
 
     @Override
     public Message receive(String destination, Long timeout) {
@@ -103,7 +124,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
         try {
             final PCFMessage request = new PCFMessage(CMQCFC.MQCMD_INQUIRE_Q_NAMES);
             request.addParameter(CMQC.MQCA_Q_NAME, "*");
-            request.addParameter(CMQC.MQIA_Q_TYPE, CMQC.MQQT_ALL);
+            //request.addParameter(CMQC.MQIA_Q_TYPE, CMQC.MQQT_ALL);
             synchronized (this.LOCK) {
                 PCFMessageAgent messageAgent = getAgent();
                 PCFMessage[] response = messageAgent.send(request);
@@ -131,13 +152,27 @@ public class IbmMqConnector implements JmsConnectorInstance {
         }
     }
     
-    private PCFMessageAgent getAgent() throws MQException, MQDataException {
-        synchronized (LOCK) {
-            if (ibmMqManager == null) {
+    /**
+     * Checks our connection and if needed connects us again.
+     */
+    private MQQueueManager getMQQueueManager() throws MQException {
+        if (isClosed()) {
+            synchronized (LOCK) {
+                // clean and reconnect
+                this.close(); 
                 ibmMqManager = new MQQueueManager(queueManagerName, config);
             }
-            if (agent == null) {                
-                agent = new PCFMessageAgent(ibmMqManager);
+        }
+        return ibmMqManager;
+    }
+    
+    private PCFMessageAgent getAgent() throws MQException, MQDataException {
+        final MQQueueManager qManager = getMQQueueManager(); // ensure connection
+        if (agent == null) {
+            synchronized (LOCK) {
+                if (agent == null) {                
+                    agent = new PCFMessageAgent(qManager);
+                }
             }
         }
         return agent;
@@ -152,23 +187,25 @@ public class IbmMqConnector implements JmsConnectorInstance {
 
     @Override
     public void close() {
-        synchronized (LOCK) {
-            if (agent != null) {
-                try {
-                    agent.disconnect();
-                } catch (MQDataException e) {
-                    LOG.info("Error during closing PCFMessageAgent. {}", e.getMessage());
-                } finally {
-                    agent = null;
+        if (agent != null || ibmMqManager != null) {
+            synchronized (LOCK) {
+                if (agent != null) {
+                    try {
+                        agent.disconnect();
+                    } catch (MQDataException e) {
+                        LOG.info("Error during closing PCFMessageAgent. {}", e.getMessage());
+                    } finally {
+                        agent = null;
+                    }
                 }
-            }
-            if (ibmMqManager != null) {
-                try {
-                    ibmMqManager.close();
-                } catch (MQException e) {
-                    LOG.info("Error during closing MQQueueManager. {}", e.getMessage());
-                } finally {
-                    ibmMqManager = null;
+                if (ibmMqManager != null) {
+                    try {
+                        ibmMqManager.close();
+                    } catch (MQException e) {
+                        LOG.info("Error during closing MQQueueManager. {}", e.getMessage());
+                    } finally {
+                        ibmMqManager = null;
+                    }
                 }
             }
         }
@@ -190,6 +227,6 @@ public class IbmMqConnector implements JmsConnectorInstance {
 
     @Override
     public boolean isClosed() {
-        return ibmMqManager != null && !ibmMqManager.isConnected();
+        return ibmMqManager == null || !ibmMqManager.isConnected() || !ibmMqManager.isOpen();
     }
 }

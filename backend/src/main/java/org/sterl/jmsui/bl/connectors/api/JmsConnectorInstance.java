@@ -22,9 +22,12 @@ public interface JmsConnectorInstance extends Closeable {
     JmsTemplate getJmsTemplate();
     void testConnection() throws JMSException;
 
-    List<JmsResource> listResources();
+    List<JmsResource> listResources() throws JMSException;
 
-    void sendMessage(String destination, String message, JmsHeaderRequestValues header);
+    void sendMessage(String destination, String message, JmsHeaderRequestValues header) throws JMSException;
+    
+    int getQueueDepth(String queueName) throws JMSException;
+    
     /**
      * Receive a JMS message for a given destination.
      * 
@@ -32,7 +35,7 @@ public interface JmsConnectorInstance extends Closeable {
      * @param timeout the optional timeout // maybe <code>null</code>
      * @return the message received // maybe <code>null</code>
      */
-    Message receive(String destination, Long timeout);
+    Message receive(String destination, Long timeout) throws JMSException;
     
     boolean isClosed();
 }
