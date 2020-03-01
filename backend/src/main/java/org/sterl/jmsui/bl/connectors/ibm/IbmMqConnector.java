@@ -124,7 +124,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
         try {
             final PCFMessage request = new PCFMessage(CMQCFC.MQCMD_INQUIRE_Q_NAMES);
             request.addParameter(CMQC.MQCA_Q_NAME, "*");
-            //request.addParameter(CMQC.MQIA_Q_TYPE, CMQC.MQQT_ALL);
+            request.addParameter(CMQC.MQIA_Q_TYPE, CMQC.MQQT_ALL);
             synchronized (this.LOCK) {
                 PCFMessageAgent messageAgent = getAgent();
                 PCFMessage[] response = messageAgent.send(request);

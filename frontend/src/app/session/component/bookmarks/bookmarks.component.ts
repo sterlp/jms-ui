@@ -42,11 +42,11 @@ export class BookmarksComponent implements OnInit {
 
   doLoad() {
     this.bookmarksService.list(this.connectorId, null).subscribe(result => {
-      this.dataSource.disconnect();
-      this.dataSource = new MatTableDataSource(result.content);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
-      if (this.paginator) this.paginator.length = result.numberOfElements;
+        this.dataSource.disconnect();
+        this.dataSource = new MatTableDataSource(result.content);
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        if (this.paginator) this.paginator.length = result.numberOfElements;
     });
   }
 
