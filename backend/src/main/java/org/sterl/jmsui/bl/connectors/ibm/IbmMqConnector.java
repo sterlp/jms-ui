@@ -35,16 +35,20 @@ import lombok.Getter;
 public class IbmMqConnector implements JmsConnectorInstance {
     private static final Logger LOG = LoggerFactory.getLogger(IbmMqConnector.class);
     
+    private static final String[] SYSTEM_PREFIXES = {"LOOPBACK", "AMQ.", "SYSTEM."};
+    
     private final String queueManagerName;
     @Getter
     private final JmsTemplate jmsTemplate;
     
     private final Object LOCK = new Object();
     private final Long defaultTimeoutInMs;
+
     @Getter(value = AccessLevel.PACKAGE)
     private final Hashtable<String, Object> config;
-    private MQQueueManager ibmMqManager;
-    private PCFMessageAgent agent;
+
+    private volatile MQQueueManager ibmMqManager;
+    private volatile PCFMessageAgent agent;
     
     public IbmMqConnector(String queueManagerName, 
             Long defaultTimeoutInMs,
@@ -97,20 +101,24 @@ public class IbmMqConnector implements JmsConnectorInstance {
     public List<JmsResource> listResources() {
         List<JmsResource> result = new ArrayList<>();
         try {
-            PCFMessageAgent messageAgent = getAgent();
             final PCFMessage request = new PCFMessage(CMQCFC.MQCMD_INQUIRE_Q_NAMES);
             request.addParameter(CMQC.MQCA_Q_NAME, "*");
             request.addParameter(CMQC.MQIA_Q_TYPE, CMQC.MQQT_ALL);
             synchronized (this.LOCK) {
+                PCFMessageAgent messageAgent = getAgent();
                 PCFMessage[] response = messageAgent.send(request);
                 
                 String[] names = response[0].getStringListParameterValue(MQConstants.MQCACF_Q_NAMES);
                 int[] types = response[0].getIntListParameterValue(MQConstants.MQIACF_Q_TYPES);
                 
                 for (int i = 0; i < names.length; i++) {
-                    QTypes type = QTypes.from(types[i]);
-                    result.add(new JmsResource(
-                            trim(names[i]), ToJmsResourceType.INSTANCE.convert(type), type.name()));
+                    final String qName = trim(names[i]);
+
+                    if (qName != null && !isSystemQueue(qName)) {                        
+                        final QTypes type = QTypes.from(types[i]);
+                        result.add(new JmsResource(
+                                trim(names[i]), ToJmsResourceType.INSTANCE.convert(type), type.name()));
+                    }
                 }
             }
             return result;
@@ -127,10 +135,12 @@ public class IbmMqConnector implements JmsConnectorInstance {
         synchronized (LOCK) {
             if (ibmMqManager == null) {
                 ibmMqManager = new MQQueueManager(queueManagerName, config);
+            }
+            if (agent == null) {                
                 agent = new PCFMessageAgent(ibmMqManager);
             }
-            return agent;
         }
+        return agent;
     }
     
     private RuntimeException parseException(MQException e, String message) {
@@ -162,6 +172,15 @@ public class IbmMqConnector implements JmsConnectorInstance {
                 }
             }
         }
+    }
+    
+    private static boolean isSystemQueue(String name) {
+        if (name != null && name.length() > 0) {
+            for (String prefix : SYSTEM_PREFIXES) {
+                if (name.startsWith(prefix)) return true;
+            }
+        }
+        return false;
     }
     
     private static String trim(String value) {
