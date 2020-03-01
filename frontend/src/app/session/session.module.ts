@@ -13,6 +13,7 @@ import { SharedModule } from '../shared/shared.module';
 import { BookmarksComponent } from './component/bookmarks/bookmarks.component';
 import { FormsModule } from '@angular/forms';
 import { QueueListComponent } from './component/queue-list/queue-list.component';
+import { LoadingButtonComponent } from '../shared/loading-button/loading-button.component';
 
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     tabSize: 2,
