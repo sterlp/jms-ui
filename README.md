@@ -1,3 +1,5 @@
+![](https://github.com/sterlp/jms-ui/workflows/Java%20CI/badge.svg)
+
 # How to run
 - Download latest version from https://github.com/sterlp/jms-ui/releases
 - `java -jar jms-ui-backend-xxx.jar`
