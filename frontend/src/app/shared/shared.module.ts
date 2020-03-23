@@ -4,11 +4,12 @@ import { LoadingComponent } from './loading/loading.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingButtonComponent } from './loading-button/loading-button.component';
 import { MatButtonModule } from '@angular/material/button';
+import { ErrorMessagesComponent } from './error-messages/error-messages.component';
 
 
 
 @NgModule({
-  declarations: [LoadingComponent, LoadingButtonComponent],
+  declarations: [LoadingComponent, LoadingButtonComponent, ErrorMessagesComponent],
   imports: [
     CommonModule,
     MatProgressSpinnerModule,
@@ -16,7 +17,8 @@ import { MatButtonModule } from '@angular/material/button';
   ],
   exports: [
     LoadingComponent,
-    LoadingButtonComponent
+    LoadingButtonComponent,
+    ErrorMessagesComponent
   ]
 })
 export class SharedModule { }

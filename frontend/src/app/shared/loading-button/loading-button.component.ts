@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 })
 export class LoadingButtonComponent implements OnInit {
 
+    @Input() loadingText ?= 'Loading ...';
     @Input() loading$: Observable<boolean>;
     @Output() doLoad: EventEmitter<any> = new EventEmitter();
 

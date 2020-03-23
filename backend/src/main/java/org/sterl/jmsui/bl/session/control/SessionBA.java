@@ -13,10 +13,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
+import javax.jms.JMSException;
 import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jms.JmsException;
 import org.springframework.stereotype.Component;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
@@ -53,21 +55,23 @@ class SessionBA implements Closeable {
     Set<Long> openSessions() {
         return SESSIONS.keySet();
     }
-    JmsConnectorInstance connect(JmsConnectionBE connection) {
+    JmsConnectorInstance connect(JmsConnectionBE connection) throws JMSException {
         Optional<Entry<Long, JmsConnectorInstance>> storedSession = getStoredSession(connection.getId());
         JmsConnectorInstance connector;
 
         try {
             if (storedSession.isEmpty()) {
+                LOG.info("Creating new connection to {}", connection);
                 connector = FACTORIES.get(connection.getType()).create(connection);
                 SESSIONS.put(connection.getId(), connector);
             } else {
                 connector = storedSession.get().getValue();
             }
-            connector.testConnection();
+            connector.connect();
         } catch (Exception e) {
             SESSIONS.remove(connection.getId());
             if (e instanceof RuntimeException) throw (RuntimeException)e;
+            else if (e instanceof JMSException) throw (JMSException)e;
             else throw new RuntimeException("Failed to connect to " + connection, e);
         }
         return connector;
@@ -78,8 +82,7 @@ class SessionBA implements Closeable {
             try {
                 remove.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                LOG.warn("Failled to close {}.", connectorId, e);
             }
         }
     }

@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api';
 import { ConnectorService } from 'src/app/connectors/service/connector.service';
 import { ConnectorData } from 'src/app/api/connector';
+import { SubscriptionsHolder } from '@sterlp/ng-spring-boot-api';
 
 @Component({
   selector: 'app-connector.page',
@@ -21,7 +21,7 @@ export class ConnectorPage implements OnInit, OnDestroy {
               private connectorService: ConnectorService) { }
 
   ngOnInit() {
-    this.subs.addAny(this.route.params.subscribe(params => {
+    this.subs.add(this.route.params.subscribe(params => {
       const id = params.id * 1;
       if (id) {
         this.connectorService.getConnectorWithConfig(id).subscribe(d => this.connectorData = d);

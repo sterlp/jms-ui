@@ -80,6 +80,7 @@ export class JmsHeadersComponent implements OnInit {
             delete this.internalHeader.properties[oldKey];
         }
     }
+    console.info(this.internalHeader);
     this.headersChange.emit(this.internalHeader);
   }
 

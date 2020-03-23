@@ -20,7 +20,8 @@ public interface JmsConnectorInstance extends Closeable {
      * @return spring {@link JmsTemplate} for more use cases later on
      */
     JmsTemplate getJmsTemplate();
-    void testConnection() throws JMSException;
+
+    void connect() throws JMSException;
 
     List<JmsResource> listResources() throws JMSException;
 

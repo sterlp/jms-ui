@@ -1,7 +1,7 @@
 spring:
   jackson:
     mapper:
-      use-std-bean-naming: true
+      use-std-bean-naming: true    serialization:      FAIL_ON_EMPTY_BEANS: false
   h2:
     console:
       path: /api/db
@@ -15,10 +15,11 @@ spring:
     hibernate:
       ddl-auto: update
     # https://stackoverflow.com/questions/30549489/what-is-this-spring-jpa-open-in-view-true-property-in-spring-boot
-    open-in-view: false
+    properties:
+      hibernate.enable_lazy_load_no_trans: false
   data:
     rest:
       base-path: /api
-      default-page-size: 10
+      default-page-size: 25
   quartz:
     job-store-type: JDBC

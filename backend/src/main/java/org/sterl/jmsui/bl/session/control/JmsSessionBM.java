@@ -11,7 +11,11 @@ import java.util.Set;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.sterl.jmsui.api.JmsHeaderRequestValues;
 import org.sterl.jmsui.bl.common.spring.BusinessManager;
 import org.sterl.jmsui.bl.connection.control.JmsConnectionBM;
@@ -21,7 +25,7 @@ import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 
 @BusinessManager
 public class JmsSessionBM {
-
+    private static final Logger LOG = LoggerFactory.getLogger(JmsSessionBM.class);
     @Autowired JmsConnectionBM connectionBM;
     @Autowired SessionBA sessionBA;
 
@@ -36,13 +40,14 @@ public class JmsSessionBM {
         JmsConnectorInstance connector = getOrConnect(connectorId);
         return connector.receive(destination, timeout);
     }
-    public List<JmsResource> listQueues(long connectorId) throws JMSException {
-        JmsConnectorInstance connector = getOrConnect(connectorId);
+    @Cacheable("jms-resources")
+    public List<JmsResource> listResources(long connectorId) throws JMSException {
+        final JmsConnectorInstance connector = getOrConnect(connectorId);
         return connector.listResources();
     }
     public Map<String, Integer> queueDepths(long connectorId, List<String> queues) throws JMSException {
         final JmsConnectorInstance connector = getOrConnect(connectorId);
-        Map<String, Integer> result = new LinkedHashMap<>();
+        final Map<String, Integer> result = new LinkedHashMap<>();
         for (String queueName : queues) {
             // do the request only once ...
             if (!result.containsKey(queueName)) {                
@@ -56,20 +61,18 @@ public class JmsSessionBM {
      * Creates a connections to the given connector and returns all open sessions id's.
      * @param connectorId the connector to connect to
      * @return the {@link Set} of open sessions
+     * @throws JMSException if the connection failed.
      */
-    public Set<Long> connect(long connectorId) {
-        Optional<Entry<Long, JmsConnectorInstance>> storedSession = sessionBA.getStoredSession(connectorId);
-        if (!storedSession.isPresent()) {
-            sessionBA.connect(connectionBM.getWithConfig(connectorId));
-        }
-        return sessionBA.openSessions();
+    public JmsConnectorInstance connect(long connectorId) throws JMSException {
+        return sessionBA.connect(connectionBM.getWithConfig(connectorId));
     }
+    @CacheEvict("jms-resources")
     public Set<Long> disconnect(long connectorId) {
         sessionBA.disconnect(connectorId);
         return sessionBA.openSessions();
     }
     
-    private JmsConnectorInstance getOrConnect(long connectorId) {
+    private JmsConnectorInstance getOrConnect(long connectorId) throws JMSException {
         Optional<Entry<Long, JmsConnectorInstance>> storedSession = sessionBA.getStoredSession(connectorId);
         JmsConnectorInstance result;
         if (storedSession.isEmpty()) {

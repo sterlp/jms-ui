@@ -1,12 +1,10 @@
 package org.sterl.jmsui.bl.connectors.memory;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import javax.jms.JMSException;
 import javax.jms.Message;
 
 import org.springframework.jms.core.JmsTemplate;
@@ -20,19 +18,14 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     
     private Queue<DummyJmsMessage> memoryQueue = new ConcurrentLinkedQueue<>();
 
-    public MemoryQueueConnector() {
-    }
     @Override
-    public void close() throws IOException {
+    public void close() {
         memoryQueue.clear();
     }
 
     @Override
     public JmsTemplate getJmsTemplate() {
         throw new RuntimeException("Not supported.");
-    }
-    @Override
-    public void testConnection() throws JMSException {
     }
     @Override
     public List<JmsResource> listResources() {
@@ -51,7 +44,10 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
         return false;
     }
     @Override
-    public int getQueueDepth(String queueName) throws JMSException {
+    public int getQueueDepth(String queueName) {
         return memoryQueue.size();
+    }
+    @Override
+    public void connect() {
     }
 }

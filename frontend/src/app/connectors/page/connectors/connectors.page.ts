@@ -1,17 +1,12 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { SupportedConnector, ConnectorData } from 'src/app/api/connector';
-import { ArrayUtils } from 'src/app/common/utils';
 import { ConnectorService, ConnertorViewDataSource } from 'src/app/connectors/service/connector.service';
-import { catchError, map, tap, finalize } from 'rxjs/operators';
 import { JmsSessionService } from 'src/app/session/service/session/jms-session.service';
 import { Router } from '@angular/router';
-import { LoadingService } from 'src/app/common/loading/loading.service';
-import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
+import { ConnectorData } from 'src/app/api/connector';
+import { ErrorDialogService } from 'src/app/common/error-dialog/error-dialog.service';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   templateUrl: './connectors.page.html',
@@ -23,11 +18,13 @@ export class ConnectorsPage implements OnInit, AfterViewInit {
 
   dataSource: ConnertorViewDataSource;
 
-  constructor(private $connector: ConnectorService, private $loading: LoadingService,
-              private $session: JmsSessionService, private $router: Router, private dialog: MatDialog) { }
+  connectingId: number;
+
+  constructor(private $connector: ConnectorService,
+              private $session: JmsSessionService, private $router: Router, private errorDialog: ErrorDialogService) { }
 
   ngOnInit() {
-    this.dataSource = new ConnertorViewDataSource(this.$connector, this.$loading);
+    this.dataSource = new ConnertorViewDataSource(this.$connector);
     this.dataSource.loadConnectorData();
   }
   ngAfterViewInit(): void {
@@ -41,13 +38,20 @@ export class ConnectorsPage implements OnInit, AfterViewInit {
   }
 
   doConnect(conData: ConnectorData) {
-    this.$session.openSession(conData.id).subscribe(
-      openSessions => {
-        // only if we session was created
-        if (openSessions.find(s => s.id === conData.id)) {
-          this.$router.navigate(['/sessions', conData.id]);
-        }
-      },
+    this.connectingId = conData.id;
+    this.$session.openSession(conData.id)
+        .subscribe(
+            openSessions => {
+                // only if we session was created
+                if (openSessions.find(s => s.id === conData.id)) {
+                this.$router.navigate(['/sessions', conData.id]);
+                }
+            },
+            e => {
+                this.connectingId = null;
+                this.errorDialog.openError(`Failed to open connection to ${conData.name}`, e.error || e)
+            },
+            () => this.connectingId = null
     );
   }
 }

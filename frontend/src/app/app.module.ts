@@ -13,12 +13,11 @@ import { ConnectorViewComponent } from './connectors/component/connector-view/co
 import { ErrorDialogComponent } from './common/error-dialog/error-dialog.component';
 import { ConfigFieldComponent } from './connectors/component/config-field/config-field.component';
 import { HttpClientModule } from '@angular/common/http';
-import { NgSpringBootApiModule } from 'projects/ng-spring-boot-api/src/public-api';
 import { ConnectorPage } from './connectors/page/connector/connector.page';
 import { DatePipe, LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { LoadingBarModule } from '@ngx-loading-bar/core';
+import { LoadingBarHttpClientModule } from '@ngx-loading-bar/http-client';
 import { SharedModule } from './shared/shared.module';
-
-
 
 @NgModule({
   declarations: [
@@ -38,8 +37,9 @@ import { SharedModule } from './shared/shared.module';
     AppRoutingModule,
     MaterialModule,
     HttpClientModule,
-    NgSpringBootApiModule,
-    SharedModule
+    SharedModule,
+    LoadingBarModule,
+    LoadingBarHttpClientModule
   ],
   providers: [DatePipe,
     {

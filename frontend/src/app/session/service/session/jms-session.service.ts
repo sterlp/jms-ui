@@ -1,116 +1,79 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable, OnDestroy } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { ConnectorData, ConnectorView } from 'src/app/api/connector';
+import { ConnectorView } from 'src/app/api/connector';
 import { JmsResource, SendJmsMessageCommand, JmsResultMessage } from 'src/app/api/jms-session';
-import { LoadingService } from 'src/app/common/loading/loading.service';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { catchError, map, tap, finalize } from 'rxjs/operators';
-import { MatDialog } from '@angular/material/dialog';
-import { ErrorDialogComponent } from 'src/app/common/error-dialog/error-dialog.component';
-import { Page } from 'projects/ng-spring-boot-api/src/public-api';
+import { BehaviorSubject } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Page } from '@sterlp/ng-spring-boot-api';
 
 // /api/jms/sessions
 @Injectable({
   providedIn: 'root'
 })
-export class JmsSessionService {
+export class JmsSessionService implements OnDestroy {
 
-  public sessions$ = new BehaviorSubject<ConnectorView[]>([]);
-  public loading$: Observable<boolean>;
+    private readonly listUrl = '/api/sessions';
+    public sessions$ = new BehaviorSubject<ConnectorView[]>([]);
 
-  constructor(private http: HttpClient, private $loading: LoadingService, private dialog: MatDialog) {
-    this.loading$ = $loading.loading$;
-  }
+    constructor(private http: HttpClient) {}
 
-  getStoredSession(connectorId: number, connectors?: ConnectorView[]): ConnectorView {
-    // tslint:disable-next-line: curly
-    if (!connectors) connectors = this.sessions$.value;
-    return connectors.find(s => s.id === connectorId);
-  }
+    ngOnDestroy(): void {
+        this.sessions$.complete();
+    }
 
-  /**
-   * Opens a session to the given connector.
-   * @returns subject of all currently open sessions
-   */
-  openSession(connectorId: number): Observable<ConnectorView[]> {
-    this.$loading.isLoading();
-    return this.http.post<Page<ConnectorView>>(`/api/jms/sessions/${connectorId}`, null)
-      .pipe(
-        finalize(() => this.$loading.finishedLoading()),
-        catchError(this.handleError<Page<ConnectorView>>('Failed to connect', null)),
-        map(s => {
-          if (s && s.content) {
-            this.sessions$.next(s.content);
-            return s.content;
-          }
-          return [];
-        })
-      );
-  }
+    getStoredSession(connectorId: number, connectors?: ConnectorView[]): ConnectorView {
+        // tslint:disable-next-line: curly
+        if (!connectors) connectors = this.sessions$.value;
+        return connectors.find(s => s.id === connectorId);
+    }
 
-  closeSession(connectorId: number): Observable<ConnectorView[]> {
-    this.$loading.isLoading();
-    return this.http.delete<Page<ConnectorView>>(`/api/jms/sessions/${connectorId}`)
-      .pipe(
-        finalize(() => this.$loading.finishedLoading()),
-        catchError(this.handleError<Page<ConnectorView>>('Failed to disconnect', null)),
-        map(s => {
-          if (s && s.content) {
-            this.sessions$.next(s.content);
-            return s.content;
-          }
-          return [];
-        })
-      );
-  }
+    /**
+     * Opens a session to the given connector.
+     * @returns subject of all currently open sessions
+     */
+    openSession(connectorId: number): Observable<ConnectorView[]> {
+        return this.http.post<Page<ConnectorView>>(`${this.listUrl}/${connectorId}`, null)
+            .pipe(
+                map(s => {
+                    if (s && s.content) {
+                        this.sessions$.next(s.content);
+                        return s.content;
+                    }
+                    return [];
+                })
+            );
+    }
 
-  sendJmsMessage(connectorId: number, target: string, body: SendJmsMessageCommand): Observable<void> {
-    this.$loading.isLoading();
-    return this.http.post<void>(`api/jms/sessions/${connectorId}/message/${target}`, body)
-                    .pipe(
-                      finalize(() => this.$loading.finishedLoading()),
-                      catchError(this.handleError<void>('Send JMS Message to ' + target, null))
-                    );
-  }
+    closeSession(connectorId: number): Observable<ConnectorView[]> {
+        return this.http.delete<Page<ConnectorView>>(`${this.listUrl}/${connectorId}`)
+            .pipe(
+                map(s => {
+                    if (s && s.content) {
+                        this.sessions$.next(s.content);
+                        return s.content;
+                    }
+                    return [];
+                })
+        );
+    }
 
-  receiveJmsMessage(connectorId: number, target: string): Observable<JmsResultMessage> {
-    this.$loading.isLoading();
-    return this.http.get<JmsResultMessage>(`api/jms/sessions/${connectorId}/message/${target}`).pipe(
-        finalize(() => this.$loading.finishedLoading()),
-        catchError(this.handleError<JmsResultMessage>('Send JMS Message to ' + target, null))
-      );
-  }
+    sendJmsMessage(connectorId: number, target: string, body: SendJmsMessageCommand): Observable<void> {
+        return this.http.post<void>(`${this.listUrl}/${connectorId}/message/${target}`, body);
+    }
 
-  getQueues(connectorId: number): Observable<JmsResource[]> {
-    this.$loading.isLoading();
-    return this.http.get<JmsResource[]>('api/jms/sessions/' + connectorId + '/queues').pipe(
-      finalize(() => this.$loading.finishedLoading()),
-      catchError(this.handleError<JmsResource[]>('Failed to load the Queue List.' , []))
-    );
-  }
+    receiveJmsMessage(connectorId: number, target: string): Observable<JmsResultMessage> {
+        return this.http.get<JmsResultMessage>(`${this.listUrl}/${connectorId}/message/${target}`);
+    }
 
-  /**
-   * Returns a object map of the current queue length. Call this method only with queues.
-   */
-  getDepths(connectorId: number, queues: string[]): Observable<object> {
-    this.$loading.isLoading();
-    return this.http.post<object>('api/jms/sessions/' + connectorId + '/depths', queues).pipe(
-      finalize(() => this.$loading.finishedLoading()),
-      catchError(this.handleError<object>('Failed to load the Queue depth.' , null))
-    );
-  }
+    listResources(connectorId: number): Observable<JmsResource[]> {
+        return this.http.get<JmsResource[]>(`${this.listUrl}/${connectorId}/resources`);
+    }
 
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      console.error(`${operation} failed: ${error.message}`, error); // log to console instead
-      this.dialog.open(ErrorDialogComponent, {
-        width: '80%',
-        data: {error, operation},
-        closeOnNavigation: true
-      });
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
-  }
+    /**
+     * Returns a object map of the current queue length. Call this method only with queues.
+     */
+    getDepths(connectorId: number, queues: string[]): Observable<object> {
+        return this.http.post<object>(`${this.listUrl}/${connectorId}/queue/depths`, queues);
+    }
 }

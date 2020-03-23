@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { SupportedConnector, ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { ArrayUtils } from 'src/app/common/utils';
 import { CollectionViewer, DataSource } from '@angular/cdk/collections';
 import { BehaviorSubject } from 'rxjs';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
-import { LoadingService } from 'src/app/common/loading/loading.service';
-import { Page, Pageable, EMPTY_PAGE } from 'projects/ng-spring-boot-api/src/public-api';
+import { Page, Pageable, EMPTY_PAGE } from '@sterlp/ng-spring-boot-api';
+import { ErrorDialogService } from 'src/app/common/error-dialog/error-dialog.service';
 
 
 @Injectable({
@@ -17,7 +17,7 @@ export class ConnectorService {
   supportedConnectors = new BehaviorSubject<SupportedConnector[]>([]);
   supportedConnectors$ = this.supportedConnectors.asObservable();
 
-  constructor(private http: HttpClient, private loading: LoadingService) { }
+  constructor(private http: HttpClient, private errorDialog: ErrorDialogService) { }
 
   getSupported(): Observable<SupportedConnector[]> {
     if (this.supportedConnectors.value.length === 0) {
@@ -26,44 +26,35 @@ export class ConnectorService {
     return this.supportedConnectors$;
   }
   reloadSupportedConnectors(): Observable<SupportedConnector[]> {
-    this.loading.isLoading();
     const res = this.http.get<SupportedConnector[]>('api/connectors')
-      .pipe(
-        finalize(() => this.loading.finishedLoading()),
-        catchError(this.loading.handleError<SupportedConnector[]>('Load Supported Connectors', []))
-      );
+                         .pipe(catchError(this.errorDialog.showError<SupportedConnector[]>('Load Supported Connectors', [])));
     res.subscribe(result => this.supportedConnectors.next(result));
     return res;
   }
 
   save(data: ConnectorData): Observable<ConnectorData> {
-    this.loading.isLoading();
     return this.http.post<ConnectorData>('api/jms/connections', data)
       .pipe(
-        finalize(() => this.loading.finishedLoading()),
-        catchError(this.loading.handleError<ConnectorData>('Save JMS Connector', data))
+        catchError(this.errorDialog.showError<ConnectorData>('Save JMS Connector', data))
       );
   }
 
   delete(id: number) {
-    this.loading.isLoading();
     return this.http.delete(`api/jms/connections/${id}`)
       .pipe(
-        finalize(() => this.loading.finishedLoading()),
-        catchError(this.loading.handleError<ConnectorData>('Delete JMS Connector', null))
+        catchError(this.errorDialog.showError<ConnectorData>('Delete JMS Connector', null))
       );
   }
 
   getConnectorWithConfig(id: number): Observable<ConnectorData> {
     return this.http.get<ConnectorData>(`api/jms/connections/${id}`)
       .pipe(
-        finalize(() => this.loading.finishedLoading()),
-        catchError(this.loading.handleError<ConnectorData>('Load JMS Connector', null))
+        catchError(this.errorDialog.showError<ConnectorData>('Load JMS Connector', null))
       );
   }
 
   /**
-   * Returns a Hateos Resource containing 
+   * Returns a Hateos Resource containing
    * <li> _embedded.jmsConnections
    * <li> page
    */
@@ -72,38 +63,49 @@ export class ConnectorService {
       params: pageable ? pageable.newHttpParams() : null
     })
     .pipe(
-      finalize(() => this.loading.finishedLoading()),
-      catchError(this.loading.handleError<Page<ConnectorView>>('Load JMS Connectors', null))
+      catchError(this.errorDialog.showError<Page<ConnectorView>>('Load JMS Connectors', EMPTY_PAGE))
     );
   }
 }
 
 export class ConnertorViewDataSource implements DataSource<ConnectorView> {
-  constructor(private $connector: ConnectorService, private $loading: LoadingService) {}
+    constructor(private $connector: ConnectorService) {}
 
-  private connectorDataSubject = new BehaviorSubject<ConnectorView[]>([]);
-  private pageSubject = new BehaviorSubject<Page<ConnectorView>>(EMPTY_PAGE);
+    private connectorDataSubject = new BehaviorSubject<ConnectorView[]>([]);
+    private pageSubject = new BehaviorSubject<Page<ConnectorView>>(EMPTY_PAGE);
 
-  public loading$ = this.$loading.loading$;
-  public page$ = this.pageSubject.asObservable();
+    // tslint:disable: variable-name
+    private _lastRequest: Subscription;
+    private _loading = new BehaviorSubject<boolean>(false);
+    public readonly loading$ = this._loading.asObservable();
+    public page$ = this.pageSubject.asObservable();
 
-  connect(collectionViewer: CollectionViewer): Observable<ConnectorView[] | readonly ConnectorView[]> {
-    return this.connectorDataSubject.asObservable();
-  }
+    connect(collectionViewer: CollectionViewer): Observable<ConnectorView[] | readonly ConnectorView[]> {
+        return this.connectorDataSubject.asObservable();
+    }
 
-  disconnect(collectionViewer: CollectionViewer): void {
-    this.connectorDataSubject.complete();
-    this.pageSubject.complete();
-  }
+    disconnect(collectionViewer: CollectionViewer): void {
+        this.connectorDataSubject.complete();
+        this.pageSubject.complete();
+    }
 
-  loadConnectorData(page: number = 0, size: number = 10): void {
-    console.info('loadConnectorData ...');
-    this.$loading.isLoading();
-    this.$connector.listConnections(Pageable.of(page, size))
-      .pipe(finalize(() => this.$loading.finishedLoading()))
-      .subscribe(data => {
-        this.pageSubject.next(data);
-        this.connectorDataSubject.next(data.content ? data.content : []);
-      });
-  }
+    loadConnectorData(page: number = 0, size: number = 10): void {
+        console.info('loadConnectorData ...', page, size);
+        this._cancel();
+        this._loading.next(true);
+        this._lastRequest = this.$connector.listConnections(Pageable.of(page, size))
+            .pipe(finalize(() => this._loading.next(false)))
+            .subscribe(data => {
+                this.pageSubject.next(data);
+                this.connectorDataSubject.next(data.content ? data.content : []);
+            }
+        );
+    }
+
+    private _cancel() {
+        if (this._lastRequest && this._lastRequest.unsubscribe) { // cancel any pending requests ...
+            this._lastRequest.unsubscribe();
+            this._lastRequest = null;
+        }
+    }
 }

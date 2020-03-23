@@ -36,6 +36,12 @@ public class JmsConnectionBF {
     @GetMapping
     public SimplePage<JmsConnectionView> list(
             @RequestParam(name = "ids", required = false) Collection<Long> ids, Pageable page) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         if (ids == null || ids.isEmpty()) {            
             return new SimplePage<>(jmsConnectionDao.findViewBy(page));
         } else {

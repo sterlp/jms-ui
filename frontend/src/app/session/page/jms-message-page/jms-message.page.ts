@@ -4,8 +4,8 @@ import { JmsSessionService } from 'src/app/session/service/session/jms-session.s
 import { SendJmsMessageCommand, JmsResultMessage, JmsHeaderRequestValues } from 'src/app/api/jms-session';
 import { Observable } from 'rxjs';
 import { ConnectorView } from 'src/app/api/connector';
-import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api';
 import { transition, trigger, state, animate, style } from '@angular/animations';
+import { SubscriptionsHolder } from '@sterlp/ng-spring-boot-api';
 
 @Component({
   templateUrl: './jms-message.page.html',
@@ -48,7 +48,6 @@ export class JmsMessagePage implements OnInit, OnDestroy {
               private sessionService: JmsSessionService) { }
 
   ngOnInit() {
-    this.loading$ = this.sessionService.loading$;
     const s = this.route.params.subscribe(params => {
       this.target = params.target;
       const id =  params.id * 1;
@@ -64,7 +63,7 @@ export class JmsMessagePage implements OnInit, OnDestroy {
         }
       }
     });
-    this.subs.addAny(s);
+    this.subs.add(s);
   }
 
   ngOnDestroy(): void {

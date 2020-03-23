@@ -1,6 +1,6 @@
 export interface JmsResource {
     name: string;
-    type: JmsResourceType;
+    type: JmsResourceType | string;
     vendorType: string;
     // dynamically loaded in some areas ...
     _depth?: number;

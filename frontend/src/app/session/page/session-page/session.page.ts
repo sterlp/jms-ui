@@ -2,13 +2,9 @@ import { Component, OnInit, ViewChild, AfterViewInit, AfterContentInit, OnDestro
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { JmsSessionService } from 'src/app/session/service/session/jms-session.service';
 import { ConnectorView } from 'src/app/api/connector';
-import { Observable } from 'rxjs';
-import { JmsResource } from 'src/app/api/jms-session';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { SubscriptionsHolder } from 'projects/ng-spring-boot-api/src/public-api';
 import { BookmarksComponent } from '../../component/bookmarks/bookmarks.component';
+import { SubscriptionsHolder } from '@sterlp/ng-spring-boot-api';
+import { JmsResource } from 'src/app/api/jms-session';
 
 @Component({
   templateUrl: './session.page.html',
@@ -19,7 +15,7 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
   id: number;
   private subs = new SubscriptionsHolder();
 
-  loading$: Observable<boolean>;
+  loading = false;
   conData: ConnectorView;
 
   @ViewChild(BookmarksComponent) bookmarkComponent: BookmarksComponent;
@@ -31,7 +27,6 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
     private sessionService: JmsSessionService) { }
 
   ngOnInit() {
-    this.loading$ = this.sessionService.loading$;
   }
   ngAfterContentInit(): void {
     const s = this.route.params.subscribe(params => {
@@ -40,10 +35,14 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
         this.handleId(params.id);
       }
     });
-    this.subs.addAny(s);
+    this.subs.add(s);
   }
   ngOnDestroy(): void {
     this.subs.close();
+  }
+
+  doAddBookmark(v: JmsResource) {
+    this.bookmarkComponent.doBookmark(v);
   }
 
   private handleId(id: any) {
@@ -52,13 +51,15 @@ export class SessionPage implements OnInit, AfterContentInit, OnDestroy {
       this.goBack();
     } else {
       if (!this.conData || this.conData.id !== id) {
+        this.loading = true;
         const s = this.sessionService.openSession(id).subscribe(sessions => {
           const v = this.sessionService.getStoredSession(id, sessions);
           if ( v && !this.conData || (this.conData && v && this.conData.id !== v.id)) {
             this.conData = v;
           }
+          this.loading = false;
         });
-        this.subs.addAny(s);
+        this.subs.add(s);
       }
     }
   }

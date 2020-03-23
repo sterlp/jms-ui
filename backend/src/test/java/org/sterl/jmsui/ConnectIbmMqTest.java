@@ -1,6 +1,7 @@
 package org.sterl.jmsui;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -34,8 +35,8 @@ import com.ibm.msg.client.wmq.WMQConstants;
 public class ConnectIbmMqTest {
 
     private static final String QMGR = "PAUL.DEV";
-    private static final String HOST = "paul-dev-644d.qm.eu-de.mq.appdomain.cloud";
-    private static final int PORT = 31195;
+    private static final String HOST = "paul-dev-eef2.qm.eu-gb.mq.appdomain.cloud";
+    private static final int PORT = 30623;
     private static final String CHANNEL = "CLOUD.ADMIN.SVRCONN";
 
     private static final String APP_USER = "puele";
@@ -53,16 +54,17 @@ public class ConnectIbmMqTest {
             .addOrSetConfig("password", APP_PASSWORD);
 
         IbmMqConnector ibmMQConnection = new IbmMqConnectorFactory().create(jmsConnection);
-        ibmMQConnection.testConnection();
+        ibmMQConnection.connect();
+        assertThat(ibmMQConnection.isClosed()).isFalse();
 
+        /*
         JmsTemplate jmsTemplate = ibmMQConnection.getJmsTemplate();
-        
-        
         jmsTemplate.convertAndSend("DEV.QUEUE.1", "Simple message");
         Message msg = jmsTemplate.receive("DEV.QUEUE.1");
         assertNotNull(msg);
         System.out.println(((TextMessage) msg).getText());
         assertEquals("Simple message", ((TextMessage) msg).getText());
+        */
 
         List<JmsResource> listQueues = ibmMQConnection.listResources();
         listQueues.forEach(System.out::println);
@@ -84,9 +86,11 @@ public class ConnectIbmMqTest {
         
         JmsTemplate jmsTemplate = new JmsTemplate(cf);
         jmsTemplate.setReceiveTimeout(1500);
-
+        jmsTemplate.setPriority(7);
+        jmsTemplate.setExplicitQosEnabled(true);
         jmsTemplate.convertAndSend("DEV.QUEUE.1", "Simple message");
         Message msg = jmsTemplate.receive("DEV.QUEUE.1");
+        System.out.println("prio: " + msg.getJMSPriority());
         assertNotNull(msg);
         System.out.println(((TextMessage) msg).getText());
         assertEquals("Simple message", ((TextMessage) msg).getText());

@@ -12,8 +12,8 @@ import { JmsHeadersComponent } from './component/jms-headers/jms-headers.compone
 import { SharedModule } from '../shared/shared.module';
 import { BookmarksComponent } from './component/bookmarks/bookmarks.component';
 import { FormsModule } from '@angular/forms';
-import { QueueListComponent } from './component/queue-list/queue-list.component';
 import { LoadingButtonComponent } from '../shared/loading-button/loading-button.component';
+import { JmsResourceListComponent } from './component/jms-resource-list/jms-resource-list.component';
 
 const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     tabSize: 2,
@@ -29,7 +29,7 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     JmsHeadersComponent,
     AceEditorComponent,
     BookmarksComponent,
-    QueueListComponent
+    JmsResourceListComponent
   ],
   imports: [
     CommonModule,

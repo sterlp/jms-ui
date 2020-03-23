@@ -5,7 +5,7 @@
         <li class="breadcrumb-item active" aria-current="page">{{ conData?.name }}</li>
     </ol>
     <div class="c-subheader-nav">
-        <app-loading *ngIf="loading$ | async"></app-loading>
+        <app-loading text="Connecting ..." *ngIf="loading"></app-loading>
         <div class="btn-group" role="group">
             <button mat-button (click)="doDisconnect()"  matTooltip="Disconnect & Close"><i class="cui-action-undo"></i><mat-icon>close</mat-icon></button>
         </div>
@@ -30,11 +30,11 @@
                     <mat-spinner *ngIf="!conData"></mat-spinner>
                     <ng-container *ngIf="conData">
                         <mat-card-header>
-                            <mat-card-title>Queues</mat-card-title>
+                            <mat-card-title>JMS Resources</mat-card-title>
                             <mat-card-subtitle>{{ conData.name }}</mat-card-subtitle>
                         </mat-card-header>
                         <mat-card-content>
-                            <app-queue-list [connectorId]="conData.id"></app-queue-list>
+                            <app-jms-resource-list (addBookmark)="doAddBookmark($event)" [connectorId]="conData.id"></app-jms-resource-list>
                         </mat-card-content>
                     </ng-container>
                 </mat-card>

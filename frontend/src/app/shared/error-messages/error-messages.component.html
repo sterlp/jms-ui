@@ -1,0 +1,7 @@
+<div *ngIf="error" class="alert alert-warning alert-dismissible fade show" role="alert">
+    {{ error.message ? error.message : error.error }}
+    <ng-content></ng-content>
+    <button type="button" class="close" aria-label="Close" (click)="doClose()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>

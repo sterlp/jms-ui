@@ -44,7 +44,8 @@ public class IbmMqConnectorFactory implements JmsConnectorInstanceFactory {
         //System.out.println(rawConfig);
         Hashtable<String, Object> config = new Hashtable<>(rawConfig.size());
         rawConfig.forEach((k, v) -> {
-            if (isSet(k) && isSet(v) && !"queue_manager".equals(k)) {
+            // if key and value is set -- we ignore queue_manager as it is not a config value 
+            if (isSet(k) && isSet(v) ) {
                 config.put(k, v);
             }
         });

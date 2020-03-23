@@ -1,21 +1,25 @@
 package org.sterl.jmsui.bl.connectors.ibm;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
 import javax.jms.JMSException;
+import javax.jms.JMSSecurityException;
 import javax.jms.Message;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jms.UncategorizedJmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
 import org.sterl.jmsui.api.JmsHeaderRequestValues;
-import org.sterl.jmsui.api.exception.JmsAuthorizationException;
+import org.sterl.jmsui.bl.common.helper.StopWatch;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
+import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
+import org.sterl.jmsui.bl.connectors.exception.UnknownJmsException;
+import org.sterl.jmsui.bl.connectors.ibm.common.IbmResourceHelper;
 import org.sterl.jmsui.bl.connectors.ibm.converter.IbmConverter.ToJmsResourceType;
 import org.sterl.jmsui.bl.connectors.ibm.model.QTypes;
 import org.sterl.jmsui.bl.connectors.util.JmsHeaderUtil;
@@ -27,13 +31,18 @@ import com.ibm.mq.constants.CMQC;
 import com.ibm.mq.constants.CMQCFC;
 import com.ibm.mq.constants.MQConstants;
 import com.ibm.mq.headers.MQDataException;
+import com.ibm.mq.headers.pcf.PCFException;
 import com.ibm.mq.headers.pcf.PCFMessage;
 import com.ibm.mq.headers.pcf.PCFMessageAgent;
-import com.ibm.msg.client.jms.DetailedJMSSecurityException;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 
+/**
+ * 
+ * Links:
+ * https://github.com/spring-cloud/spring-cloud-stream-binder-ibm-mq/blob/master/src/main/java/org/springframework/cloud/stream/binder/jms/ibmmq/IBMMQRequests.java
+ */
 public class IbmMqConnector implements JmsConnectorInstance {
     private static final Logger LOG = LoggerFactory.getLogger(IbmMqConnector.class);
     
@@ -43,14 +52,15 @@ public class IbmMqConnector implements JmsConnectorInstance {
     @Getter
     private final JmsTemplate jmsTemplate;
     
-    private final Object LOCK = new Object();
     private final Long defaultTimeoutInMs;
 
     @Getter(value = AccessLevel.PACKAGE)
     private final Hashtable<String, Object> config;
 
-    private volatile MQQueueManager ibmMqManager;
-    private volatile PCFMessageAgent agent;
+    private final StopWatch LOCK = new StopWatch();
+    // MQQueueManager is NOT THREAD SAVE!
+    protected volatile MQQueueManager ibmMqManager;
+    protected volatile PCFMessageAgent agent;
     
     public IbmMqConnector(String queueManagerName, 
             Long defaultTimeoutInMs,
@@ -63,9 +73,13 @@ public class IbmMqConnector implements JmsConnectorInstance {
 
     @Override
     public void sendMessage(String destination, String message, JmsHeaderRequestValues header) {
-        if (header.getJMSPriority() != null) jmsTemplate.setPriority(header.getJMSPriority());
-        else jmsTemplate.setPriority(4);
-        
+        jmsTemplate.setExplicitQosEnabled(true);
+        if (header.getJMSPriority() != null) {
+            jmsTemplate.setPriority(header.getJMSPriority());
+        } else {
+            jmsTemplate.setPriority(4);
+        }
+
         jmsTemplate.convertAndSend(destination, message, new MessagePostProcessor() {
             @Override
             public Message postProcessMessage(Message message) throws JMSException {
@@ -75,26 +89,6 @@ public class IbmMqConnector implements JmsConnectorInstance {
         });
         
     }
-    
-    public int getQueueDepth(String queueName) throws JMSException {
-        MQQueue destQueue = null;
-        int depth = 0;
-        try {
-           destQueue = getMQQueueManager().accessQueue(queueName, CMQC.MQOO_INQUIRE);
-           depth = destQueue.getCurrentDepth();
-        } catch (MQException e) {
-            throw new UncategorizedJmsException("Failed to read queue depth of " + queueName + ". " + e.getMessage(), e);
-        } finally {
-           if (destQueue != null) {
-              try {
-                 destQueue.close();
-              } catch (MQException e) {}
-           }
-        }
-
-        return depth;
-     }
-
     @Override
     public Message receive(String destination, Long timeout) {
         if (timeout != null) jmsTemplate.setReceiveTimeout(timeout);
@@ -103,59 +97,108 @@ public class IbmMqConnector implements JmsConnectorInstance {
         return jmsTemplate.receive(destination);
     }
     
+    public int getQueueDepth(String queueName) throws JMSException {
+        MQQueue destQueue = null;
+        int depth = 0;
+        try {
+            MQQueueManager qm = getMQQueueManager();
+            synchronized (LOCK) {
+                destQueue = qm.accessQueue(queueName, CMQC.MQOO_INQUIRE);
+            }
+            depth = destQueue.getCurrentDepth();
+        } catch (MQException e) {
+            throw parseException(e, "");
+        } finally {
+            IbmResourceHelper.close(destQueue);
+        }
+        return depth;
+    }
+    
     /**
      * Connects and disconnects again.
      */
-    public void testConnection() throws JMSException {
-        try {
-            jmsTemplate.getConnectionFactory().createConnection().close();
-        } catch (JMSException e) {
-            if (e instanceof DetailedJMSSecurityException) {
-                throw new JmsAuthorizationException(e.getMessage(), e);
-            } else if (e.getCause() instanceof DetailedJMSSecurityException) {
-                throw new JmsAuthorizationException(e.getMessage(), e);
+    public void connect() throws JMSException {
+        if (isClosed()) {
+            try {
+                LOCK.start();
+                boolean connected = getMQQueueManager().isConnected();
+                LOCK.stop();
+                LOG.info("Connected to '{}' status '{}' in {}ms.", queueManagerName, connected ? "open" : "closed", LOCK.getTimeInMs());
+            } catch (MQException e) {
+                throw parseException(e, "Failed to connect IBM MQ.");
             }
-            throw e;
-        }
+        }        
     }
 
-    public List<JmsResource> listResources() {
+    public List<JmsResource> listResources() throws JMSException {
         List<JmsResource> result = new ArrayList<>();
         try {
             final PCFMessage request = new PCFMessage(CMQCFC.MQCMD_INQUIRE_Q_NAMES);
             request.addParameter(CMQC.MQCA_Q_NAME, "*");
             request.addParameter(CMQC.MQIA_Q_TYPE, CMQC.MQQT_ALL);
-            synchronized (this.LOCK) {
-                PCFMessageAgent messageAgent = getAgent();
-                PCFMessage[] response = messageAgent.send(request);
-                
-                String[] names = response[0].getStringListParameterValue(MQConstants.MQCACF_Q_NAMES);
-                int[] types = response[0].getIntListParameterValue(MQConstants.MQIACF_Q_TYPES);
-                
-                for (int i = 0; i < names.length; i++) {
-                    final String qName = trim(names[i]);
 
-                    if (qName != null && !isSystemQueue(qName)) {                        
-                        final QTypes type = QTypes.from(types[i]);
-                        result.add(new JmsResource(
-                                trim(names[i]), ToJmsResourceType.INSTANCE.convert(type), type.name()));
-                    }
+            final PCFMessage[] response = sendPfcMessage(request);
+            final String[] names = response[0].getStringListParameterValue(MQConstants.MQCACF_Q_NAMES);
+            final int[] types = response[0].getIntListParameterValue(MQConstants.MQIACF_Q_TYPES);
+            
+            for (int i = 0; i < names.length; i++) {
+                final String qName = trim(names[i]);
+                
+                if (qName != null && !isSystemResource(qName)) {                        
+                    final QTypes type = QTypes.from(types[i]);
+                    result.add(new JmsResource(
+                            qName, ToJmsResourceType.INSTANCE.convert(type), type.name()));
                 }
             }
             return result;
         } catch (MQException e) {
-            throw parseException(e, "Failed to read resources.");
+            throw parseException(e, "Failed to read IBM MQ Queues.");
         } catch (Exception e) {
             if (e instanceof IllegalArgumentException) throw (IllegalArgumentException)e;
             if (e instanceof RuntimeException) throw (RuntimeException)e;
             throw new RuntimeException(e);
         }
     }
+    public List<JmsResource> getTopics() throws JMSException {
+        List<JmsResource> result = new ArrayList<>();
+        try {
+            final PCFMessage request = new PCFMessage(CMQCFC.MQCMD_INQUIRE_TOPIC_NAMES);
+            request.addParameter(CMQC.MQCA_TOPIC_NAME, "*");
+
+            final PCFMessage[] response = sendPfcMessage(request);
+            final String[] names = response[0].getStringListParameterValue(MQConstants.MQCACF_Q_NAMES);
+            
+            for (int i = 0; i < names.length; i++) {
+                final String tName = trim(names[i]);
+                
+                if (tName != null && !isSystemResource(tName)) {                        
+                    result.add(new JmsResource(tName, Type.TOPIC, "TOPIC"));
+                }
+            }
+            return result;
+        } catch (MQException e) {
+            throw parseException(e, "Failed to read IBM MQ Topics.");
+        } catch (Exception e) {
+            if (e instanceof IllegalArgumentException) throw (IllegalArgumentException)e;
+            if (e instanceof RuntimeException) throw (RuntimeException)e;
+            throw new RuntimeException(e);
+        }
+    }
+
+    private PCFMessage[] sendPfcMessage(final PCFMessage request)
+            throws MQException, MQDataException, PCFException, IOException {
+        PCFMessage[] response;
+        synchronized (this.LOCK) {
+            final PCFMessageAgent messageAgent = getAgent();
+            response = messageAgent.send(request);
+        }
+        return response;
+    }
     
     /**
      * Checks our connection and if needed connects us again.
      */
-    private MQQueueManager getMQQueueManager() throws MQException {
+    protected MQQueueManager getMQQueueManager() throws MQException {
         if (isClosed()) {
             synchronized (LOCK) {
                 // clean and reconnect
@@ -166,7 +209,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
         return ibmMqManager;
     }
     
-    private PCFMessageAgent getAgent() throws MQException, MQDataException {
+    protected PCFMessageAgent getAgent() throws MQException, MQDataException {
         final MQQueueManager qManager = getMQQueueManager(); // ensure connection
         if (agent == null) {
             synchronized (LOCK) {
@@ -178,11 +221,22 @@ public class IbmMqConnector implements JmsConnectorInstance {
         return agent;
     }
     
-    private RuntimeException parseException(MQException e, String message) {
-        if (e.getCompCode() == 2 && e.getReason() == 2035) {
-            return new IllegalArgumentException("User has no permissions to list queues.", e);
+    private JMSException parseException(Exception e, String message) {
+        if (e instanceof MQException) {
+            final MQException mqEx = (MQException)e;
+            final String errorCode = "Code: '" + mqEx.getCompCode() + "', Reason: '" + mqEx.getReason() + "'.";
+
+            if (mqEx.getCompCode() == 2 && mqEx.getReason() == 2035) {
+                return new JMSSecurityException(message + " User has not permissions." , errorCode);
+            } else {
+                return new UnknownJmsException(message + " " + errorCode, errorCode, e);
+            }
+        } else if (e instanceof MQDataException) {
+            final MQDataException dataEx = (MQDataException)e;
+            final String errorCode = "Code: '" + dataEx.getCompCode() + "', Reason: '" + dataEx.getReason() + "'.";
+            return new UnknownJmsException(message + " " + errorCode, errorCode, e);
         }
-        return new RuntimeException(message, e);
+        return new UnknownJmsException(message, e);
     }
 
     @Override
@@ -211,7 +265,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
         }
     }
     
-    private static boolean isSystemQueue(String name) {
+    private static boolean isSystemResource(String name) {
         if (name != null && name.length() > 0) {
             for (String prefix : SYSTEM_PREFIXES) {
                 if (name.startsWith(prefix)) return true;

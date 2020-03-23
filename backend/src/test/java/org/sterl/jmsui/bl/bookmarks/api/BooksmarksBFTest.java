@@ -56,7 +56,7 @@ class BooksmarksBFTest {
         
         
         ResponseEntity<SimplePage<BookmarkBE>> exchange = restTemplate.exchange(
-                baseUrl + BooksmarksBF.URL + "/" + con2.getId(), HttpMethod.GET, null, 
+                baseUrl + BooksmarksBF.URL + "?connectorId=" + con2.getId(), HttpMethod.GET, null, 
                 new ParameterizedTypeReference<SimplePage<BookmarkBE>>() {});
         
         assertTrue(exchange.getStatusCode().is2xxSuccessful());
@@ -76,7 +76,7 @@ class BooksmarksBFTest {
         assertEquals("FOO3", b.getName());
         assertNotNull(b.getId());
         assertEquals(1, restTemplate.exchange(
-                baseUrl + BooksmarksBF.URL + "/" + con2.getId(), HttpMethod.GET, null, 
+                baseUrl + BooksmarksBF.URL + "?connectorId=" + con2.getId(), HttpMethod.GET, null, 
                 new ParameterizedTypeReference<SimplePage<BookmarkBE>>() {})
             .getBody().getContent().size());
         
@@ -88,7 +88,7 @@ class BooksmarksBFTest {
                 BookmarkBE.class);
         assertEquals("foo.bar.tar", b.getName());
         assertEquals(1, restTemplate.exchange(
-                baseUrl + BooksmarksBF.URL + "/" + con2.getId(), HttpMethod.GET, null, 
+                baseUrl + BooksmarksBF.URL + "?connectorId=" + con2.getId(), HttpMethod.GET, null, 
                 new ParameterizedTypeReference<SimplePage<BookmarkBE>>() {})
             .getBody().getContent().size());
         
@@ -100,17 +100,17 @@ class BooksmarksBFTest {
                 BookmarkBE.class);
         assertEquals("foo.bar", b.getName());
         assertEquals(1, restTemplate.exchange(
-                baseUrl + BooksmarksBF.URL + "/" + con2.getId(), HttpMethod.GET, null, 
+                baseUrl + BooksmarksBF.URL + "?connectorId=" + con2.getId(), HttpMethod.GET, null, 
                 new ParameterizedTypeReference<SimplePage<BookmarkBE>>() {})
             .getBody().getContent().size());
         
         final long connections = connectionDao.count();
         //-- delete again the resource
-        restTemplate.delete(baseUrl + BooksmarksBF.URL + "/" + con2.getId() + "/" + b.getId());
+        restTemplate.delete(baseUrl + BooksmarksBF.URL + "/" + b.getId());
         
         
         assertEquals(0, restTemplate.exchange(
-                baseUrl + BooksmarksBF.URL + "/" + con2.getId(), HttpMethod.GET, null, 
+                baseUrl + BooksmarksBF.URL + "?connectorId=" + con2.getId(), HttpMethod.GET, null, 
                 new ParameterizedTypeReference<SimplePage<BookmarkBE>>() {})
             .getBody().getContent().size());
         

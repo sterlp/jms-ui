@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer", "handler"})
 @Data @NoArgsConstructor @EqualsAndHashCode(of = "id") @Accessors(chain = true)
 @ToString(exclude = "connection")
 @Entity

@@ -32,7 +32,7 @@ import org.sterl.jmsui.bl.session.control.JmsSessionBM;
 @JsonRestController(JmsSessionBF.BASE_URL)
 public class JmsSessionBF {
 
-    public static final String BASE_URL = "/api/jms/sessions";
+    public static final String BASE_URL = "/api/sessions";
 
     @Autowired JmsSessionBM jmsSessionBM;
     @Autowired JmsConnectionBF connectionBF;
@@ -42,19 +42,20 @@ public class JmsSessionBF {
      * 
      * @param connectorId the connection to open
      * @return the open sessions
+     * @throws JMSException 
      */
     @PostMapping("/{connectorId}")
-    public SimplePage<JmsConnectionView> open(@PathVariable long connectorId) {
-        Set<Long> sessions = jmsSessionBM.connect(connectorId);
-        return connectionBF.list(sessions, null);
+    public SimplePage<JmsConnectionView> open(@PathVariable long connectorId) throws JMSException {
+        jmsSessionBM.connect(connectorId);
+        return connectionBF.list(jmsSessionBM.openSessions(), null);
     }
     
-    @GetMapping("/{connectorId}/queues")
-    public List<JmsResource> listQueues(@PathVariable long connectorId) throws JMSException {
-        return jmsSessionBM.listQueues(connectorId);
+    @GetMapping("/{connectorId}/resources")
+    public List<JmsResource> listResources(@PathVariable long connectorId) throws JMSException {
+        return jmsSessionBM.listResources(connectorId);
     }
     
-    @PostMapping("/{connectorId}/depths")
+    @PostMapping("/{connectorId}/queue/depths")
     public Map<String, Integer> queuesDepths(@PathVariable long connectorId, @RequestBody List<String> queues) throws JMSException {
         return jmsSessionBM.queueDepths(connectorId, queues);
     }

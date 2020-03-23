@@ -7,4 +7,5 @@ public interface JmsConnectionView {
     String getType();
     String getClientName();
     long getVersion();
+    Long getTimeout();
 }

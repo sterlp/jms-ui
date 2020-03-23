@@ -130,47 +130,6 @@
           }
         }
       }
-    },
-    "ng-spring-boot-api": {
-      "projectType": "library",
-      "root": "projects/ng-spring-boot-api",
-      "sourceRoot": "projects/ng-spring-boot-api/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-ng-packagr:build",
-          "options": {
-            "tsConfig": "projects/ng-spring-boot-api/tsconfig.lib.json",
-            "project": "projects/ng-spring-boot-api/ng-package.json"
-          }
-        ,
-        "configurations": {
-            "production": {
-              "tsConfig": "projects/ng-spring-boot-api/tsconfig.lib.prod.json"
-            }
-          }
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/ng-spring-boot-api/src/test.ts",
-            "tsConfig": "projects/ng-spring-boot-api/tsconfig.spec.json",
-            "karmaConfig": "projects/ng-spring-boot-api/karma.conf.js"
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "projects/ng-spring-boot-api/tsconfig.lib.json",
-              "projects/ng-spring-boot-api/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
-        }
-      }
     }},
   "defaultProject": "frontend"
 }

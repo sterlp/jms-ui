@@ -1,11 +1,8 @@
-<button mat-button (click)="doClick($event)">
+<button mat-button (click)="doClick($event)" [disabled]="loading$ | async">
     <ng-container *ngIf="!(loading$ | async)">
         <ng-content></ng-content>
     </ng-container>
     <ng-container *ngIf="loading$ | async">
-        <div class="spinner-border" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-        Loading ...
+        <app-loading [text]="loadingText"></app-loading>
     </ng-container>
 </button>
