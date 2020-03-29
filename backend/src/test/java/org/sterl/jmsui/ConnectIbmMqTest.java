@@ -6,11 +6,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import javax.jms.JMSConsumer;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
+import javax.jms.Topic;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -31,6 +41,10 @@ import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
+/**
+ * https://github.com/ibm-messaging/mq-jms-spring 
+ *
+ */
 @Disabled
 public class ConnectIbmMqTest {
 
@@ -41,6 +55,7 @@ public class ConnectIbmMqTest {
 
     private static final String APP_USER = "puele";
     private static final String APP_PASSWORD = "";
+    
     
     @Test
     public void testConnectionFactory() throws Exception {
@@ -72,6 +87,51 @@ public class ConnectIbmMqTest {
 
     @Test
     public void simpleSendMessageTest() throws Exception {
+        JmsConnectionFactory cf = createConnectionFactory();
+        
+        final String msgString = "Simple message " + new Date();
+        JmsTemplate jmsTemplate = new JmsTemplate(cf);
+        jmsTemplate.setPubSubDomain(true);
+        jmsTemplate.setReceiveTimeout(2500);
+        jmsTemplate.setPriority(7);
+        jmsTemplate.setExplicitQosEnabled(true);
+        jmsTemplate.convertAndSend("dev/topic/2", msgString);
+        Message msg = jmsTemplate.receive("dev/topic/2");
+        assertNotNull(msg);
+        System.out.println("prio: " + msg.getJMSPriority());
+        System.out.println(((TextMessage) msg).getText());
+        assertEquals(msgString, ((TextMessage) msg).getText());
+    }
+    
+    @Test
+    public void topicTest() throws Exception {
+        final JmsConnectionFactory cf = createConnectionFactory();
+        final String msgString = "Simple message " + new Date();
+        final ExecutorService executor = Executors.newFixedThreadPool(1);
+        
+        try (JMSContext c = cf.createContext()) {
+            final Topic topic = c.createTopic("dev/topic/2");
+            Future<Message> listen = executor.submit(new Callable<Message>() {
+                @Override
+                public Message call() throws Exception {
+                    final JMSConsumer consumer = c.createConsumer(topic);
+                    c.createProducer().send(topic, msgString);
+                    final Message m = consumer.receive(5500);
+                    c.acknowledge();
+                    return m;
+                }
+            });
+            
+            c.createProducer().send(topic, msgString);
+            
+            Message m = listen.get();
+            System.out.println(m);
+        }
+        
+        executor.shutdownNow();
+    }
+
+    private JmsConnectionFactory createConnectionFactory() throws JMSException {
         JmsFactoryFactory ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
         JmsConnectionFactory cf = ff.createConnectionFactory();
         cf.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, QMGR);
@@ -83,17 +143,7 @@ public class ConnectIbmMqTest {
         cf.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, true);
         cf.setStringProperty(WMQConstants.USERID, APP_USER);
         cf.setStringProperty(WMQConstants.PASSWORD, APP_PASSWORD);
-        
-        JmsTemplate jmsTemplate = new JmsTemplate(cf);
-        jmsTemplate.setReceiveTimeout(1500);
-        jmsTemplate.setPriority(7);
-        jmsTemplate.setExplicitQosEnabled(true);
-        jmsTemplate.convertAndSend("DEV.QUEUE.1", "Simple message");
-        Message msg = jmsTemplate.receive("DEV.QUEUE.1");
-        System.out.println("prio: " + msg.getJMSPriority());
-        assertNotNull(msg);
-        System.out.println(((TextMessage) msg).getText());
-        assertEquals("Simple message", ((TextMessage) msg).getText());
+        return cf;
     }
 
     @Test
