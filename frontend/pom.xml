@@ -6,7 +6,7 @@
     <parent>
 	    <groupId>org.sterl.jms.ui</groupId>
 	    <artifactId>jms-ui-root</artifactId>
-	    <version>0.2.0-SNAPSHOT</version>
+	    <version>0.2.2-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
 
