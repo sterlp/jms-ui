@@ -88,15 +88,15 @@ public class ConnectIbmMqTest {
     @Test
     public void simpleSendMessageTest() throws Exception {
         JmsConnectionFactory cf = createConnectionFactory();
-        
+        final String queueName = "DEV.QUEUE.2";
         final String msgString = "Simple message " + new Date();
         JmsTemplate jmsTemplate = new JmsTemplate(cf);
         jmsTemplate.setPubSubDomain(true);
         jmsTemplate.setReceiveTimeout(2500);
         jmsTemplate.setPriority(7);
         jmsTemplate.setExplicitQosEnabled(true);
-        jmsTemplate.convertAndSend("dev/topic/2", msgString);
-        Message msg = jmsTemplate.receive("dev/topic/2");
+        jmsTemplate.convertAndSend(queueName, msgString);
+        Message msg = jmsTemplate.receive(queueName);
         assertNotNull(msg);
         System.out.println("prio: " + msg.getJMSPriority());
         System.out.println(((TextMessage) msg).getText());
@@ -106,17 +106,18 @@ public class ConnectIbmMqTest {
     @Test
     public void topicTest() throws Exception {
         final JmsConnectionFactory cf = createConnectionFactory();
+        final String topicName = "DEV.TOPIC.2";//  "dev/topic/2";
         final String msgString = "Simple message " + new Date();
         final ExecutorService executor = Executors.newFixedThreadPool(1);
         
         try (JMSContext c = cf.createContext()) {
-            final Topic topic = c.createTopic("dev/topic/2");
+            final Topic topic = c.createTopic(topicName);
             Future<Message> listen = executor.submit(new Callable<Message>() {
                 @Override
                 public Message call() throws Exception {
                     final JMSConsumer consumer = c.createConsumer(topic);
                     c.createProducer().send(topic, msgString);
-                    final Message m = consumer.receive(5500);
+                    final Message m = consumer.receive(2500);
                     c.acknowledge();
                     return m;
                 }
