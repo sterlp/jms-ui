@@ -15,9 +15,9 @@ export class JmsResourceModel {
 }
 
 export enum JmsResourceType {
-    QUEUE,
-    REMOTE_QUEUE,
-    TOPIC
+    QUEUE = 'QUEUE',
+    REMOTE_QUEUE = 'REMOTE_QUEUE',
+    TOPIC = 'TOPIC'
 }
 
 export interface JmsHeader {
@@ -47,7 +47,10 @@ export interface JmsMessage<T extends JmsHeader> {
     body: string;
     header?: T;
 }
-export interface SendJmsMessageCommand extends JmsMessage<JmsHeaderRequestValues> {}
+export interface SendJmsMessageCommand extends JmsMessage<JmsHeaderRequestValues> {
+    destination?: string;
+    destinationType?: JmsResourceType;
+}
 
 export interface JmsResultMessage extends JmsMessage<JmsHeaderResultValues> {
     /** time it took to get the jms message */

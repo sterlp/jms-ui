@@ -1,5 +1,24 @@
-<div *ngIf="error" class="alert alert-warning alert-dismissible fade show" role="alert">
-    {{ error.message ? error.message : error.error }}
+<div *ngIf="error" [class]="type" class="alert alert-dismissible fade show" role="alert">
+    <ng-container *ngIf="!error.trace">
+        <strong *ngIf="error.header">{{ error.header }}</strong> {{ error.message || error.error || error }}
+    </ng-container>
+    <ng-container *ngIf="error.trace">
+        <p>
+            <strong *ngIf="error.header">{{ error.header }}</strong> {{ error.message || error.error || error }}
+        </p>
+        <hr>
+        <mat-expansion-panel *ngIf="error.trace" class="mb-2" [class]="type">
+            <mat-expansion-panel-header color>
+                <mat-panel-title>
+                    {{ 'Error details' }}
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <!-- render body lazy -->
+            <ng-template matExpansionPanelContent>
+                <pre style="overflow-x: auto">{{ error.trace }}</pre>
+            </ng-template>
+        </mat-expansion-panel>
+    </ng-container>
     <ng-content></ng-content>
     <button type="button" class="close" aria-label="Close" (click)="doClose()">
         <span aria-hidden="true">&times;</span>

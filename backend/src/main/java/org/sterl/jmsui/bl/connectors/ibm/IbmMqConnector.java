@@ -1,28 +1,34 @@
 package org.sterl.jmsui.bl.connectors.ibm;
 
+import static org.sterl.jmsui.bl.connectors.util.JmsHeaderUtil.getOrDefault;
+import static org.sterl.jmsui.bl.connectors.util.JmsHeaderUtil.setMeassageHeader;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.jms.Destination;
+import javax.jms.JMSConsumer;
+import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import javax.jms.Message;
+import javax.jms.TextMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessagePostProcessor;
 import org.sterl.jmsui.api.JmsHeaderRequestValues;
 import org.sterl.jmsui.bl.common.helper.StopWatch;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
+import org.sterl.jmsui.bl.connectors.api.model.JmsResourceComperator;
 import org.sterl.jmsui.bl.connectors.exception.UnknownJmsException;
 import org.sterl.jmsui.bl.connectors.ibm.common.IbmResourceHelper;
 import org.sterl.jmsui.bl.connectors.ibm.converter.IbmConverter.ToJmsResourceType;
 import org.sterl.jmsui.bl.connectors.ibm.model.QTypes;
-import org.sterl.jmsui.bl.connectors.util.JmsHeaderUtil;
 
 import com.ibm.mq.MQException;
 import com.ibm.mq.MQQueue;
@@ -34,6 +40,7 @@ import com.ibm.mq.headers.MQDataException;
 import com.ibm.mq.headers.pcf.PCFException;
 import com.ibm.mq.headers.pcf.PCFMessage;
 import com.ibm.mq.headers.pcf.PCFMessageAgent;
+import com.ibm.msg.client.jms.JmsConnectionFactory;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,17 +49,20 @@ import lombok.Getter;
  * 
  * Links:
  * https://github.com/spring-cloud/spring-cloud-stream-binder-ibm-mq/blob/master/src/main/java/org/springframework/cloud/stream/binder/jms/ibmmq/IBMMQRequests.java
+ * https://www.ibm.com/support/knowledgecenter/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q030730_.htm
  */
 public class IbmMqConnector implements JmsConnectorInstance {
     private static final Logger LOG = LoggerFactory.getLogger(IbmMqConnector.class);
     
+    private final Integer DEFAULT_PRIO = Integer.valueOf(4);
     private static final String[] SYSTEM_PREFIXES = {"LOOPBACK", "SYSTEM."};
+    private static final JmsResourceComperator RESOURCE_CMP = new JmsResourceComperator();
     
     private final String queueManagerName;
-    @Getter
-    private final JmsTemplate jmsTemplate;
+    @Getter(AccessLevel.PACKAGE)
+    private final JmsConnectionFactory connectionFactory;
     
-    private final Long defaultTimeoutInMs;
+    private final long defaultTimeoutInMs;
 
     @Getter(value = AccessLevel.PACKAGE)
     private final Hashtable<String, Object> config;
@@ -64,37 +74,36 @@ public class IbmMqConnector implements JmsConnectorInstance {
     
     public IbmMqConnector(String queueManagerName, 
             Long defaultTimeoutInMs,
-            JmsTemplate jmsTemplate, Hashtable<String, Object> config) {
+            JmsConnectionFactory connectionFactory, Hashtable<String, Object> config) {
         this.queueManagerName = queueManagerName;
-        this.jmsTemplate = jmsTemplate;
+        this.connectionFactory = connectionFactory;
         this.config = config;
-        this.defaultTimeoutInMs = defaultTimeoutInMs;
+        this.defaultTimeoutInMs = defaultTimeoutInMs == null ? 3000 : defaultTimeoutInMs;
     }
 
     @Override
-    public void sendMessage(String destination, String message, JmsHeaderRequestValues header) {
-        jmsTemplate.setExplicitQosEnabled(true);
-        if (header.getJMSPriority() != null) {
-            jmsTemplate.setPriority(header.getJMSPriority());
-        } else {
-            jmsTemplate.setPriority(4);
+    public void sendMessage(String destination, Type jmsType, String message, JmsHeaderRequestValues header) {
+        try (JMSContext c = connectionFactory.createContext()) {
+            final Destination d = jmsType == Type.TOPIC ? c.createTopic(destination) : c.createQueue(destination);
+            TextMessage m = c.createTextMessage();
+            setMeassageHeader(header, m);
+            c.createProducer()
+             .setPriority(getOrDefault(header.getJMSPriority(), DEFAULT_PRIO))
+             .send(d, m);
+            
         }
-
-        jmsTemplate.convertAndSend(destination, message, new MessagePostProcessor() {
-            @Override
-            public Message postProcessMessage(Message message) throws JMSException {
-                JmsHeaderUtil.setMeassageHeader(header, message);
-                return message;
-            }
-        });
-        
     }
     @Override
-    public Message receive(String destination, Long timeout) {
-        if (timeout != null) jmsTemplate.setReceiveTimeout(timeout);
-        else if (defaultTimeoutInMs != null) jmsTemplate.setReceiveTimeout(defaultTimeoutInMs);
-
-        return jmsTemplate.receive(destination);
+    public Message receive(String destination, Type jmsType, Long timeout) {
+        Message result;
+        try (JMSContext c = connectionFactory.createContext()) {
+            final Destination d = jmsType == Type.TOPIC ? c.createTopic(destination) : c.createQueue(destination);
+            try (JMSConsumer consumer = c.createConsumer(d)) {
+                result = consumer.receive(getOrDefault(timeout, defaultTimeoutInMs));
+                c.acknowledge();
+            }
+        }
+        return result;
     }
     
     public int getQueueDepth(String queueName) throws JMSException {
@@ -129,8 +138,16 @@ public class IbmMqConnector implements JmsConnectorInstance {
             }
         }        
     }
-
     public List<JmsResource> listResources() throws JMSException {
+        final List<JmsResource> result = getQueues();
+        final List<JmsResource> topics = getTopics();
+        Collections.sort(result, RESOURCE_CMP);
+        Collections.sort(topics, RESOURCE_CMP);
+        result.addAll(topics);
+        return result;
+    }
+
+    public List<JmsResource> getQueues() throws JMSException {
         List<JmsResource> result = new ArrayList<>();
         try {
             final PCFMessage request = new PCFMessage(CMQCFC.MQCMD_INQUIRE_Q_NAMES);
@@ -166,7 +183,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
             request.addParameter(CMQC.MQCA_TOPIC_NAME, "*");
 
             final PCFMessage[] response = sendPfcMessage(request);
-            final String[] names = response[0].getStringListParameterValue(MQConstants.MQCACF_Q_NAMES);
+            final String[] names = response[0].getStringListParameterValue(MQConstants.MQCACF_TOPIC_NAMES);
             
             for (int i = 0; i < names.length; i++) {
                 final String tName = trim(names[i]);

@@ -5,6 +5,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingButtonComponent } from './loading-button/loading-button.component';
 import { MatButtonModule } from '@angular/material/button';
 import { ErrorMessagesComponent } from './error-messages/error-messages.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 
 
@@ -13,7 +14,8 @@ import { ErrorMessagesComponent } from './error-messages/error-messages.componen
   imports: [
     CommonModule,
     MatProgressSpinnerModule,
-    MatButtonModule
+    MatButtonModule,
+    MatExpansionModule
   ],
   exports: [
     LoadingComponent,

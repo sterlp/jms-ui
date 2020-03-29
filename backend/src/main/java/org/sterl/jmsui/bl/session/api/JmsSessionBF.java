@@ -26,6 +26,7 @@ import org.sterl.jmsui.bl.common.spring.JsonRestController;
 import org.sterl.jmsui.bl.connection.api.JmsConnectionBF;
 import org.sterl.jmsui.bl.connection.api.model.JmsConnectionView;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
+import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
 import org.sterl.jmsui.bl.session.control.JmsSessionBM;
 
 @Transactional
@@ -77,16 +78,25 @@ public class JmsSessionBF {
         return result;
     }
     
+    @PostMapping("/{connectorId}/message")
+    public void sendMessage(@PathVariable long connectorId, 
+            @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
+        jmsSessionBM.sendMessage(connectorId, message.getDestination(), message.getDestinationType(), message.getBody(), message.getHeader());
+    }
+    
     @PostMapping("/{connectorId}/message/{destination}")
     public void sendMessage(@PathVariable long connectorId, @PathVariable String destination, 
             @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
-        jmsSessionBM.sendMessage(connectorId, destination, message.getBody(), message.getHeader());
+        message.setDestination(destination);
+        this.sendMessage(connectorId, message);
     }
     
     @GetMapping("/{connectorId}/message/{destination}")
-    public JmsResultMessage receiveMessage(@PathVariable long connectorId, @PathVariable String destination, 
+    public JmsResultMessage receiveMessage(@PathVariable long connectorId, 
+            @PathVariable String destination,
+            @RequestParam(required = false, defaultValue = "QUEUE") Type type,
             @RequestParam(required = false) Long timeout) throws JMSException {
-        Message msg = jmsSessionBM.receive(connectorId, destination, timeout);
+        final Message msg = jmsSessionBM.receive(connectorId, destination, type, timeout);
         return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
     }
     

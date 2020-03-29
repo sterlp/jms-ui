@@ -3,6 +3,7 @@ package org.sterl.jmsui.api;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.jms.Destination;
 import javax.jms.JMSException;
@@ -18,12 +19,16 @@ public class JmsMessageConverter {
         public JmsHeaderResultValues convert(Message source) {
             if (source == null) return null;
             try {
-                final Map<String, Object> properties = new LinkedHashMap<>();
+                LinkedHashMap<String, Object> properties = new LinkedHashMap<>();
                 final Enumeration<String> propertyNames = source.getPropertyNames();
                 while (propertyNames.hasMoreElements()) {
-                    String key = propertyNames.nextElement();
+                    final String key = propertyNames.nextElement();
                     properties.put(key, source.getObjectProperty(key));
                 }
+                // sort by key
+                properties = properties.entrySet().stream().sorted(Map.Entry.comparingByKey())
+                                       .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (e1, e2) -> e2, LinkedHashMap::new));
+
 
                 return JmsHeaderResultValues.builder()
                         .JMSType(source.getJMSType())

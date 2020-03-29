@@ -5,9 +5,11 @@ import java.net.URI;
 
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Profile("!TEST")
+@Component
 public class RepoConfig implements
     ApplicationListener<WebServerInitializedEvent> /* extends RepositoryRestConfigurerAdapter */ {
 /*

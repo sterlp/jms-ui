@@ -22,6 +22,7 @@ import org.sterl.jmsui.bl.connection.control.JmsConnectionBM;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
 import org.sterl.jmsui.bl.connectors.api.SupportedConnector;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
+import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
 
 @BusinessManager
 public class JmsSessionBM {
@@ -32,13 +33,13 @@ public class JmsSessionBM {
     public Collection<Long> openSessions() {
         return sessionBA.openSessions();
     }
-    public void sendMessage(long connectorId, String destination, String message, JmsHeaderRequestValues header) throws JMSException {
+    public void sendMessage(long connectorId, String destination, Type jmsType, String message, JmsHeaderRequestValues header) throws JMSException {
         JmsConnectorInstance c = getOrConnect(connectorId);
-        c.sendMessage(destination, message, header);
+        c.sendMessage(destination, jmsType, message, header);
     }
-    public Message receive(long connectorId, String destination, Long timeout) throws JMSException {
+    public Message receive(long connectorId, String destination, Type jmsType, Long timeout) throws JMSException {
         JmsConnectorInstance connector = getOrConnect(connectorId);
-        return connector.receive(destination, timeout);
+        return connector.receive(destination, jmsType, timeout);
     }
     @Cacheable("jms-resources")
     public List<JmsResource> listResources(long connectorId) throws JMSException {

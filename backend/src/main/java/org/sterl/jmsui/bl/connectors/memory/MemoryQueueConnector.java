@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.jms.Message;
 
-import org.springframework.jms.core.JmsTemplate;
 import org.sterl.jmsui.api.JmsHeaderRequestValues;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
@@ -24,19 +23,15 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     }
 
     @Override
-    public JmsTemplate getJmsTemplate() {
-        throw new RuntimeException("Not supported.");
-    }
-    @Override
     public List<JmsResource> listResources() {
         return Arrays.asList(new JmsResource("MEMORY.QUEUE", Type.QUEUE, "QUEUE"));
     }
     @Override
-    public void sendMessage(String destination, String message, JmsHeaderRequestValues header) {
+    public void sendMessage(String destination, Type type, String message, JmsHeaderRequestValues header) {
         memoryQueue.offer(new DummyJmsMessage(message, header));
     }
     @Override
-    public Message receive(String destination, Long timeout) {
+    public Message receive(String destination, Type type, Long timeout) {
         return memoryQueue.poll();
     }
     @Override

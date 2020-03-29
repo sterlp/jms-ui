@@ -8,13 +8,14 @@ import { EventEmitter } from 'events';
 })
 export class ErrorMessagesComponent implements OnInit {
 
+    @Input() type = 'alert-warning';
     @Input() error: any;
     @Output() closed = new EventEmitter();
 
     constructor() { }
 
-    ngOnInit(): void {
-    }
+    ngOnInit(): void {}
+
     doClose() {
         this.closed.emit(this.error);
         this.error = null;

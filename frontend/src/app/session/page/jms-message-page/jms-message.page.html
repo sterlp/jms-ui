@@ -4,6 +4,7 @@
         <li class="breadcrumb-item" aria-current="page" *ngIf="connector">
             <a [routerLink]="['/sessions', connector.id]">{{ connector.name }}</a>
         </li>
+        <li class="breadcrumb-item active" aria-current="page">{{ targetType }}</li>
         <li class="breadcrumb-item active" aria-current="page">{{ target }}</li>
     </ol>
     <div class="c-subheader-nav">
@@ -16,6 +17,8 @@
 
 <main class="c-main">
     <div class="container-fluid">
+        <app-error-messages type="jms-box-shadow mb-2 {{ headerMessage?.style || 'alert-success' }}" [error]="headerMessage">
+        </app-error-messages>
 
         <mat-card class="mb-2">
             <mat-card-header>

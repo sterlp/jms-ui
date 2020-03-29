@@ -14,18 +14,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.jms.core.JmsTemplate;
 
 import com.ibm.mq.MQException;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.headers.MQDataException;
 import com.ibm.mq.headers.pcf.PCFMessageAgent;
+import com.ibm.msg.client.jms.JmsConnectionFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class IbmMqConnectorTest {
 
     Hashtable<String, Object> config = new Hashtable<>();
-    @Mock JmsTemplate jmsTemplate;
+    @Mock JmsConnectionFactory connectionFactory;
     @Mock MQQueueManager mqQueueManager;
     @Mock PCFMessageAgent agent;
     IbmMqConnector subject;
@@ -34,7 +34,7 @@ public class IbmMqConnectorTest {
 
     class IbmMqConnectorMock extends IbmMqConnector {
         public IbmMqConnectorMock() {
-            super("Test", 10L, jmsTemplate, config);
+            super("Test", 10L, connectionFactory, config);
         }
         @Override
         protected MQQueueManager getMQQueueManager() throws MQException {

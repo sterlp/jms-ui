@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 
 import { SessionRoutingModule } from './session-routing.module';
 import { SessionPage } from './page/session-page/session.page';
@@ -40,7 +40,7 @@ const DEFAULT_ACE_CONFIG: AceConfigInterface = {
     SharedModule
   ],
   providers: [
-    { provide: ACE_CONFIG, useValue: DEFAULT_ACE_CONFIG }
+    { provide: ACE_CONFIG, useValue: DEFAULT_ACE_CONFIG }, DecimalPipe
   ],
 })
 export class SessionModule { }

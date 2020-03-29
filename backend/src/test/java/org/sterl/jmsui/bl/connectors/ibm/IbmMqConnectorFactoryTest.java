@@ -4,7 +4,6 @@ package org.sterl.jmsui.bl.connectors.ibm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.jms.core.JmsTemplate;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 
 import com.ibm.msg.client.jms.JmsConnectionFactory;
@@ -24,10 +23,9 @@ public class IbmMqConnectorFactoryTest {
             .addOrSetConfig("password", "pass")
             .addOrSetConfig("APPNAME", "myApp");
 
-        IbmMqConnector ibmMQConnection = new IbmMqConnectorFactory().create(jmsConnection);
-        JmsTemplate jmsTemplate = ibmMQConnection.getJmsTemplate();
+        IbmMqConnector ibmConnector = new IbmMqConnectorFactory().create(jmsConnection);
         
-        JmsConnectionFactory cf = (JmsConnectionFactory)jmsTemplate.getConnectionFactory();
+        JmsConnectionFactory cf = ibmConnector.getConnectionFactory();
         
         assertEquals("qmgr", cf.getStringProperty(WMQConstants.WMQ_QUEUE_MANAGER));
         assertEquals("host", cf.getStringProperty(WMQConstants.WMQ_HOST_NAME));
@@ -42,11 +40,11 @@ public class IbmMqConnectorFactoryTest {
         
         assertEquals("myApp", cf.getStringProperty(WMQConstants.WMQ_APPLICATIONNAME));
         
-        assertEquals("host", ibmMQConnection.getConfig().get("hostname"));
-        assertEquals(111, ibmMQConnection.getConfig().get("port"));
-        assertEquals("a.channel", ibmMQConnection.getConfig().get("channel"));
-        assertEquals("user", ibmMQConnection.getConfig().get("userID"));
-        assertEquals("pass", ibmMQConnection.getConfig().get("password"));
-        assertEquals("myApp", ibmMQConnection.getConfig().get("APPNAME"));
+        assertEquals("host", ibmConnector.getConfig().get("hostname"));
+        assertEquals(111, ibmConnector.getConfig().get("port"));
+        assertEquals("a.channel", ibmConnector.getConfig().get("channel"));
+        assertEquals("user", ibmConnector.getConfig().get("userID"));
+        assertEquals("pass", ibmConnector.getConfig().get("password"));
+        assertEquals("myApp", ibmConnector.getConfig().get("APPNAME"));
     }
 }

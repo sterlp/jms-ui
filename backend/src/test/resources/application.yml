@@ -21,5 +21,5 @@ spring:
       base-path: /api
       default-page-size: 10
   quartz:
-    job-store-type: JDBC
+    job-store-type: JDBC  profiles:    active:    - TEST
     

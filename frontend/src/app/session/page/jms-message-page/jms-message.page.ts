@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { JmsSessionService } from 'src/app/session/service/session/jms-session.service';
-import { SendJmsMessageCommand, JmsResultMessage, JmsHeaderRequestValues } from 'src/app/api/jms-session';
+import { SendJmsMessageCommand, JmsResultMessage, JmsHeaderRequestValues, JmsResourceType } from 'src/app/api/jms-session';
 import { Observable } from 'rxjs';
 import { ConnectorView } from 'src/app/api/connector';
 import { transition, trigger, state, animate, style } from '@angular/animations';
 import { SubscriptionsHolder } from '@sterlp/ng-spring-boot-api';
+import { DecimalPipe } from '@angular/common';
 
 @Component({
   templateUrl: './jms-message.page.html',
@@ -37,21 +38,26 @@ export class JmsMessagePage implements OnInit, OnDestroy {
 
   connector: ConnectorView;
   target: string;
+  targetType: JmsResourceType;
   jmsMessage: string;
   loading$: Observable<boolean>;
   jmsHeader = {} as JmsHeaderRequestValues;
+
+  headerMessage: any;
 
   receivedMessages: JmsResultMessage[] = [];
 
   constructor(private route: ActivatedRoute,
               private router: Router,
-              private sessionService: JmsSessionService) { }
+              private sessionService: JmsSessionService,
+              private numberPipe: DecimalPipe) { }
 
   ngOnInit() {
     const s = this.route.params.subscribe(params => {
       this.target = params.target;
+      this.targetType = params.type === 'TOPIC' ? JmsResourceType.TOPIC : JmsResourceType.QUEUE;
       const id =  params.id * 1;
-      console.info('JmsMessagePage', params, id, this.target, this.connector);
+      console.info('JmsMessagePage', params, id, this.target, this.targetType, this.connector);
       if (isNaN(id)) {
         this.goBack();
       } else {
@@ -75,32 +81,57 @@ export class JmsMessagePage implements OnInit, OnDestroy {
   }
 
   doSend() {
+    this.clearMessage();
+    const startTime = new Date();
     const body: SendJmsMessageCommand = {
       body: this.jmsMessage || '',
-      header: this.jmsHeader
+      header: this.jmsHeader,
+      destination: this.target,
+      destinationType: this.targetType
     };
     this.sessionService.sendJmsMessage(this.connector.id, this.target, body)
       .subscribe(r => {
-        console.info("send ...", r);
+        const time = new Date().getTime() - startTime.getTime();
+        console.info('message:', r, 'send in:', time);
+        this.showMessage('Message successsfully send in ' + this.numberPipe.transform(time) + 'ms.');
+      },
+      e => {
+          this.headerMessage = e.error;
+          this.headerMessage.style = 'alert-danger';
       }
     );
   }
   doListen() {
+    this.clearMessage();
     const startTime = new Date();
-    this.sessionService.receiveJmsMessage(this.connector.id, this.target)
+    this.sessionService.receiveJmsMessage(this.connector.id, this.target, this.targetType)
       .subscribe(r => {
-        console.info("receive ...", r);
+        const time = new Date().getTime() - startTime.getTime();
         if (r && (r.header || r.body)) {
-          r._time = new Date().getDate() - startTime.getDate();
+          r._time = time;
           this.receivedMessages.unshift(r);
-
         } else {
-          // TODO no message ...
+          this.headerMessage = 'No message recevied in ' + this.numberPipe.transform(time) + 'ms from ' + this.target + '.';
         }
+        console.info('received message:', r, 'time:', time);
+      },
+      e => {
+          this.headerMessage = e.error;
+          this.headerMessage.style = 'alert-danger';
       }
     );
   }
   doClear(): void {
     this.receivedMessages = [];
+  }
+
+  private showMessage(message: string, style: 'alert-success' | 'alert-primary' | 'alert-danger' | 'alert-warning' = 'alert-success') {
+    this.headerMessage = {
+        header: this.target + ':',
+        message, style
+    };
+  }
+  private clearMessage() {
+      this.headerMessage = null;
   }
 }

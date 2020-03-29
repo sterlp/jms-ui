@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { ConnectorView } from 'src/app/api/connector';
-import { JmsResource, SendJmsMessageCommand, JmsResultMessage } from 'src/app/api/jms-session';
+import { JmsResource, SendJmsMessageCommand, JmsResultMessage, JmsResourceType } from 'src/app/api/jms-session';
 import { BehaviorSubject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Page } from '@sterlp/ng-spring-boot-api';
@@ -62,8 +62,9 @@ export class JmsSessionService implements OnDestroy {
         return this.http.post<void>(`${this.listUrl}/${connectorId}/message/${target}`, body);
     }
 
-    receiveJmsMessage(connectorId: number, target: string): Observable<JmsResultMessage> {
-        return this.http.get<JmsResultMessage>(`${this.listUrl}/${connectorId}/message/${target}`);
+    receiveJmsMessage(connectorId: number, target: string, type = JmsResourceType.QUEUE): Observable<JmsResultMessage> {
+        const params = new HttpParams().set('type', type);
+        return this.http.get<JmsResultMessage>(`${this.listUrl}/${connectorId}/message/${target}`, {params});
     }
 
     listResources(connectorId: number): Observable<JmsResource[]> {

@@ -6,7 +6,7 @@ import { JmsMessagePage } from './page/jms-message-page/jms-message.page';
 
 const routes: Routes = [
     { path: ':id', component: SessionPage },
-    { path: ':id/:target', component: JmsMessagePage},
+    { path: ':id/:target/:type', component: JmsMessagePage},
 ];
 
 @NgModule({
