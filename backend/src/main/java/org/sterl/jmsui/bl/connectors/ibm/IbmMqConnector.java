@@ -85,7 +85,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
     public void sendMessage(String destination, Type jmsType, String message, JmsHeaderRequestValues header) {
         try (JMSContext c = connectionFactory.createContext()) {
             final Destination d = jmsType == Type.TOPIC ? c.createTopic(destination) : c.createQueue(destination);
-            TextMessage m = c.createTextMessage();
+            final TextMessage m = message == null ? c.createTextMessage() : c.createTextMessage(message);
             setMeassageHeader(header, m);
             c.createProducer()
              .setPriority(getOrDefault(header.getJMSPriority(), DEFAULT_PRIO))

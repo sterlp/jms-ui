@@ -6,7 +6,6 @@ import { MatTableDataSource } from '@angular/material/table';
 import { LoadingHelper } from 'src/app/common/loading/loading.helper';
 import { JmsSessionService } from '../../service/session/jms-session.service';
 import { ErrorDialogService } from 'src/app/common/error-dialog/error-dialog.service';
-import { ThrowStmt } from '@angular/compiler';
 
 @Component({
   selector: 'app-jms-resource-list',
@@ -38,7 +37,6 @@ export class JmsResourceListComponent implements OnInit, AfterViewInit {
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
 
-        console.info('JmsResourceListComponent for', this.resourceType, this.resourceType === JmsResourceType.QUEUE, this.resourceType === JmsResourceType.TOPIC);
         if (this.resourceType === JmsResourceType.TOPIC) {
             this.displayColumns = this.displayColumns.filter(c => c !== 'depth');
         }
