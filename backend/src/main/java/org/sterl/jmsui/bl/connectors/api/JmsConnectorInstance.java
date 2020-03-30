@@ -16,7 +16,8 @@ import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
 public interface JmsConnectorInstance extends Closeable {
     void connect() throws JMSException;
 
-    List<JmsResource> listResources() throws JMSException;
+    List<JmsResource> listQueues() throws JMSException;
+    List<JmsResource> listTopics() throws JMSException;
 
     void sendMessage(String destination, Type jmsType, String message, JmsHeaderRequestValues header) throws JMSException;
     

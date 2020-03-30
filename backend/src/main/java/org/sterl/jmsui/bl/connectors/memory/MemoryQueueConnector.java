@@ -23,8 +23,12 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     }
 
     @Override
-    public List<JmsResource> listResources() {
+    public List<JmsResource> listQueues() {
         return Arrays.asList(new JmsResource("MEMORY.QUEUE", Type.QUEUE, "QUEUE"));
+    }
+    @Override
+    public List<JmsResource> listTopics() {
+        return Arrays.asList();
     }
     @Override
     public void sendMessage(String destination, Type type, String message, JmsHeaderRequestValues header) {

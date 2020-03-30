@@ -47,16 +47,16 @@
                 [expanded] = "index === 0"
                 [@newMessage]>
                 <mat-expansion-panel-header>
-                <mat-panel-title>
-                    <mat-icon>mail_outline</mat-icon> Received at: {{ m.header.JMSTimestamp | date:'medium' }}
-                </mat-panel-title>
-                <mat-panel-description>
-                    Body length {{ m.body?.length }}
-                </mat-panel-description>
+                    <mat-panel-title>
+                        <mat-icon>mail_outline</mat-icon> Received at: {{ m.header.JMSTimestamp | date:'medium' }}
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        Body length {{ m.body?.length }}
+                    </mat-panel-description>
                 </mat-expansion-panel-header>
 
                 <ng-template matExpansionPanelContent>
-                <app-jms-message [jms-message] = 'm'></app-jms-message>
+                    <app-jms-message [jms-message] = 'm'></app-jms-message>
                 </ng-template>
 
             </mat-expansion-panel>

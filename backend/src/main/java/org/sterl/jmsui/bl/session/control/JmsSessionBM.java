@@ -41,10 +41,15 @@ public class JmsSessionBM {
         JmsConnectorInstance connector = getOrConnect(connectorId);
         return connector.receive(destination, jmsType, timeout);
     }
-    @Cacheable("jms-resources")
-    public List<JmsResource> listResources(long connectorId) throws JMSException {
+    @Cacheable("jms-queues")
+    public List<JmsResource> listQueues(long connectorId) throws JMSException {
         final JmsConnectorInstance connector = getOrConnect(connectorId);
-        return connector.listResources();
+        return connector.listQueues();
+    }
+    @Cacheable("jms-topics")
+    public List<JmsResource> listTopics(long connectorId) throws JMSException {
+        final JmsConnectorInstance connector = getOrConnect(connectorId);
+        return connector.listTopics();
     }
     public Map<String, Integer> queueDepths(long connectorId, List<String> queues) throws JMSException {
         final JmsConnectorInstance connector = getOrConnect(connectorId);
@@ -67,7 +72,7 @@ public class JmsSessionBM {
     public JmsConnectorInstance connect(long connectorId) throws JMSException {
         return sessionBA.connect(connectionBM.getWithConfig(connectorId));
     }
-    @CacheEvict("jms-resources")
+    @CacheEvict({"jms-topics", "jms-queues"})
     public Set<Long> disconnect(long connectorId) {
         sessionBA.disconnect(connectorId);
         return sessionBA.openSessions();

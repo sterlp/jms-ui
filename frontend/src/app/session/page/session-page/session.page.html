@@ -17,11 +17,30 @@
 
         <div class="row">
             <div class="col">
-                <mat-card class="mat-elevation-z8 mb-4">
-                    <mat-card-header><mat-card-title>Bookmarks</mat-card-title></mat-card-header>
-                    <mat-card-content>
+                <mat-expansion-panel class="mat-elevation-z8 mb-3">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title style="font-size: 20px;">Bookmarks</mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <!-- render body lazy -->
+                    <ng-template matExpansionPanelContent>
                         <app-bookmarks [connectorId]="id"></app-bookmarks>
-                    </mat-card-content>
+                    </ng-template>
+                </mat-expansion-panel>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <mat-card class="mat-elevation-z8">
+                    <mat-spinner *ngIf="!conData"></mat-spinner>
+                    <ng-container *ngIf="conData">
+                        <mat-card-header>
+                            <mat-card-title>JMS Queues</mat-card-title>
+                            <mat-card-subtitle>{{ conData.name }}</mat-card-subtitle>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <app-jms-resource-list resourceType="QUEUE" (addBookmark)="doAddBookmark($event)" [connectorId]="conData.id"></app-jms-resource-list>
+                        </mat-card-content>
+                    </ng-container>
                 </mat-card>
             </div>
 
@@ -30,11 +49,11 @@
                     <mat-spinner *ngIf="!conData"></mat-spinner>
                     <ng-container *ngIf="conData">
                         <mat-card-header>
-                            <mat-card-title>JMS Resources</mat-card-title>
+                            <mat-card-title>JMS Topics</mat-card-title>
                             <mat-card-subtitle>{{ conData.name }}</mat-card-subtitle>
                         </mat-card-header>
                         <mat-card-content>
-                            <app-jms-resource-list (addBookmark)="doAddBookmark($event)" [connectorId]="conData.id"></app-jms-resource-list>
+                            <app-jms-resource-list resourceType="TOPIC" (addBookmark)="doAddBookmark($event)" [connectorId]="conData.id"></app-jms-resource-list>
                         </mat-card-content>
                     </ng-container>
                 </mat-card>

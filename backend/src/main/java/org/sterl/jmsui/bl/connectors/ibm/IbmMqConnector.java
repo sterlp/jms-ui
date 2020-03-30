@@ -139,15 +139,15 @@ public class IbmMqConnector implements JmsConnectorInstance {
         }        
     }
     public List<JmsResource> listResources() throws JMSException {
-        final List<JmsResource> result = getQueues();
-        final List<JmsResource> topics = getTopics();
+        final List<JmsResource> result = listQueues();
+        final List<JmsResource> topics = listTopics();
         Collections.sort(result, RESOURCE_CMP);
         Collections.sort(topics, RESOURCE_CMP);
         result.addAll(topics);
         return result;
     }
-
-    public List<JmsResource> getQueues() throws JMSException {
+    @Override
+    public List<JmsResource> listQueues() throws JMSException {
         List<JmsResource> result = new ArrayList<>();
         try {
             final PCFMessage request = new PCFMessage(CMQCFC.MQCMD_INQUIRE_Q_NAMES);
@@ -176,7 +176,8 @@ public class IbmMqConnector implements JmsConnectorInstance {
             throw new RuntimeException(e);
         }
     }
-    public List<JmsResource> getTopics() throws JMSException {
+    @Override
+    public List<JmsResource> listTopics() throws JMSException {
         List<JmsResource> result = new ArrayList<>();
         try {
             final PCFMessage request = new PCFMessage(CMQCFC.MQCMD_INQUIRE_TOPIC_NAMES);

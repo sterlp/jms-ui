@@ -67,8 +67,11 @@ export class JmsSessionService implements OnDestroy {
         return this.http.get<JmsResultMessage>(`${this.listUrl}/${connectorId}/message/${target}`, {params});
     }
 
-    listResources(connectorId: number): Observable<JmsResource[]> {
-        return this.http.get<JmsResource[]>(`${this.listUrl}/${connectorId}/resources`);
+    listQueues(connectorId: number): Observable<JmsResource[]> {
+        return this.http.get<JmsResource[]>(`${this.listUrl}/${connectorId}/queues`);
+    }
+    listTopics(connectorId: number): Observable<JmsResource[]> {
+        return this.http.get<JmsResource[]>(`${this.listUrl}/${connectorId}/topics`);
     }
 
     /**

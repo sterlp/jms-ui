@@ -51,9 +51,13 @@ public class JmsSessionBF {
         return connectionBF.list(jmsSessionBM.openSessions(), null);
     }
     
-    @GetMapping("/{connectorId}/resources")
-    public List<JmsResource> listResources(@PathVariable long connectorId) throws JMSException {
-        return jmsSessionBM.listResources(connectorId);
+    @GetMapping("/{connectorId}/queues")
+    public List<JmsResource> listQueues(@PathVariable long connectorId) throws JMSException {
+        return jmsSessionBM.listQueues(connectorId);
+    }
+    @GetMapping("/{connectorId}/topics")
+    public List<JmsResource> listTopics(@PathVariable long connectorId) throws JMSException {
+        return jmsSessionBM.listTopics(connectorId);
     }
     
     @PostMapping("/{connectorId}/queue/depths")
@@ -83,20 +87,49 @@ public class JmsSessionBF {
             @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
         jmsSessionBM.sendMessage(connectorId, message.getDestination(), message.getDestinationType(), message.getBody(), message.getHeader());
     }
-    
     @PostMapping("/{connectorId}/message/{destination}")
-    public void sendMessage(@PathVariable long connectorId, @PathVariable String destination, 
+    public void sendMessage(@PathVariable long connectorId,
+            @PathVariable String destination,
             @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
         message.setDestination(destination);
         this.sendMessage(connectorId, message);
     }
-    
     @GetMapping("/{connectorId}/message/{destination}")
-    public JmsResultMessage receiveMessage(@PathVariable long connectorId, 
+    public JmsResultMessage receive(@PathVariable long connectorId, 
             @PathVariable String destination,
             @RequestParam(required = false, defaultValue = "QUEUE") Type type,
             @RequestParam(required = false) Long timeout) throws JMSException {
         final Message msg = jmsSessionBM.receive(connectorId, destination, type, timeout);
+        return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
+    }
+    
+    @PostMapping("/{connectorId}/queues/{destination}")
+    public void sendToQueue(@PathVariable long connectorId, @PathVariable String destination, 
+            @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
+        message.setDestination(destination);
+        message.setDestinationType(Type.QUEUE);
+        this.sendMessage(connectorId, message);
+    }
+    @PostMapping("/{connectorId}/topics/{destination}")
+    public void sendToTopic(@PathVariable long connectorId, @PathVariable String destination, 
+            @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
+        message.setDestination(destination);
+        message.setDestinationType(Type.TOPIC);
+        this.sendMessage(connectorId, message);
+    }
+    
+    @GetMapping("/{connectorId}/queues/{destination}")
+    public JmsResultMessage receiveFromQueue(@PathVariable long connectorId, 
+            @PathVariable String destination,
+            @RequestParam(required = false) Long timeout) throws JMSException {
+        final Message msg = jmsSessionBM.receive(connectorId, destination, Type.QUEUE, timeout);
+        return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
+    }
+    @GetMapping("/{connectorId}/topcis/{destination}")
+    public JmsResultMessage receiveFromTopic(@PathVariable long connectorId, 
+            @PathVariable String destination,
+            @RequestParam(required = false) Long timeout) throws JMSException {
+        final Message msg = jmsSessionBM.receive(connectorId, destination, Type.TOPIC, timeout);
         return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
     }
     

@@ -1,6 +1,6 @@
 <ng-container *ngIf="error">
     <app-error-messages [error]="error">
-        <app-loading-button [loading$] = "loading$" (doLoad)="loadQueues()">
+        <app-loading-button [loading$] = "loading$" (doLoad)="load()">
             <mat-icon>loop</mat-icon> Reload
         </app-loading-button>
     </app-error-messages>
@@ -21,7 +21,7 @@
         <ng-container matColumnDef="actions">
             <!-- empty header is needed because material design widget -->
             <th class="text-right" mat-header-cell *matHeaderCellDef>
-                <app-loading-button [loading$] = "loading$" (doLoad)="loadQueues()">
+                <app-loading-button [loading$] = "loading$" (doLoad)="load()">
                     <mat-icon>loop</mat-icon> Reload
                 </app-loading-button>
             </th>

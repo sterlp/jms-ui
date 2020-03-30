@@ -92,7 +92,7 @@ export class JmsMessagePage implements OnInit, OnDestroy {
     this.sessionService.sendJmsMessage(this.connector.id, this.target, body)
       .subscribe(r => {
         const time = new Date().getTime() - startTime.getTime();
-        console.info('message:', r, 'send in:', time);
+        console.info('message:', body, 'send in:', time);
         this.showMessage('Message successsfully send in ' + this.numberPipe.transform(time) + 'ms.');
       },
       e => {
