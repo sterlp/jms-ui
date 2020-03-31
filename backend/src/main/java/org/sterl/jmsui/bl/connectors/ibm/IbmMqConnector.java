@@ -17,6 +17,7 @@ import javax.jms.JMSSecurityException;
 import javax.jms.Message;
 import javax.jms.TextMessage;
 
+import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sterl.jmsui.api.JmsHeaderRequestValues;
@@ -72,6 +73,8 @@ public class IbmMqConnector implements JmsConnectorInstance {
     protected volatile MQQueueManager ibmMqManager;
     protected volatile PCFMessageAgent agent;
     
+    private final JmsPoolConnectionFactory poolConnectionFactory;
+    
     public IbmMqConnector(String queueManagerName, 
             Long defaultTimeoutInMs,
             JmsConnectionFactory connectionFactory, Hashtable<String, Object> config) {
@@ -79,11 +82,15 @@ public class IbmMqConnector implements JmsConnectorInstance {
         this.connectionFactory = connectionFactory;
         this.config = config;
         this.defaultTimeoutInMs = defaultTimeoutInMs == null ? 3000 : defaultTimeoutInMs;
+        
+        this.poolConnectionFactory = new JmsPoolConnectionFactory();
+        this.poolConnectionFactory.setMaxConnections(10);
+        this.poolConnectionFactory.setConnectionFactory(connectionFactory);
     }
 
     @Override
     public void sendMessage(String destination, Type jmsType, String message, JmsHeaderRequestValues header) {
-        try (JMSContext c = connectionFactory.createContext()) {
+        try (JMSContext c = poolConnectionFactory.createContext()) {
             final Destination d = jmsType == Type.TOPIC ? c.createTopic(destination) : c.createQueue(destination);
             final TextMessage m = message == null ? c.createTextMessage() : c.createTextMessage(message);
             setMeassageHeader(header, m);
@@ -96,7 +103,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
     @Override
     public Message receive(String destination, Type jmsType, Long timeout) {
         Message result;
-        try (JMSContext c = connectionFactory.createContext()) {
+        try (JMSContext c = poolConnectionFactory.createContext()) {
             final Destination d = jmsType == Type.TOPIC ? c.createTopic(destination) : c.createQueue(destination);
             try (JMSConsumer consumer = c.createConsumer(d)) {
                 result = consumer.receive(getOrDefault(timeout, defaultTimeoutInMs));
@@ -131,6 +138,8 @@ public class IbmMqConnector implements JmsConnectorInstance {
             try {
                 LOCK.start();
                 boolean connected = getMQQueueManager().isConnected();
+                this.poolConnectionFactory.start();
+                this.poolConnectionFactory.initConnectionsPool();
                 LOCK.stop();
                 LOG.info("Connected to '{}' status '{}' in {}ms.", queueManagerName, connected ? "open" : "closed", LOCK.getTimeInMs());
             } catch (MQException e) {
@@ -259,6 +268,8 @@ public class IbmMqConnector implements JmsConnectorInstance {
 
     @Override
     public void close() {
+        this.poolConnectionFactory.clear();
+        this.poolConnectionFactory.stop();
         if (agent != null || ibmMqManager != null) {
             synchronized (LOCK) {
                 if (agent != null) {

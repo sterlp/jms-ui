@@ -17,6 +17,9 @@ import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
+/**
+ * https://spring.io/guides/gs/messaging-jms/
+ */
 public class IbmMqConnectorFactory implements JmsConnectorInstanceFactory {
     
     private static final ConfigMetaData<?>[] CONFIG = {
