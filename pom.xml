@@ -12,7 +12,7 @@
 
 	<groupId>org.sterl.jms.ui</groupId>
 	<artifactId>jms-ui-root</artifactId>
-	<version>0.2.3-SNAPSHOT</version>
+	<version>0.2.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
