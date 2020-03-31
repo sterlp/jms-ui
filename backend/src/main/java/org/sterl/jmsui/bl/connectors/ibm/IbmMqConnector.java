@@ -47,7 +47,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 /**
- * 
  * Links:
  * https://github.com/spring-cloud/spring-cloud-stream-binder-ibm-mq/blob/master/src/main/java/org/springframework/cloud/stream/binder/jms/ibmmq/IBMMQRequests.java
  * https://www.ibm.com/support/knowledgecenter/SSFKSJ_7.5.0/com.ibm.mq.dev.doc/q030730_.htm
@@ -86,6 +85,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
         this.poolConnectionFactory = new JmsPoolConnectionFactory();
         this.poolConnectionFactory.setMaxConnections(10);
         this.poolConnectionFactory.setConnectionFactory(connectionFactory);
+        this.poolConnectionFactory.setConnectionIdleTimeout(5 * 60 * 1_000);
     }
 
     @Override
@@ -292,6 +292,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
                 }
             }
         }
+        LOG.info("{} closed.", this.queueManagerName);
     }
     
     private static boolean isSystemResource(String name) {
