@@ -5,27 +5,3 @@ table {
 .mat-paginator, .mat-elevation-z8 {
     min-width: 450px;
 }
-
-tr .mat-icon {
-    cursor: pointer;
-}
-tr.expanded-detail-row {
-    height: 0;
-}
-
-tr.expanded-element-row:not(.expanded-expanded-row):hover {
-    background: whitesmoke;
-}
-
-tr.expanded-element-row:not(.expanded-expanded-row):active {
-    background: #efefef;
-}
-
-.expanded-element-row td {
-    border-bottom-width: 0;
-}
-
-.expanded-element-detail {
-    overflow: hidden;
-    display: flex;
-}

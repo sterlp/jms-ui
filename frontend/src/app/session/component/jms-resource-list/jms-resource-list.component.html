@@ -43,8 +43,9 @@
             </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayColumns;"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row"></tr>
+        <tr mat-row *matRowDef="let element; columns: displayColumns;"
+            [class.expanded-element-row]="expandedElement === element"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="expanded-detail-row" [class.hidden-element-row]="expandedElement != row"></tr>
     </table>
     <mat-paginator [pageSize]="100" [pageSizeOptions]="[5, 10, 25, 100, 200, 500]"></mat-paginator>
 </ng-container>

@@ -5,18 +5,10 @@ import { JmsSessionService } from 'src/app/session/service/session/jms-session.s
 import { Router } from '@angular/router';
 import { ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { ErrorDialogService } from 'src/app/common/error-dialog/error-dialog.service';
-import {animate, state, style, transition, trigger} from '@angular/animations';
 
 @Component({
   templateUrl: './connectors.page.html',
-  styleUrls: ['./connectors.page.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({height: '0px', minHeight: '0'})),
-      state('expanded', style({height: '*'})),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ],
+  styleUrls: ['./connectors.page.scss']
 })
 // tslint:disable-next-line: component-class-suffix
 export class ConnectorsPage implements OnInit, AfterViewInit {
@@ -25,8 +17,7 @@ export class ConnectorsPage implements OnInit, AfterViewInit {
   dataSource: ConnertorViewDataSource;
   connectingId: number;
 
-  columnsToDisplay  = ['expand', 'name', 'timeout', 'clientName', 'action'];
-  expandedElement: ConnectorView | null;
+  columnsToDisplay  = ['name', 'timeout', 'clientName', 'action'];
 
   constructor(private $connector: ConnectorService,
               private $session: JmsSessionService, private $router: Router, private errorDialog: ErrorDialogService) { }

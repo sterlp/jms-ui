@@ -21,3 +21,6 @@ tr.expanded-element-row:not(.expanded-expanded-row):active {
     overflow: hidden;
     display: flex;
 }
+.hidden-element-row td.mat-cell {
+    border-bottom-color: transparent;
+}
