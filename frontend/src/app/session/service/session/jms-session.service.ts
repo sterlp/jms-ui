@@ -80,4 +80,11 @@ export class JmsSessionService implements OnDestroy {
     getDepths(connectorId: number, queues: string[]): Observable<object> {
         return this.http.post<object>(`${this.listUrl}/${connectorId}/queue/depths`, queues);
     }
+
+    getQueueInfo(connectorId: number, name: string): Observable<object> {
+        return this.http.get<object>(`${this.listUrl}/${connectorId}/queues/${name}/info`);
+    }
+    getTopicInfo(connectorId: number, name: string): Observable<object> {
+        return this.http.get<object>(`${this.listUrl}/${connectorId}/topics/${name}/info`);
+    }
 }

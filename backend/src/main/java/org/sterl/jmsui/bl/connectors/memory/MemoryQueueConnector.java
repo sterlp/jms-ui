@@ -2,6 +2,7 @@ package org.sterl.jmsui.bl.connectors.memory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -48,5 +49,17 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     }
     @Override
     public void connect() {
+    }
+
+    @Override
+    public Map<String, Object> getQueueInformation(String queueName) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> getTopicInformation(String destination) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

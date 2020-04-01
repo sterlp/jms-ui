@@ -2,6 +2,7 @@ package org.sterl.jmsui.bl.connectors.api;
 
 import java.io.Closeable;
 import java.util.List;
+import java.util.Map;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -18,6 +19,9 @@ public interface JmsConnectorInstance extends Closeable {
 
     List<JmsResource> listQueues() throws JMSException;
     List<JmsResource> listTopics() throws JMSException;
+    
+    Map<String, Object> getQueueInformation(String queueName);
+    Map<String, Object> getTopicInformation(String destination);
 
     void sendMessage(String destination, Type jmsType, String message, JmsHeaderRequestValues header) throws JMSException;
     

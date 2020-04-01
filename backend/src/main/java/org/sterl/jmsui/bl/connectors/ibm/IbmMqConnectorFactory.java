@@ -59,7 +59,7 @@ public class IbmMqConnectorFactory implements JmsConnectorInstanceFactory {
         cf.setIntProperty(WMQConstants.WMQ_PORT, asInt(rawConfig, "port"));
         cf.setStringProperty(WMQConstants.WMQ_CHANNEL, asString(rawConfig, "channel"));
         cf.setIntProperty(WMQConstants.WMQ_CONNECTION_MODE, WMQConstants.WMQ_CM_CLIENT);
-        cf.setBooleanProperty(WMQConstants.WMQ_USE_CONNECTION_POOLING, true);
+        cf.setBooleanProperty(WMQConstants.WMQ_USE_CONNECTION_POOLING, true); // guess useless ...
         
         if (asString(rawConfig, "APPNAME") != null) {
             cf.setStringProperty(WMQConstants.WMQ_APPLICATIONNAME, asString(rawConfig, "APPNAME"));

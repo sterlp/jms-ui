@@ -1,0 +1,9 @@
+<div class="row mb-2 mt-2" *ngIf="queueData">
+    <ng-container *ngFor="let item of queueData.data | keyvalue">
+        <div class="col-6">{{item.key}}:</div>
+        <div class="col-6">{{item.value}}</div>
+    </ng-container>
+</div>
+<div class="mb-3 mt-3" *ngIf="!queueData">
+    <app-loading></app-loading>
+</div>

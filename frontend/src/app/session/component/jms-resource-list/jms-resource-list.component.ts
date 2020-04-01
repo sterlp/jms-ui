@@ -6,11 +6,20 @@ import { MatTableDataSource } from '@angular/material/table';
 import { LoadingHelper } from 'src/app/common/loading/loading.helper';
 import { JmsSessionService } from '../../service/session/jms-session.service';
 import { ErrorDialogService } from 'src/app/common/error-dialog/error-dialog.service';
+import { MatDialog } from '@angular/material/dialog';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'app-jms-resource-list',
   templateUrl: './jms-resource-list.component.html',
-  styleUrls: ['./jms-resource-list.component.scss']
+  styleUrls: ['./jms-resource-list.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 // tslint:disable: curly variable-name
 export class JmsResourceListComponent implements OnInit, AfterViewInit {
@@ -23,6 +32,7 @@ export class JmsResourceListComponent implements OnInit, AfterViewInit {
     @ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
     dataSource = new MatTableDataSource<JmsResource>([]);
+    expandedElement: JmsResource | null;
 
     private loading = new LoadingHelper();
     loading$ = this.loading.loading$;
@@ -30,7 +40,7 @@ export class JmsResourceListComponent implements OnInit, AfterViewInit {
 
     @Input() connectorId: number;
 
-    constructor(private sessionService: JmsSessionService, private errorService: ErrorDialogService) { }
+    constructor(private sessionService: JmsSessionService, private errorService: ErrorDialogService, private dialog: MatDialog) { }
 
     ngOnInit(): void {
         this.displayColumns.push('actions');
@@ -40,6 +50,13 @@ export class JmsResourceListComponent implements OnInit, AfterViewInit {
         if (this.resourceType === JmsResourceType.TOPIC) {
             this.displayColumns = this.displayColumns.filter(c => c !== 'depth');
         }
+    }
+    get isQueue(): boolean {
+        return this.resourceType === JmsResourceType.TOPIC;
+    }
+    onShowDetailsClick(r: JmsResource) {
+        if (this.expandedElement === r) this.expandedElement = null;
+        else this.expandedElement = r;
     }
     ngAfterViewInit(): void {
         // avoid view update, so loading the stuff in the next tick ...

@@ -6,18 +6,26 @@ table {
     min-width: 450px;
 }
 
+tr .mat-icon {
+    cursor: pointer;
+}
+tr.expanded-detail-row {
+    height: 0;
+}
 
-.jms-loading {
+tr.expanded-element-row:not(.expanded-expanded-row):hover {
+    background: whitesmoke;
+}
+
+tr.expanded-element-row:not(.expanded-expanded-row):active {
+    background: #efefef;
+}
+
+.expanded-element-row td {
+    border-bottom-width: 0;
+}
+
+.expanded-element-detail {
+    overflow: hidden;
     display: flex;
-    box-sizing: border-box;
-    padding: 0 16px;
-    width: 100%;
-    flex-direction: row;
-    align-items: center;
-    white-space: nowrap;
-    background: white;
-    span, label {
-        margin: 8px;
-        white-space: nowrap;
-    }
 }

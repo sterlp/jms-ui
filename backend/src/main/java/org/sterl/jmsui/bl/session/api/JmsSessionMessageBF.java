@@ -1,0 +1,95 @@
+package org.sterl.jmsui.bl.session.api;
+
+import java.nio.charset.Charset;
+import java.util.Map;
+
+import javax.jms.BytesMessage;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.TextMessage;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.sterl.jmsui.api.JmsMessageConverter.ToJmsHeaderResultValues;
+import org.sterl.jmsui.bl.common.spring.JsonRestController;
+import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
+import org.sterl.jmsui.bl.session.control.JmsSessionBM;
+
+@Transactional
+@JsonRestController(JmsSessionMessageBF.BASE_URL)
+public class JmsSessionMessageBF {
+    public static final String BASE_URL = "/api/sessions";
+
+    @Autowired private JmsSessionBM jmsSessionBM;
+    
+    @PostMapping("/{connectorId}/message")
+    public void sendMessage(@PathVariable long connectorId, 
+            @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
+        jmsSessionBM.sendMessage(connectorId, message.getDestination(), message.getDestinationType(), message.getBody(), message.getHeader());
+    }
+    @PostMapping("/{connectorId}/message/{destination}")
+    public void sendMessage(@PathVariable long connectorId,
+            @PathVariable String destination,
+            @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
+        message.setDestination(destination);
+        this.sendMessage(connectorId, message);
+    }
+    @GetMapping("/{connectorId}/message/{destination}")
+    public JmsResultMessage receive(@PathVariable long connectorId, 
+            @PathVariable String destination,
+            @RequestParam(required = false, defaultValue = "QUEUE") Type type,
+            @RequestParam(required = false) Long timeout) throws JMSException {
+        final Message msg = jmsSessionBM.receive(connectorId, destination, type, timeout);
+        return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
+    }
+    
+    @PostMapping("/{connectorId}/queues/{destination}")
+    public void sendToQueue(@PathVariable long connectorId, @PathVariable String destination, 
+            @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
+        message.setDestination(destination);
+        message.setDestinationType(Type.QUEUE);
+        this.sendMessage(connectorId, message);
+    }
+    @PostMapping("/{connectorId}/topics/{destination}")
+    public void sendToTopic(@PathVariable long connectorId, @PathVariable String destination, 
+            @RequestBody @Valid SendJmsMessageCommand message) throws JMSException {
+        message.setDestination(destination);
+        message.setDestinationType(Type.TOPIC);
+        this.sendMessage(connectorId, message);
+    }
+    
+    @GetMapping("/{connectorId}/queues/{destination}")
+    public JmsResultMessage receiveFromQueue(@PathVariable long connectorId, 
+            @PathVariable String destination,
+            @RequestParam(required = false) Long timeout) throws JMSException {
+        final Message msg = jmsSessionBM.receive(connectorId, destination, Type.QUEUE, timeout);
+        return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
+    }
+    @GetMapping("/{connectorId}/topcis/{destination}")
+    public JmsResultMessage receiveFromTopic(@PathVariable long connectorId, 
+            @PathVariable String destination,
+            @RequestParam(required = false) Long timeout) throws JMSException {
+        final Message msg = jmsSessionBM.receive(connectorId, destination, Type.TOPIC, timeout);
+        return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
+    }
+    
+    private static String getJmsBody(Message msg) throws JMSException {
+        if (msg == null) return null;
+        if (msg instanceof TextMessage) {
+            return ((TextMessage)msg).getText();
+        } else if (msg instanceof BytesMessage) {
+            BytesMessage message = (BytesMessage)msg;
+            byte[] bytes = new byte[(int) message.getBodyLength()];
+            message.readBytes(bytes);
+            return new String(bytes, Charset.forName("UTF-8"));
+        } else {
+            throw new IllegalStateException("Result message of type " + msg.getClass() + " isn't supported.");
+        }
+    }
+}

@@ -21,10 +21,9 @@
                     <mat-expansion-panel-header>
                         <mat-panel-title style="font-size: 20px;">Bookmarks</mat-panel-title>
                     </mat-expansion-panel-header>
-                    <!-- render body lazy -->
-                    <ng-template matExpansionPanelContent>
-                        <app-bookmarks [connectorId]="id"></app-bookmarks>
-                    </ng-template>
+
+                    <app-bookmarks [connectorId]="id"></app-bookmarks>
+
                 </mat-expansion-panel>
             </div>
         </div>

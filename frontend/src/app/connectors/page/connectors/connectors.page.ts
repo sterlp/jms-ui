@@ -1,24 +1,32 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { ConnectorService, ConnertorViewDataSource } from 'src/app/connectors/service/connector.service';
 import { JmsSessionService } from 'src/app/session/service/session/jms-session.service';
 import { Router } from '@angular/router';
-import { ConnectorData } from 'src/app/api/connector';
+import { ConnectorData, ConnectorView } from 'src/app/api/connector';
 import { ErrorDialogService } from 'src/app/common/error-dialog/error-dialog.service';
-import { catchError } from 'rxjs/operators';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 
 @Component({
   templateUrl: './connectors.page.html',
-  styleUrls: ['./connectors.page.scss']
+  styleUrls: ['./connectors.page.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 // tslint:disable-next-line: component-class-suffix
 export class ConnectorsPage implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   dataSource: ConnertorViewDataSource;
-
   connectingId: number;
+
+  columnsToDisplay  = ['expand', 'name', 'timeout', 'clientName', 'action'];
+  expandedElement: ConnectorView | null;
 
   constructor(private $connector: ConnectorService,
               private $session: JmsSessionService, private $router: Router, private errorDialog: ErrorDialogService) { }

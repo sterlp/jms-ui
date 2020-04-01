@@ -62,7 +62,14 @@ public class JmsSessionBM {
         }
         return result;
     }
-
+    public Map<String, Object> getQueueInfo(long connectorId, String destination) throws JMSException {
+        JmsConnectorInstance connector = getOrConnect(connectorId);
+        return connector.getQueueInformation(destination);
+    }
+    public Map<String, Object> getTopicInfo(long connectorId, String destination) throws JMSException {
+        JmsConnectorInstance connector = getOrConnect(connectorId);
+        return connector.getTopicInformation(destination);
+    }
     /**
      * Creates a connections to the given connector and returns all open sessions id's.
      * @param connectorId the connector to connect to
