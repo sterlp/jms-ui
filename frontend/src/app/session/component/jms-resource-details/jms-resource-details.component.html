@@ -1,9 +1,14 @@
 <div class="row mb-2 mt-2" *ngIf="queueData">
     <ng-container *ngFor="let item of queueData.data | keyvalue">
         <div class="col-6">{{item.key}}:</div>
-        <div class="col-6">{{item.value}}</div>
+        <div class="col-6"><strong>{{item.value}}</strong></div>
     </ng-container>
 </div>
-<div class="mb-3 mt-3" *ngIf="!queueData">
-    <app-loading></app-loading>
+<div class="row">
+    <app-error-messages class="col-12 mt-2" [error]="error"></app-error-messages>
+    <div class="col">
+        <app-loading-button [loading$]="loading$" (doLoad)="doLoad()">Reload</app-loading-button>
+        <small *ngIf="queueData?.date && !(loading$ | async)" class="text-muted ml-2">Last updated: {{ queueData.date | date }}</small>
+    </div>
 </div>
+<ng-content></ng-content>

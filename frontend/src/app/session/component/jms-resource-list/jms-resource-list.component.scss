@@ -1,26 +1,17 @@
 tr .mat-icon {
     cursor: pointer;
 }
-tr.expanded-detail-row {
+tr.detail-row {
     height: 0;
 }
 
-tr.expanded-element-row:not(.expanded-expanded-row):hover {
-    background: whitesmoke;
-}
-
-tr.expanded-element-row:not(.expanded-expanded-row):active {
-    background: #efefef;
-}
-
-.expanded-element-row td {
+.detail-row td {
     border-bottom-width: 0;
+    border-bottom-color: transparent;
 }
 
-.expanded-element-detail {
-    overflow: hidden;
-    display: flex;
-}
-.hidden-element-row td.mat-cell {
-    border-bottom-color: transparent;
+.table-hr {
+    margin-left: -24px;
+    margin-right: -24px;
+    margin-bottom: 0;
 }
