@@ -1,7 +1,7 @@
 package org.sterl.jmsui.bl.connectors.ibm;
 
-import static org.sterl.jmsui.bl.connectors.util.JmsHeaderUtil.getOrDefault;
-import static org.sterl.jmsui.bl.connectors.util.JmsHeaderUtil.setMeassageHeader;
+import static org.sterl.jmsui.bl.connectors.common.JmsHeaderUtil.getOrDefault;
+import static org.sterl.jmsui.bl.connectors.common.JmsHeaderUtil.setMeassageHeader;
 
 import java.io.IOException;
 import java.util.ArrayList;

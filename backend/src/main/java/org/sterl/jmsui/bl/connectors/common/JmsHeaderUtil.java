@@ -1,4 +1,4 @@
-package org.sterl.jmsui.bl.connectors.util;
+package org.sterl.jmsui.bl.connectors.common;
 
 import java.util.Map.Entry;
 
