@@ -18,12 +18,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
 import org.sterl.jmsui.bl.connection.api.model.JmsConnectionDetails;
 import org.sterl.jmsui.bl.connection.api.model.JmsConnectionView;
 import org.sterl.jmsui.bl.connection.dao.JmsConnectionDao;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 
-//@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class JmsConnectionBFTest {
 

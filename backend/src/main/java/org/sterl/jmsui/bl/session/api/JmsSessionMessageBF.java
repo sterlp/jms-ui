@@ -1,11 +1,7 @@
 package org.sterl.jmsui.bl.session.api;
 
-import java.nio.charset.Charset;
-
-import javax.jms.BytesMessage;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.TextMessage;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
@@ -15,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.sterl.jmsui.api.JmsMessageConverter.ToJmsHeaderResultValues;
 import org.sterl.jmsui.api.JmsMessageConverter.ToJmsResultMessage;
 import org.sterl.jmsui.bl.common.spring.JsonRestController;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;

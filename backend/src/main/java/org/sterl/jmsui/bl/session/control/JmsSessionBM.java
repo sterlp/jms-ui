@@ -95,7 +95,4 @@ public class JmsSessionBM {
         }
         return result;
     }
-    public Collection<SupportedConnector> getSupportedJmsFactories() {
-        return sessionBA.getJmsFactories();
-    }
 }

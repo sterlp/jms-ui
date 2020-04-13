@@ -9,13 +9,12 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -53,25 +52,34 @@ class SocketMessageSenderBMTest {
         }
     };
     
+    private WebSocketStompClient stompClient;
+
     @BeforeEach
     public void setup() {
         completableFuture = new CompletableFuture<>();
         URL = "ws://localhost:" + port + "/stomp";
+        
+        stompClient = createWebSocketStompClient();
+    }
+    @AfterEach
+    public void after() {
+        stompClient.stop();
     }
 
     @Test
     void testTopicMessageReceived() throws Exception {
         final long connectorId = 1;
         final String topicName = "TOPIC.1";
-        WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
-        StompSession stompSession = stompClient.connect(URL, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
+        StompSession stompSession = stompClient.connect(URL, new StompSessionHandlerAdapter() {}).get(2, TimeUnit.SECONDS);
+
         stompSession.subscribe("/sessions/" + connectorId + "/topics/" + topicName, frameHandler);
-        
+        assertThat(stompSession.isConnected()).isTrue();
+
         final String msg = "foo " + Instant.now();
         subject.topicMessageReceived(connectorId, topicName, msg);
-        //stompSession.send("/move/test", "Foo " + Instant.now());
+        // TODO for some reason we have to send it here twice if the run all tests together -- check needed
+        subject.topicMessageReceived(connectorId, topicName, msg);
 
         JmsResultMessage jmsResultMessage = completableFuture.get(5, TimeUnit.SECONDS);
         System.out.println(jmsResultMessage);
@@ -82,13 +90,11 @@ class SocketMessageSenderBMTest {
     }
     
     @Test
-    void testRegisteredCound() throws Exception {
+    void testRegisteredCount() throws Exception {
         final String subScription = "/sessions/999/topics/FOO_BAR_TEST";
         
         assertEquals(subject.getSubscriberCount(subScription), 0);
         
-        WebSocketStompClient stompClient = new WebSocketStompClient(new SockJsClient(createTransportClient()));
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
         StompSession stompSession = stompClient.connect(URL, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
         
         stompSession.subscribe(subScription, frameHandler);
@@ -99,9 +105,12 @@ class SocketMessageSenderBMTest {
         
     }
 
-    private List<Transport> createTransportClient() {
+    private WebSocketStompClient createWebSocketStompClient() {
         List<Transport> transports = new ArrayList<>(1);
         transports.add(new WebSocketTransport(new StandardWebSocketClient()));
-        return transports;
+        
+        WebSocketStompClient result = new WebSocketStompClient(new SockJsClient(transports));
+        result.setMessageConverter(new MappingJackson2MessageConverter());
+        return result;
     }
 }

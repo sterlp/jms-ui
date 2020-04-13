@@ -4,13 +4,11 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 import javax.jms.JMSException;
@@ -18,26 +16,18 @@ import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jms.JmsException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
-import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstanceFactory;
-import org.sterl.jmsui.bl.connectors.api.SupportedConnector;
-import org.sterl.jmsui.bl.connectors.ibm.IbmMqConnectorFactory;
-import org.sterl.jmsui.bl.connectors.memory.MemoryQueueConnectorFactory;
+import org.sterl.jmsui.bl.connectors.control.JmsConnectorBM;
 
 @Component
 class SessionBA implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(SessionBA.class);
-    
-    private static final Map<String, JmsConnectorInstanceFactory> FACTORIES = new HashMap<>();
     private static final Map<Long, JmsConnectorInstance> SESSIONS = Collections.synchronizedMap(new Hashtable<>());
     
-    static {
-        FACTORIES.put(IbmMqConnectorFactory.class.getName(), new IbmMqConnectorFactory());
-        FACTORIES.put(MemoryQueueConnectorFactory.class.getName(), new MemoryQueueConnectorFactory());
-    }
+    @Autowired JmsConnectorBM connecrtorBM;
 
     @PreDestroy
     public void close() {
@@ -62,7 +52,8 @@ class SessionBA implements Closeable {
         try {
             if (storedSession.isEmpty()) {
                 LOG.info("Creating new connection to {}", connection);
-                connector = FACTORIES.get(connection.getType()).create(connection);
+                // TODO check if null
+                connector = connecrtorBM.getFactory(connection.getType()).get().create(connection);
                 SESSIONS.put(connection.getId(), connector);
             } else {
                 connector = storedSession.get().getValue();
@@ -96,13 +87,5 @@ class SessionBA implements Closeable {
             session = Optional.empty();
         }
         return session;
-    }
-    public Collection<SupportedConnector> getJmsFactories() {
-        return FACTORIES.entrySet().stream().map(e -> {
-            return SupportedConnector.builder().id(e.getKey())
-                .name(e.getValue().getName())
-                .configMeta(e.getValue().getConfigMetaData())
-                .build();
-        }).collect(Collectors.toList());
     }
 }

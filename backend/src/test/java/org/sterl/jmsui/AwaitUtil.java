@@ -14,7 +14,9 @@ public class AwaitUtil {
         final long startTime = System.currentTimeMillis();
         do {
             // wait some time, if we are in retry
-            if (count > 0) Thread.sleep( Math.min(count * 2, deltaToNow(duration, startTime)) );
+            if (count > 0) {
+                Thread.sleep( Math.min(count * 2, deltaToNow(duration, startTime)) );
+            }
             v = callable.call();
             ++count;
         } while (!Objects.equals(v, value) && deltaToNow(duration, startTime) > 0);

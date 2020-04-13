@@ -1,9 +1,11 @@
 package org.sterl.jmsui.bl.connectors.memory;
 
+import org.springframework.stereotype.Component;
 import org.sterl.jmsui.api.ConfigMetaData;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstanceFactory;
 
+@Component
 public class MemoryQueueConnectorFactory implements JmsConnectorInstanceFactory {
     
     private static final ConfigMetaData<?>[] CONFIG = {
@@ -22,5 +24,10 @@ public class MemoryQueueConnectorFactory implements JmsConnectorInstanceFactory 
 
     public MemoryQueueConnector create(JmsConnectionBE jmsResource) throws Exception {
         return new MemoryQueueConnector();
+    }
+
+    @Override
+    public String getId() {
+        return MemoryQueueConnectorFactory.class.getName();
     }
 }

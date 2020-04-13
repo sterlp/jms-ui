@@ -8,6 +8,7 @@ import static org.sterl.jmsui.bl.common.config.ConfigParser.parse;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.springframework.stereotype.Component;
 import org.sterl.jmsui.api.ConfigMetaData;
 import org.sterl.jmsui.api.ConfigMetaData.ConfigType;
 import org.sterl.jmsui.bl.connection.model.JmsConnectionBE;
@@ -20,6 +21,7 @@ import com.ibm.msg.client.wmq.WMQConstants;
 /**
  * https://spring.io/guides/gs/messaging-jms/
  */
+@Component
 public class IbmMqConnectorFactory implements JmsConnectorInstanceFactory {
     
     private static final ConfigMetaData<?>[] CONFIG = {
@@ -33,7 +35,10 @@ public class IbmMqConnectorFactory implements JmsConnectorInstanceFactory {
         ConfigMetaData.<String>builder().property("userID").label("user").mandatory(false).build(),
         ConfigMetaData.<String>builder().property("password").type(ConfigType.PASSWORD).mandatory(false).build()
     };
-    
+    @Override
+    public String getId() {
+        return IbmMqConnectorFactory.class.getName();
+    }
     public String getName() {
         return "IBM MQ";
     }
