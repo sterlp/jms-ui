@@ -11,6 +11,8 @@ import org.sterl.jmsui.api.JmsHeaderRequestValues;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
 
+import com.ibm.msg.client.jms.JmsMessageConsumer;
+
 /**
  * Represents an active instance of an JMS connector.
  */

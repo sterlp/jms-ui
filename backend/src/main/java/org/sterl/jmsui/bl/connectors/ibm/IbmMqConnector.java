@@ -18,6 +18,7 @@ import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import javax.jms.Message;
+import javax.jms.MessageListener;
 import javax.jms.TextMessage;
 
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
@@ -114,6 +115,14 @@ public class IbmMqConnector implements JmsConnectorInstance {
             }
         }
         return result;
+    }
+    
+    public void listen(String destination, Type jmsType, MessageListener listener) {
+        try (JMSContext c = poolConnectionFactory.createContext()) {
+            final Destination d = jmsType == Type.TOPIC ? c.createTopic(destination) : c.createQueue(destination);
+            JMSConsumer consumer = poolConnectionFactory.createContext().createConsumer(d);
+            consumer.setMessageListener(listener);
+        }
     }
     
     public int getQueueDepth(String queueName) throws JMSException {

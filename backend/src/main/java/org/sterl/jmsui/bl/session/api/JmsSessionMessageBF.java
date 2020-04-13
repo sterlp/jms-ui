@@ -1,7 +1,6 @@
 package org.sterl.jmsui.bl.session.api;
 
 import java.nio.charset.Charset;
-import java.util.Map;
 
 import javax.jms.BytesMessage;
 import javax.jms.JMSException;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.sterl.jmsui.api.JmsMessageConverter.ToJmsHeaderResultValues;
+import org.sterl.jmsui.api.JmsMessageConverter.ToJmsResultMessage;
 import org.sterl.jmsui.bl.common.spring.JsonRestController;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
 import org.sterl.jmsui.bl.session.control.JmsSessionBM;
@@ -46,7 +46,7 @@ public class JmsSessionMessageBF {
             @RequestParam(required = false, defaultValue = "QUEUE") Type type,
             @RequestParam(required = false) Long timeout) throws JMSException {
         final Message msg = jmsSessionBM.receive(connectorId, destination, type, timeout);
-        return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
+        return ToJmsResultMessage.INSTANCE.convert(msg);
     }
     
     @PostMapping("/{connectorId}/queues/{destination}")
@@ -68,28 +68,12 @@ public class JmsSessionMessageBF {
     public JmsResultMessage receiveFromQueue(@PathVariable long connectorId, 
             @PathVariable String destination,
             @RequestParam(required = false) Long timeout) throws JMSException {
-        final Message msg = jmsSessionBM.receive(connectorId, destination, Type.QUEUE, timeout);
-        return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
+        return receive(connectorId, destination, Type.QUEUE, timeout);
     }
     @GetMapping("/{connectorId}/topcis/{destination}")
     public JmsResultMessage receiveFromTopic(@PathVariable long connectorId, 
             @PathVariable String destination,
             @RequestParam(required = false) Long timeout) throws JMSException {
-        final Message msg = jmsSessionBM.receive(connectorId, destination, Type.TOPIC, timeout);
-        return new JmsResultMessage(getJmsBody(msg), ToJmsHeaderResultValues.INSTANCE.convert(msg));
-    }
-    
-    private static String getJmsBody(Message msg) throws JMSException {
-        if (msg == null) return null;
-        if (msg instanceof TextMessage) {
-            return ((TextMessage)msg).getText();
-        } else if (msg instanceof BytesMessage) {
-            BytesMessage message = (BytesMessage)msg;
-            byte[] bytes = new byte[(int) message.getBodyLength()];
-            message.readBytes(bytes);
-            return new String(bytes, Charset.forName("UTF-8"));
-        } else {
-            throw new IllegalStateException("Result message of type " + msg.getClass() + " isn't supported.");
-        }
+        return receive(connectorId, destination, Type.TOPIC, timeout);
     }
 }

@@ -7,8 +7,8 @@
 <div class="row">
     <app-error-messages class="col-12 mt-2" [error]="error"></app-error-messages>
     <div class="col">
-        <app-loading-button [loading$]="loading$" (doLoad)="doLoad()">Reload</app-loading-button>
-        <small *ngIf="queueData?.date && !(loading$ | async)" class="text-muted ml-2">Last updated: {{ queueData.date | date }}</small>
+        <app-loading-button [loading$]="loading$" (doLoad)="doLoad()"><mat-icon>loop</mat-icon> Reload</app-loading-button>
+        <small *ngIf="queueData?.date && !(loading$ | async)" class="text-muted ml-2">Last updated: {{ queueData?.date | date:'shortTime' }}</small>
     </div>
 </div>
 <ng-content></ng-content>

@@ -1,17 +1,48 @@
 package org.sterl.jmsui.api;
 
+import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.jms.BytesMessage;
 import javax.jms.Destination;
 import javax.jms.JMSException;
+import javax.jms.JMSRuntimeException;
 import javax.jms.Message;
+import javax.jms.TextMessage;
 
 import org.springframework.core.convert.converter.Converter;
+import org.sterl.jmsui.bl.session.api.JmsResultMessage;
 
 public class JmsMessageConverter {
+    public enum ToJmsResultMessage implements Converter<Message, JmsResultMessage> {
+        INSTANCE;
+
+        @Override
+        public JmsResultMessage convert(Message source) {
+            if (source == null) return null;
+            
+            String body;
+            try {
+                if (source instanceof TextMessage) {
+                    body = ((TextMessage)source).getText();
+                } else if (source instanceof BytesMessage) {
+                    BytesMessage message = (BytesMessage)source;
+                    byte[] bytes = new byte[(int) message.getBodyLength()];
+                    message.readBytes(bytes);
+                    body = new String(bytes, Charset.forName("UTF-8"));
+                } else {
+                    body = source.getBody(String.class);
+                }
+            } catch (JMSException e) {
+                throw new JMSRuntimeException("Failed convert JMS message.", e.getErrorCode(), e);
+            }
+            return new JmsResultMessage(body, ToJmsHeaderResultValues.INSTANCE.convert(source));
+        }
+    }
+
     public enum ToJmsHeaderResultValues implements Converter<Message, JmsHeaderResultValues> {
         INSTANCE;
 
@@ -46,7 +77,7 @@ public class JmsMessageConverter {
                         .build();
 
             } catch (JMSException e) {
-                throw new RuntimeException(e);
+                throw new JMSRuntimeException("Failed access JMS message header values.", e.getErrorCode(), e);
             }
         }
         static String valueOf(Destination jmsDestination) {
