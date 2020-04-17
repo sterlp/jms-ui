@@ -14,9 +14,26 @@ import javax.jms.Message;
 import javax.jms.TextMessage;
 
 import org.springframework.core.convert.converter.Converter;
+import org.sterl.jmsui.api.JmsHeaderResultValues.JmsHeaderResultValuesBuilder;
 import org.sterl.jmsui.bl.session.api.JmsResultMessage;
 
 public class JmsMessageConverter {
+    
+    public static String getMessageBody(Message source) throws JMSException {
+        String body;
+        if (source instanceof TextMessage) {
+            body = ((TextMessage)source).getText();
+        } else if (source instanceof BytesMessage) {
+            BytesMessage message = (BytesMessage)source;
+            byte[] bytes = new byte[(int) message.getBodyLength()];
+            message.readBytes(bytes);
+            body = new String(bytes, Charset.forName("UTF-8"));
+        } else {
+            body = source.getBody(String.class);
+        }
+        return body;
+    }
+    
     public enum ToJmsResultMessage implements Converter<Message, JmsResultMessage> {
         INSTANCE;
 
@@ -26,16 +43,7 @@ public class JmsMessageConverter {
             
             String body;
             try {
-                if (source instanceof TextMessage) {
-                    body = ((TextMessage)source).getText();
-                } else if (source instanceof BytesMessage) {
-                    BytesMessage message = (BytesMessage)source;
-                    byte[] bytes = new byte[(int) message.getBodyLength()];
-                    message.readBytes(bytes);
-                    body = new String(bytes, Charset.forName("UTF-8"));
-                } else {
-                    body = source.getBody(String.class);
-                }
+                body = getMessageBody(source);
             } catch (JMSException e) {
                 throw new JMSRuntimeException("Failed convert JMS message.", e.getErrorCode(), e);
             }
@@ -60,8 +68,13 @@ public class JmsMessageConverter {
                 properties = properties.entrySet().stream().sorted(Map.Entry.comparingByKey())
                                        .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue(), (e1, e2) -> e2, LinkedHashMap::new));
 
+                final JmsHeaderResultValuesBuilder builder = JmsHeaderResultValues.builder();
+                // not supported by activemq
+                try {
+                    builder.JMSDeliveryTime(source.getJMSDeliveryTime());
+                } catch (Exception | AbstractMethodError ignroed) {}
 
-                return JmsHeaderResultValues.builder()
+                return builder
                         .JMSType(source.getJMSType())
                         .JMSDeliveryMode(source.getJMSDeliveryMode())
                         .JMSPriority(source.getJMSPriority())
@@ -70,7 +83,6 @@ public class JmsMessageConverter {
                         .JMSReplyTo(valueOf(source.getJMSReplyTo()))
                         .JMSTimestamp(source.getJMSTimestamp())
                         .JMSExpiration(source.getJMSExpiration())
-                        .JMSDeliveryTime(source.getJMSDeliveryTime())
                         .JMSMessageID(source.getJMSMessageID())
                         .JMSCorrelationID(source.getJMSCorrelationID())
                         .properties(properties)

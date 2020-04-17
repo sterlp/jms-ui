@@ -10,6 +10,9 @@ import lombok.NonNull;
  */
 @Data @AllArgsConstructor @Builder
 public class ConfigMetaData<T> {
+    public static final ConfigMetaData<String> USER = ConfigMetaData.<String>builder().property("user").label("User").description("Optional user name for authentication.").mandatory(false).build();
+    public static final ConfigMetaData<String> PASSWORD = ConfigMetaData.<String>builder().property("password").label("Password").type(ConfigType.PASSWORD).mandatory(false).build();
+
     public enum ConfigType {
         STRING,
         NUMBER,

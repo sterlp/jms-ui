@@ -23,3 +23,6 @@ spring:
       default-page-size: 25
   quartz:
     job-store-type: JDBC
+    jms-ui:  embedded:    activemq: 
+      enabled: true
+      port: 61616

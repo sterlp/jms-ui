@@ -14,7 +14,6 @@ class ConnectionConverter {
         public JmsConnectionDetails convert(JmsConnectionBE source) {
             if (source == null) return null;
             final JmsConnectionDetails result = new JmsConnectionDetails();
-            result.setClientName(source.getClientName());
             result.setId(source.getId());
             result.setName(source.getName());
             result.setTimeout(source.getTimeout());
@@ -36,7 +35,6 @@ class ConnectionConverter {
             return result;
         }
         static void setValues(JmsConnectionDetails s, JmsConnectionBE t) {
-            t.setClientName(s.getClientName());
             t.setId(s.getId());
             t.setName(s.getName());
             t.setTimeout(s.getTimeout());

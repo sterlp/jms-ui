@@ -29,8 +29,8 @@ public class IbmMqConnectorFactory implements JmsConnectorInstanceFactory {
             .label("App Name").defaultValue("JMS UI")
             .description("This name is added to the connection to identify this client.").mandatory(false).build(),
         ConfigMetaData.<String>builder().property("queue_manager").label("Queue Manager").build(),
-        ConfigMetaData.<String>builder().property("hostname").defaultValue("localhost").build(),
-        ConfigMetaData.<Integer>builder().property("port").type(ConfigType.NUMBER) .defaultValue(1414).build(),
+        ConfigMetaData.<String>builder().property("hostname").label("Hostname").defaultValue("localhost").build(),
+        ConfigMetaData.<Integer>builder().property("port").label("Port").type(ConfigType.NUMBER) .defaultValue(1414).build(),
         ConfigMetaData.<String>builder().property("channel").defaultValue("localhost").defaultValue("SYSTEM.DEF.SVRCONN") .build(),
         ConfigMetaData.<String>builder().property("userID").label("user").mandatory(false).build(),
         ConfigMetaData.<String>builder().property("password").type(ConfigType.PASSWORD).mandatory(false).build()
@@ -70,7 +70,7 @@ public class IbmMqConnectorFactory implements JmsConnectorInstanceFactory {
             cf.setStringProperty(WMQConstants.WMQ_APPLICATIONNAME, asString(rawConfig, "APPNAME"));
         }
         
-        if (isSet(rawConfig.get("userID"))) {
+        if (isSet(rawConfig, "userID")) {
             cf.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, true);
             cf.setStringProperty(WMQConstants.USERID, asString(rawConfig, "userID"));
             cf.setStringProperty(WMQConstants.PASSWORD, asString(rawConfig, "password"));

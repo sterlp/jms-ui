@@ -23,9 +23,10 @@ export interface ConfigMetaData {
 export interface ConnectorView {
     id?: number;
     type?: string;
+    /** Private transaltion of the type */
+    _typeName?: string;
     version?: number;
     name: string;
-    clientName?: string;
 }
 
 export interface ConnectorData extends ConnectorView {

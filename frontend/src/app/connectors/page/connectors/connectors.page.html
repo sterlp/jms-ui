@@ -28,9 +28,9 @@
                             <td mat-cell *matCellDef="let element"> {{element.timeout | number}} ms </td>
                         </ng-container>
 
-                        <ng-container matColumnDef="clientName">
-                            <th mat-header-cell *matHeaderCellDef> Client name </th>
-                            <td mat-cell *matCellDef="let element"> {{element.clientName }} ms </td>
+                        <ng-container matColumnDef="type">
+                            <th mat-header-cell *matHeaderCellDef> Type </th>
+                            <td mat-cell *matCellDef="let element"> {{element._typeName }} </td>
                         </ng-container>
 
                         <!-- Action Column -->

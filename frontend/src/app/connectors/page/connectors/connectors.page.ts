@@ -17,7 +17,7 @@ export class ConnectorsPage implements OnInit, AfterViewInit {
   dataSource: ConnertorViewDataSource;
   connectingId: number;
 
-  columnsToDisplay  = ['name', 'timeout', 'clientName', 'action'];
+  columnsToDisplay  = ['name', 'type', 'timeout', 'action'];
 
   constructor(private $connector: ConnectorService,
               private $session: JmsSessionService, private $router: Router, private errorDialog: ErrorDialogService) { }
@@ -43,7 +43,7 @@ export class ConnectorsPage implements OnInit, AfterViewInit {
             openSessions => {
                 // only if we session was created
                 if (openSessions.find(s => s.id === conData.id)) {
-                this.$router.navigate(['/sessions', conData.id]);
+                    this.$router.navigate(['/sessions', conData.id]);
                 }
             },
             e => {

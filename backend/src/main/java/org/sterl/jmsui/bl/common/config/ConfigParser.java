@@ -21,8 +21,14 @@ public class ConfigParser {
         return !isBlank(v);
     }
     public static boolean isSet(Object v) {
+        if (v == null) return false;
+
         if (v instanceof String) return !isBlank((String)v);
         else return null != v;
+    }
+    
+    public static boolean isSet(Map<String, Object> map, String key) {
+        return isSet(map.get(key));
     }
     
     public static String asString(Map<String, Object> map, String key) {
@@ -36,6 +42,12 @@ public class ConfigParser {
         if (v == null) return null;
         if (v instanceof Integer) return (Integer)v;
         else return Integer.valueOf( String.valueOf(v) );
+    }
+    public static boolean asBoolean(Map<String, Object> rawConfig, String key, boolean defaultValue) {
+        final Object rawValue = rawConfig.get(key);
+        if (rawValue == null) return defaultValue;
+        else if (rawValue instanceof Boolean) return (Boolean)(rawValue);
+        else return Boolean.parseBoolean(rawValue.toString());
     }
     
     public static Map<String, Object> parse(ConfigMetaData<?>[] configMeta, List<ConfigValueBE> configValueBEs) {

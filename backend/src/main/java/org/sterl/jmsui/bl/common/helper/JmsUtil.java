@@ -2,13 +2,31 @@ package org.sterl.jmsui.bl.common.helper;
 
 import java.io.Closeable;
 
-import javax.jms.Connection;
+import javax.jms.*;
+import javax.jms.Destination;
 import javax.jms.JMSConsumer;
 import javax.jms.JMSContext;
+import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.Session;
 
+import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
+
+import com.ibm.msg.client.jms.JmsSession;
+
 public class JmsUtil {
+    /**
+     * JMS 1.x way to create a {@link Destination}
+     */
+    public static Destination createDestionation(String destination, Type jmsType, JmsSession s) throws JMSException {
+        return jmsType == Type.TOPIC ? s.createTopic(destination) : s.createQueue(destination);
+    }
+    /**
+     * JMS 2.x way to create a {@link Destination}
+     */
+    public static Destination createDestionation(String destination, Type jmsType, JMSContext c) {
+        return jmsType == Type.TOPIC ? c.createTopic(destination) : c.createQueue(destination);
+    }
 
     public static Exception close(MessageConsumer consumer) {
         Exception result = null;

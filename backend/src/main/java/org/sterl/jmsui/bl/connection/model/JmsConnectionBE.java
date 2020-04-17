@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -34,7 +33,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @Data @Accessors(chain = true)
 @EqualsAndHashCode(of = "id")
-@ToString(of = {"id", "name", "clientName", "type", "version", "timeout"})
+@ToString(of = {"id", "name", "type", "version", "timeout"})
 @Entity
 @Table(name =  "JMS_CONNECTON", indexes = @Index(name = "IDX_JMS_CONNECTION_TYPE", columnList = "type"))
 public class JmsConnectionBE {
@@ -52,10 +51,6 @@ public class JmsConnectionBE {
     @NotNull
     @Size(min = 1, max = 128)
     private String name;
-    
-    @Column(name = "client_name")
-    @Size(min = 3, max = 128)
-    private String clientName = "JMS UI";
     
     private Long timeout;
 

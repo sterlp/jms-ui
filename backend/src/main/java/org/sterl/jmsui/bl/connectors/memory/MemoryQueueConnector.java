@@ -44,7 +44,7 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
         return false;
     }
     @Override
-    public int getQueueDepth(String queueName) {
+    public Integer getQueueDepth(String queueName) {
         return memoryQueue.size();
     }
     @Override

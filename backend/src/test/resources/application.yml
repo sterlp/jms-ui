@@ -22,4 +22,3 @@ spring:
       default-page-size: 10
   quartz:
     job-store-type: JDBC  profiles:    active:    - TEST
-    

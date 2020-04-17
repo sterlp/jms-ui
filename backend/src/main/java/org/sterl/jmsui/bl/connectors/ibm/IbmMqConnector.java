@@ -5,7 +5,6 @@ import static org.sterl.jmsui.bl.connectors.common.JmsHeaderUtil.setMeassageHead
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,7 @@ import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sterl.jmsui.api.JmsHeaderRequestValues;
+import org.sterl.jmsui.bl.common.helper.JmsUtil;
 import org.sterl.jmsui.bl.common.helper.StopWatch;
 import org.sterl.jmsui.bl.connectors.api.JmsConnectorInstance;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
@@ -60,7 +60,6 @@ public class IbmMqConnector implements JmsConnectorInstance {
     
     private final Integer DEFAULT_PRIO = Integer.valueOf(4);
     private static final String[] SYSTEM_PREFIXES = {"LOOPBACK", "SYSTEM."};
-    private static final JmsResourceComperator RESOURCE_CMP = new JmsResourceComperator();
     
     private final String queueManagerName;
     @Getter(AccessLevel.PACKAGE)
@@ -95,7 +94,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
     @Override
     public void sendMessage(String destination, Type jmsType, String message, JmsHeaderRequestValues header) {
         try (JMSContext c = poolConnectionFactory.createContext()) {
-            final Destination d = jmsType == Type.TOPIC ? c.createTopic(destination) : c.createQueue(destination);
+            final Destination d = JmsUtil.createDestionation(destination, jmsType, c);
             final TextMessage m = message == null ? c.createTextMessage() : c.createTextMessage(message);
             setMeassageHeader(header, m);
             c.createProducer()
@@ -125,9 +124,9 @@ public class IbmMqConnector implements JmsConnectorInstance {
         }
     }
     
-    public int getQueueDepth(String queueName) throws JMSException {
+    public Integer getQueueDepth(String queueName) throws JMSException {
         MQQueue destQueue = null;
-        int depth = 0;
+        Integer depth;
         try {
             MQQueueManager qm = getMQQueueManager();
             synchronized (LOCK) {
@@ -161,10 +160,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
     }
     public List<JmsResource> listResources() throws JMSException {
         final List<JmsResource> result = listQueues();
-        final List<JmsResource> topics = listTopics();
-        Collections.sort(result, RESOURCE_CMP);
-        Collections.sort(topics, RESOURCE_CMP);
-        result.addAll(topics);
+        result.addAll(listTopics());
         return result;
     }
     @Override
@@ -182,12 +178,13 @@ public class IbmMqConnector implements JmsConnectorInstance {
             for (int i = 0; i < names.length; i++) {
                 final String qName = trim(names[i]);
                 
-                if (qName != null && !isSystemResource(qName)) {                        
+                if (qName != null && !isSystemResource(qName)) {
                     final QTypes type = QTypes.from(types[i]);
                     result.add(new JmsResource(
                             qName, ToJmsResourceType.INSTANCE.convert(type), type.name()));
                 }
             }
+            JmsResourceComperator.sort(result);
             return result;
         } catch (MQException e) {
             throw parseException(e, "Failed to read IBM MQ Queues.");
@@ -210,10 +207,11 @@ public class IbmMqConnector implements JmsConnectorInstance {
             for (int i = 0; i < names.length; i++) {
                 final String tName = trim(names[i]);
                 
-                if (tName != null && !isSystemResource(tName)) {                        
+                if (tName != null && !isSystemResource(tName)) {
                     result.add(new JmsResource(tName, Type.TOPIC, "TOPIC"));
                 }
             }
+            JmsResourceComperator.sort(result);
             return result;
         } catch (MQException e) {
             throw parseException(e, "Failed to read IBM MQ Topics.");

@@ -16,8 +16,6 @@ public class JmsConnectionDetails {
     private Long version;
     @NotNull @Size(min = 1)
     private String name;
-    @Size(min = 3, max = 128)
-    private String clientName = "JMS UI";
     private Long timeout;
     private Map<String, String> configValues = new LinkedHashMap<>();
     

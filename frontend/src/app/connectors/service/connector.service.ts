@@ -90,12 +90,23 @@ export class ConnertorViewDataSource implements DataSource<ConnectorView> {
     }
 
     loadConnectorData(page: number = 0, size: number = 10): void {
-        console.info('loadConnectorData ...', page, size);
         this._cancel();
         this._loading.next(true);
         this._lastRequest = this.$connector.listConnections(Pageable.of(page, size))
             .pipe(finalize(() => this._loading.next(false)))
             .subscribe(data => {
+                if (data.content) {
+                    this.$connector.getSupported().subscribe(s => {
+                        // tslint:disable-next-line: forin
+                        for (const ac of s) {
+                            for (const c of data.content) {
+                                if (ac.id === c.type) {
+                                    c._typeName = ac.name;
+                                }
+                            }
+                        }
+                    });
+                }
                 this.pageSubject.next(data);
                 this.connectorDataSubject.next(data.content ? data.content : []);
             }

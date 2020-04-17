@@ -11,8 +11,6 @@ import org.sterl.jmsui.api.JmsHeaderRequestValues;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource;
 import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
 
-import com.ibm.msg.client.jms.JmsMessageConsumer;
-
 /**
  * Represents an active instance of an JMS connector.
  */
@@ -22,12 +20,17 @@ public interface JmsConnectorInstance extends Closeable {
     List<JmsResource> listQueues() throws JMSException;
     List<JmsResource> listTopics() throws JMSException;
     
-    Map<String, Object> getQueueInformation(String queueName);
-    Map<String, Object> getTopicInformation(String destination);
+    Map<String, Object> getQueueInformation(String queueName) throws JMSException;
+    Map<String, Object> getTopicInformation(String destination) throws JMSException;
 
     void sendMessage(String destination, Type jmsType, String message, JmsHeaderRequestValues header) throws JMSException;
     
-    int getQueueDepth(String queueName) throws JMSException;
+    /**
+     * Get the Queue depth if supported 
+     * @param queueName the name of the Queue
+     * @return the queue depth, or <code>null</code> if not supported
+     */
+    Integer getQueueDepth(String queueName) throws JMSException;
     
     /**
      * Receive a JMS message for a given destination.
