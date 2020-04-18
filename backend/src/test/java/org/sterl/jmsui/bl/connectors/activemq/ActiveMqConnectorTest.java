@@ -2,6 +2,7 @@ package org.sterl.jmsui.bl.connectors.activemq;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
 import java.util.List;
 
 import javax.jms.Message;
@@ -13,6 +14,7 @@ import org.apache.activemq.plugin.StatisticsBrokerPlugin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.sterl.jmsui.AwaitUtil;
 import org.sterl.jmsui.api.JmsMessageConverter;
 import org.sterl.jmsui.bl.connectors.activemq.control.ActiveMqConnector;
 import org.sterl.jmsui.bl.connectors.activemq.model.ActiveMqConnectorConfigBE;
@@ -59,6 +61,7 @@ class ActiveMqConnectorTest {
         subject.sendMessage("FOO_1", null, "hallo", null);
         subject.sendMessage("ZZZZ_2", null, "hallo", null);
         
+        AwaitUtil.waitFor(() -> subject.listQueues().size(), 2, Duration.ofSeconds(1));
         List<JmsResource> result = subject.listQueues();
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).getName()).isEqualTo("FOO_1");

@@ -69,9 +69,9 @@ class SocketMessageSenderBMTest {
     @Test
     void testTopicMessageReceived() throws Exception {
         final long connectorId = 1;
-        final String topicName = "TOPIC.1";
+        final String topicName = "TOPIC_1";
 
-        StompSession stompSession = stompClient.connect(URL, new StompSessionHandlerAdapter() {}).get(2, TimeUnit.SECONDS);
+        StompSession stompSession = stompClient.connect(URL, new StompSessionHandlerAdapter() {}).get(1, TimeUnit.SECONDS);
 
         stompSession.subscribe("/sessions/" + connectorId + "/topics/" + topicName, frameHandler);
         assertThat(stompSession.isConnected()).isTrue();
@@ -81,11 +81,10 @@ class SocketMessageSenderBMTest {
         // TODO for some reason we have to send it here twice if the run all tests together -- check needed
         subject.topicMessageReceived(connectorId, topicName, msg);
 
-        JmsResultMessage jmsResultMessage = completableFuture.get(5, TimeUnit.SECONDS);
-        System.out.println(jmsResultMessage);
+        JmsResultMessage jmsResultMessage = completableFuture.get(1, TimeUnit.SECONDS);
         assertNotNull(jmsResultMessage);
         assertThat(jmsResultMessage.getBody()).isEqualTo(msg);
-        
+
         stompSession.disconnect();
     }
     
