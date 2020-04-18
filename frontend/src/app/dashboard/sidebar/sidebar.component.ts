@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Inject, Renderer2, OnDestroy, HostBinding, ElementRef, HostListener } from '@angular/core';
 import { JmsSessionService } from 'src/app/session/service/session/jms-session.service';
 import { ConnectorView } from 'src/app/api/connector';
+import { JmsResource } from 'src/app/api/jms-session';
 
 /**
  * https://coreui.io/v1/docs/layout/options/
@@ -21,6 +22,7 @@ export class SidebarComponent implements OnInit {
     @Input()
     @HostBinding('class.c-sidebar-fixed') fixed = true;
     sessions: ConnectorView[] = [];
+    private openResources: Map<number, JmsResource[]>;
 
   constructor(
     private eRef: ElementRef,
@@ -28,6 +30,13 @@ export class SidebarComponent implements OnInit {
 
     ngOnInit() {
         this.sessionsService.sessions$.subscribe(s => this.sessions = s);
+        this.openResources = this.sessionsService.openResources;
+    }
+
+    getResources(connectorId: number): JmsResource[] {
+        let result = this.openResources.get(connectorId);
+        if (result == null) result = [];
+        return result;
     }
 
     toggle(): void {

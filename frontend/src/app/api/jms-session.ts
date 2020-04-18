@@ -1,9 +1,27 @@
 export interface JmsResource {
     name: string;
     type: JmsResourceType | string;
-    vendorType: string;
+    vendorType?: string;
     // dynamically loaded in some areas ...
     _depth?: number;
+}
+
+/**
+ * Checks if the given JmsResources are equal or not,
+ */
+// tslint:disable: curly
+export function isSameJmsResource(v1: JmsResource, v2: JmsResource): boolean {
+    if (v1 == null || v2 == null) return false;
+    if (v1 === v2) return true;
+    if (v1.name === v2.name && v1.type === v2.type) {
+        if (v1.vendorType != null && v2.vendorType != null) {
+            return v1.vendorType === v2.vendorType;
+        } else {
+            return true;
+        }
+    } else {
+        return false;
+    }
 }
 
 export class JmsResourceModel {

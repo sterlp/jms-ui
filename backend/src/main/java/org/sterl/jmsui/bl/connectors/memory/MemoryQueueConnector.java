@@ -1,11 +1,13 @@
 package org.sterl.jmsui.bl.connectors.memory;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Message;
 
 import org.sterl.jmsui.api.JmsHeaderRequestValues;
@@ -22,7 +24,6 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     public void close() {
         memoryQueue.clear();
     }
-
     @Override
     public List<JmsResource> listQueues() {
         return Arrays.asList(new JmsResource("MEMORY.QUEUE", Type.QUEUE, "QUEUE"));
@@ -50,16 +51,16 @@ public class MemoryQueueConnector implements JmsConnectorInstance {
     @Override
     public void connect() {
     }
-
     @Override
     public Map<String, Object> getQueueInformation(String queueName) {
-        // TODO Auto-generated method stub
-        return null;
+        return new HashMap<>();
     }
-
     @Override
     public Map<String, Object> getTopicInformation(String destination) {
-        // TODO Auto-generated method stub
-        return null;
+        return new HashMap<>();
+    }
+    @Override
+    public ConnectionFactory getConnectionFactory() {
+        throw new RuntimeException("Not supporeted");
     }
 }

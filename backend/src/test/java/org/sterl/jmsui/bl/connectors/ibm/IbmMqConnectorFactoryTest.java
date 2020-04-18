@@ -25,7 +25,7 @@ public class IbmMqConnectorFactoryTest {
 
         IbmMqConnector ibmConnector = new IbmMqConnectorFactory().create(jmsConnection);
         
-        JmsConnectionFactory cf = ibmConnector.getConnectionFactory();
+        JmsConnectionFactory cf = ibmConnector.connectionFactory;
         
         assertEquals("qmgr", cf.getStringProperty(WMQConstants.WMQ_QUEUE_MANAGER));
         assertEquals("host", cf.getStringProperty(WMQConstants.WMQ_HOST_NAME));

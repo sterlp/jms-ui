@@ -10,7 +10,7 @@
     <div class="c-subheader-nav">
         <app-loading *ngIf="loading$ | async"></app-loading>
         <div *ngIf="connector" class="btn-group" role="group">
-            <button mat-button [routerLink]="['/sessions', connector.id]" matTooltip="Disconnect & Close"><i class="cui-action-undo"></i><mat-icon>close</mat-icon></button>
+            <button mat-button matTooltip="Close" (click)="doClose()" ><i class="cui-action-undo"></i><mat-icon>close</mat-icon></button>
         </div>
     </div>
 </div>
@@ -28,12 +28,14 @@
                 <div class="row justify-content-between mb-2">
                     <div class="col-auto btn-group" role="group">
                         <button type="button" (click)="doSend()" class="btn btn-secondary"><mat-icon>call_made</mat-icon> Send</button>
-                        <button type="button" (click)="doListen()" class="btn btn-secondary"><mat-icon>call_received</mat-icon> Listen</button>
+                        <button type="button" (click)="doReceive()" class="btn btn-secondary"><mat-icon>call_received</mat-icon> Receive</button>
                         <button type="button" (click)="doClear()" class="btn btn-secondary"><i class="fa fa-trash" aria-hidden="true"></i> Clear</button>
                     </div>
+                    <!--
                     <div class="col-auto">
                         <button type="button" class="btn btn-secondary" (click) = "doListen()"><i class="fa fa-floppy-o"></i> Save</button>
                     </div>
+                    -->
                 </div>
 
                 <app-jms-headers class="block mb-2" [(header)] = "jmsHeader"></app-jms-headers>

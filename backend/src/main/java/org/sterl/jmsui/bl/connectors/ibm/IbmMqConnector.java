@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSConsumer;
 import javax.jms.JMSContext;
@@ -62,8 +63,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
     private static final String[] SYSTEM_PREFIXES = {"LOOPBACK", "SYSTEM."};
     
     private final String queueManagerName;
-    @Getter(AccessLevel.PACKAGE)
-    private final JmsConnectionFactory connectionFactory;
+    final JmsConnectionFactory connectionFactory;
     
     private final long defaultTimeoutInMs;
 
@@ -87,7 +87,7 @@ public class IbmMqConnector implements JmsConnectorInstance {
         
         this.poolConnectionFactory = new JmsPoolConnectionFactory();
         this.poolConnectionFactory.setMaxConnections(10);
-        this.poolConnectionFactory.setConnectionFactory(connectionFactory);
+        this.poolConnectionFactory.setConnectionFactory(this.connectionFactory);
         this.poolConnectionFactory.setConnectionIdleTimeout(5 * 60 * 1_000);
     }
 
@@ -951,4 +951,8 @@ public class IbmMqConnector implements JmsConnectorInstance {
         return ibmMqManager == null || !ibmMqManager.isConnected() || !ibmMqManager.isOpen();
     }
 
+    @Override
+    public ConnectionFactory getConnectionFactory() {
+        return poolConnectionFactory;
+    }
 }

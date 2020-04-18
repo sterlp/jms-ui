@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ibm.mq.MQException;
@@ -25,7 +26,6 @@ import com.ibm.msg.client.jms.JmsConnectionFactory;
 public class IbmMqConnectorTest {
 
     Hashtable<String, Object> config = new Hashtable<>();
-    @Mock JmsConnectionFactory connectionFactory;
     @Mock MQQueueManager mqQueueManager;
     @Mock PCFMessageAgent agent;
     IbmMqConnector subject;
@@ -34,7 +34,7 @@ public class IbmMqConnectorTest {
 
     class IbmMqConnectorMock extends IbmMqConnector {
         public IbmMqConnectorMock() {
-            super("Test", 10L, connectionFactory, config);
+            super("Test", 10L, Mockito.mock(JmsConnectionFactory.class), config);
         }
         @Override
         protected MQQueueManager getMQQueueManager() throws MQException {

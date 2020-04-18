@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -23,8 +24,6 @@ import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.advisory.DestinationSource;
 import org.apache.activemq.command.ActiveMQQueue;
-import org.apache.activemq.command.ActiveMQTempQueue;
-import org.apache.activemq.command.ActiveMQTempTopic;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -180,4 +179,8 @@ public class ActiveMqConnector implements JmsConnectorInstance {
         return connection == null || connection.isClosing() || connection.isClosed();
     }
 
+    @Override
+    public ConnectionFactory getConnectionFactory() {
+        return cf;
+    }
 }

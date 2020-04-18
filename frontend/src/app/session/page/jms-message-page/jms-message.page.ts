@@ -57,14 +57,15 @@ export class JmsMessagePage implements OnInit, OnDestroy {
       this.target = params.target;
       this.targetType = params.type === 'TOPIC' ? JmsResourceType.TOPIC : JmsResourceType.QUEUE;
       const id =  params.id * 1;
-      console.info('JmsMessagePage', params, id, this.target, this.targetType, this.connector);
+      // console.info('JmsMessagePage', params, id, this.target, this.targetType, this.connector);
       if (isNaN(id)) {
-        this.goBack();
+        this.doClose();
       } else {
         if (!this.connector || this.connector.id !== id) {
           this.sessionService.openSession(id).subscribe(sessions => {
             this.connector = this.sessionService.getStoredSession(id, sessions);
-            if (!this.connector) this.goBack();
+            if (!this.connector) this.doClose();
+            else this.sessionService.markAsOpen(id, {name: this.target, type: this.targetType});
           });
         }
       }
@@ -76,8 +77,9 @@ export class JmsMessagePage implements OnInit, OnDestroy {
     this.subs.close();
   }
 
-  goBack() {
-    this.router.navigate(['/jms-connectors']);
+  doClose() {
+    this.sessionService.markAsClosed(this.connector.id, {name: this.target, type: this.targetType});
+    this.router.navigate(['/sessions', this.connector.id]);
   }
 
   doSend() {
@@ -92,7 +94,7 @@ export class JmsMessagePage implements OnInit, OnDestroy {
     this.sessionService.sendJmsMessage(this.connector.id, this.target, body)
       .subscribe(r => {
         const time = new Date().getTime() - startTime.getTime();
-        console.info('message:', body, 'send in:', time);
+        // console.info('message:', body, 'send in:', time);
         this.showMessage('Message successsfully send in ' + this.numberPipe.transform(time) + 'ms.');
       },
       e => {
@@ -101,7 +103,7 @@ export class JmsMessagePage implements OnInit, OnDestroy {
       }
     );
   }
-  doListen() {
+  doReceive() {
     this.clearMessage();
     const startTime = new Date();
     this.sessionService.receiveJmsMessage(this.connector.id, this.target, this.targetType)

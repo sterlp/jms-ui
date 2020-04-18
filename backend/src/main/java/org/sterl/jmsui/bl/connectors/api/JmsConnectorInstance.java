@@ -4,6 +4,8 @@ import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 
+import javax.jms.ConnectionFactory;
+import javax.jms.JMSConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Message;
 
@@ -17,6 +19,11 @@ import org.sterl.jmsui.bl.connectors.api.model.JmsResource.Type;
 public interface JmsConnectorInstance extends Closeable {
     void connect() throws JMSException;
 
+    /**
+     * Return the JMX {@link ConnectionFactory} best a pooled one!
+     */
+    ConnectionFactory getConnectionFactory();
+    
     List<JmsResource> listQueues() throws JMSException;
     List<JmsResource> listTopics() throws JMSException;
     

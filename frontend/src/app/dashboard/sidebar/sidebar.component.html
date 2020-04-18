@@ -8,7 +8,7 @@ https://coreui.io/docs/components/sidebar/
             <i class="c-sidebar-nav-icon cil-sitemap"></i> JMS-Connectors
         </a>
     </li>
-
+    <!--
     <li class="c-sidebar-nav-dropdown c-show" *ngIf="sessions.length > 0" >
         <a class="c-sidebar-nav-dropdown-toggle" appToggle>
             <i class="c-sidebar-nav-icon cil-input-hdmi"></i> Open Sessions
@@ -18,6 +18,27 @@ https://coreui.io/docs/components/sidebar/
                 <a class="c-sidebar-nav-link" routerLinkActive="c-active" [routerLink]="['/sessions', s.id]">
                     <i class="c-sidebar-nav-icon cil-input-power"></i> {{ s.name }}
                 </a>
+            </li>
+        </ul>
+    </li>
+    -->
+
+    <li class="c-sidebar-nav-dropdown c-show" *ngIf="sessions.length > 0">
+        <a class="c-sidebar-nav-dropdown-toggle" appToggle>
+            <i class="c-sidebar-nav-icon cil-input-hdmi"></i> Open Sessions
+        </a>
+        <ul class="c-sidebar-nav-dropdown-items" *ngFor="let s of sessions">
+            <li class="c-sidebar-nav-dropdown" [ngClass]="{'c-show': getResources(s.id).length > 0}" >
+                <a class="c-sidebar-nav-dropdown-toggle" [routerLink]="['/sessions', s.id]">
+                    <i class="c-sidebar-nav-icon cil-input-hdmi"></i> {{ s.name }}
+                </a>
+                <ul class="c-sidebar-nav-dropdown-items">
+                    <li class="c-sidebar-nav-item" *ngFor="let r of getResources(s.id)">
+                        <a class="c-sidebar-nav-link" routerLinkActive="c-active" [routerLink]="['/sessions', s.id, r.name, r.type]">
+                            {{ r.name }}
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </li>
