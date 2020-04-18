@@ -77,8 +77,8 @@ class ActiveMqConnectorTest {
         subject.sendMessage("FOO.1", Type.TOPIC, "hallo", null);
         subject.sendMessage("FOO.2", Type.TOPIC, "hallo", null);
         
-        List<JmsResource> result = subject.listTopics();
         AwaitUtil.waitFor(() -> subject.listTopics().size(), 2, Duration.ofSeconds(1));
+        List<JmsResource> result = subject.listTopics();
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0).getName()).isEqualTo("FOO.1");
         assertThat(result.get(0).getType()).isEqualTo(Type.TOPIC);
