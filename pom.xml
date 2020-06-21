@@ -1,28 +1,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.6.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.1.RELEASE</version>
+        <relativePath /> <!-- lookup parent from repository -->
+    </parent>
 
-	<groupId>org.sterl.jms.ui</groupId>
-	<artifactId>jms-ui-root</artifactId>
-	<version>0.2.4-SNAPSHOT</version>
-	<packaging>pom</packaging>
+    <groupId>org.sterl.jms.ui</groupId>
+    <artifactId>jms-ui-root</artifactId>
+    <version>0.2.4-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<modules>
-		<module>frontend</module>
-		<module>backend</module>
-	</modules>
+    <modules>
+        <module>app</module>
+        <module>aws-cicd</module>
+    </modules>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>8</java.version>
-		<springboot.version>2.2.6.RELEASE</springboot.version>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>8</java.version>
+        <springboot.version>2.3.1.RELEASE</springboot.version>
+
+        <cdk.version>1.46.0</cdk.version>
+    </properties>
 </project>

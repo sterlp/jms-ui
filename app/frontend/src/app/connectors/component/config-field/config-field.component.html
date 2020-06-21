@@ -1,0 +1,14 @@
+<ng-container *ngIf="getType() != 'checkbox'">
+    <mat-form-field>
+        <mat-label>{{ metaField.label || metaField.property }}</mat-label>
+        <input matInput [name] = "metaField.property"
+            [placeholder]="metaField.description"
+            [required] = "metaField.mandatory"
+            [type]="getType()"
+            [(ngModel)]="value"
+            >
+    </mat-form-field>
+</ng-container>
+<ng-container *ngIf="getType() == 'checkbox'">
+    <mat-checkbox matTooltip="{{metaField.description}}" [(ngModel)]="value" [required]="metaField.mandatory">{{ metaField.label || metaField.property }}</mat-checkbox>
+</ng-container>

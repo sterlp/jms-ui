@@ -29,8 +29,7 @@ target/
 
 ### VS Code ###
 .vscode/
-
-### Custom ###
 frontend/.editorconfig
 backend/jms-ui.mv.db
 jms-ui.mv.db
+mqjms.log*
